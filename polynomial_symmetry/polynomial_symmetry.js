@@ -75,12 +75,6 @@ function update_coefficients() {
     const coefficients = parse_coefficients(coeff_input.value);
     poly_shader.set_coefficients(coefficients);
     
-    /*
-    shader(poly_shader);
-    poly_shader.setUniform('powers', powers);
-    poly_shader.setUniform('coeffs', coeffs);
-    */
-    
     //const animation_input = document.getElementById('animation');
 }
 

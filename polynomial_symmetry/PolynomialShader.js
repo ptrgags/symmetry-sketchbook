@@ -1,4 +1,4 @@
-const MAX_TERMS = 3;
+const MAX_TERMS = 64;
 const POLYNOMIAL_VERT_SHADER = `
 attribute vec3 aPosition;
 attribute vec2 aTexCoord;
@@ -170,12 +170,34 @@ class PolynomialShader {
         texture.set_wrapping();
         this._shader.setUniform('texture0', texture.texture);
     }
+     
+    _pad_zeros(values, desired_length) {
+        const len = values.length;
+        if (len > desired_length) {
+            throw new Error(`Array is too long. Got ${len} elements, it should be ${desired_length}`);
+        }
+        
+        const pad_length = desired_length - len;
+        if (pad_length > 0) {
+            const padding = Array(pad_length).fill(0);
+            return values.concat(padding);
+        } else {
+            return values;
+        }
+    }
     
     set_coefficients(coefficients) {
         this.enable();
         const program = this._shader;
-        program.setUniform('powers', coefficients.powers);
-        program.setUniform('coeffs', coefficients.coeffs);
+        
+        // Since we always need to exactly fill the buffer,
+        // add on some terms that are all equal to 0 to make sure
+        // the calculation is performed correctly
+        const powers = this._pad_zeros(coefficients.powers);
+        const coeffs = this._pad_zeros(coefficients.coeffs); 
+        
+        program.setUniform('powers', powers);
+        program.setUniform('coeffs', coeffs);
     }
     
     set_animation(animation_params) {
