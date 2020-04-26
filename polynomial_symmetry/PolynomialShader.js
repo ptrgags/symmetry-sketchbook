@@ -109,6 +109,7 @@ class PolynomialShader {
         this._shader = undefined;
         this._enabled = false;
         this._coeffs = undefined;
+        this._symmetries = [];
     }
     
     init_shader() {
@@ -119,6 +120,14 @@ class PolynomialShader {
         program.setUniform('time', 0.0);
         program.setUniform('zoom', 1.0);
         program.setUniform('aspect', width/height);
+    }
+    
+    get symmetries() {
+        return this._symmetries;
+    }
+    
+    set symmetries(symmetries) {
+        this._symmetries = symmetries;
     }
     
     enable() {        
@@ -188,11 +197,22 @@ class PolynomialShader {
         }
     }
     
-    set_coefficients(coefficients) {
+    _apply_symmetries(original_coefficients) {
+        let coefficients = original_coefficients;
+        for (const symmetry of this._symmetries) {
+            coefficients = symmetry.apply_symmetry(coefficients);
+        }
+        return coefficients;
+    }
+    
+    set_coefficients(original_coefficients) {
         this.enable();
         const program = this._shader;
         
-        const {powers, coeffs} = coefficients.arrays;
+        // Apply symmetries, which often adds more terms to the polynomial
+        const actual_coefficients = this._apply_symmetries(original_coefficients);
+        console.log(actual_coefficients);
+        const {powers, coeffs} = actual_coefficients.arrays;
         
         // Since we always need to exactly fill the buffer,
         // add on some terms that are all equal to 0 to make sure

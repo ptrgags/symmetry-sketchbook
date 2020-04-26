@@ -147,12 +147,6 @@
  *   otherwise:
  *     set a_pq = conj^v rotate_k^(-P) a_nm
  *
- *
- *
- *
- *
- *
- *
  * WOW YOU'RE STILL HERE? =================================================
  *
  * Congrats, you survived a crash course in Applied Group Theory.
@@ -175,10 +169,18 @@ class SymmetryRule {
         this._input_inversion = options.input_inversion || 0;
     }
     
+    /**
+     * Algorithm explained in the long derivation at the top of this file
+     *
+     * for every coefficient a_nm:
+     *   find its partner b_nm = swap^(v + q) negate^p(a_nm)
+     *   compute B_nm = rotate_k^P conj^v b_nm
+     *   verify that B_nm == a_nm (approximately, these are floats after all)
+     */
     matches_symmetry(coefficients) {
         const terms = new TermMap(coefficients);
         for (const [n, m, amp, phase] of coefficients) {
-            let [n2, m2] = this._find_corresponding(n, m);
+            let [n2, m2] = this._find_partner(n, m);
             let [amp2, phase2] = terms.get_term(n2, m2);
             
             if (this._output_mirror) {
@@ -186,13 +188,46 @@ class SymmetryRule {
             }
             
             const power = this._compute_rotation_power(n, m);
-            [amp2, phase2] = SymmetryRule.rotate(this._folds, power);
+            [amp2, phase2] = SymmetryRule.rotate(amp2, phase2, this._folds, power);
             
             if (!SymmetryRule.terms_approx_equal([amp, phase], [amp2, phase2])) {
                 return false;
             }
         }
         return true;
+    }
+    /**
+     * Algorithm explained in the long derivation at the top of the file.
+     * 
+     * for every coefficient a_nm:
+     *   locate the partner indices (i, j) = swap^(v + q) negate^p(n, m)
+     *   if (i, j) === (n, m):
+     *     ...This case needs special care. I'll return to this soon.
+     *   otherwise:
+     *     set a_ij = conj^v rotate_k^(-P) a_nm
+     *
+     * Note that this may clobber some coefficients. A warning will be logged
+     * but the most recent coefficient will be used.
+     */
+    apply_symmetry(coefficients) {
+        const terms = new TermMap(coefficients);
+        for (const [n, m, amp, phase] of coefficients) {
+            let [i, j] = this._find_partner(n, m);
+            if (i === n && j === m) {
+                throw new Error(`Not implemented: Coefficient a[${n}, ${m}] is the same as its partner. I need to think about this more. To be continued...`);
+            }
+            
+            const power = this._compute_rotation_power(n, m);
+            let [amp2, phase2] = SymmetryRule.rotate(amp, phase, this._folds, -power);
+            
+            if (this._output_mirror === 1) {
+                [amp2, phase2] = SymmetryRule.conjugate(amp2, phase2);
+            }
+            
+            terms.set_term(i, j, amp2, phase2);
+        }
+        
+        return terms.to_coefficients();
     }
     
     /**
@@ -233,7 +268,7 @@ class SymmetryRule {
      *
      * Note that a double swap is possible.
      */
-    _find_corresponding(n, m) {
+    _find_partner(n, m) {
         let [p, q] = [n, m];
         
         if (this._input_inversion === 1) {
@@ -261,6 +296,20 @@ class SymmetryRule {
         return [m, n];
     }
     
+    /**
+     * Since coefficients are represented in polar
+     * form, rotation is easy, just add the rotation
+     * angle to the phase.
+     *
+     * the angle is given as 2pi / k * l where
+     * k represents a k-fold rotation and l is the
+     * multiples of this basic rotation
+     */
+    static rotate(amp, phase, folds, power) {
+        const theta = TWO_PI / folds * power;
+        return [amp, theta + phase];
+    }
+    
     static terms_approx_equal(a, b) {
         const EPSILON = 1e-8;
         const [amp1, phase1] = a;
@@ -279,7 +328,10 @@ class SymmetryRule {
 
 class TermMap {
     constructor(coefficients) {
-        this._terms = TermMap.make_terms_map(coefficients);
+        this._terms = new Map();
+        for (const [n, m, amp, phase] of coefficients) {
+            this.set_term(n, m, amp, phase);
+        }
     }
     
     get size() {
@@ -296,6 +348,27 @@ class TermMap {
         return coeff;
     }
     
+    set_term(n, m, amp, phase) {
+        const key = `${n}, ${m}`;
+        const value = [amp, phase];
+        if (this._terms.has(key)) {
+            console.warn('Duplicate coefficient detected! clobbering');
+            console.warn('old:', `a[${key}] = ${terms.get(key)}`);
+            console.warn('new:', `a[${key}] = ${value}`);
+        }
+        this._terms.set(key, value);
+    }
+    
+    to_coefficients() {
+        const terms = [];
+        for (const [key, [amp, phase]] of this._terms.entries()) {
+            const [n, m] = key.split(', ');
+            terms.push([n, m, amp, phase]);
+        }
+        return new Coefficients(terms);
+    }
+    
+    /*
     equals(other) {
         if (this.size !== other.size) {
             return false;
@@ -317,24 +390,5 @@ class TermMap {
         
         return true;
     }
-    
-    static make_terms_map(coefficients) {
-        const terms = new Map();
-        for (const [n, m, amp, phase] of coefficients) {
-            const key = `${n}, ${m}`;
-            const value = [amp, phase];
-            if (terms.has(key)) {
-                console.warn('Duplicate coefficient detected! clobbering');
-                console.warn('old:', `a[${key}] = ${terms.get(key)}`);
-                console.warn('new:', `a[${key}] = ${value}`);
-            }
-            terms.set(key, value);
-        }
-        return terms;
-    }
+    */
 }
-
-const SYMM_NONE = new SymmetryRule();
-const SYMM_INPUT_MIRROR = new SymmetryRule({
-    input_mirror: 1
-});

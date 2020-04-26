@@ -7,16 +7,16 @@ const placeholder = new Checkerboard();
 const DEFAULT_COEFFICIENTS = new Coefficients([
     [1, 0, 1, 0],
     [2, 0, 1/2, 0],
-    [3, 0, 1/3, 0]
+    [3, 0, 1/3, 90]
 ]);
 const DEFAULT_ANIMATION = [
     0,
-    1,
+    0,
     0
 ];
-
-console.log(SYMM_NONE.matches_symmetry(DEFAULT_COEFFICIENTS));
-console.log(SYMM_INPUT_MIRROR.matches_symmetry(DEFAULT_COEFFICIENTS));
+const SYMM_IN_MIRROR = new SymmetryRule({
+    input_mirror: 1
+});
 
 let zoom = 1.0;
 const ZOOM_DELTA = 0.5;
@@ -30,6 +30,7 @@ function setup() {
     
     // Setup the shader
     poly_shader.init_shader();
+    poly_shader.symmetries = [SYMM_IN_MIRROR];
     poly_shader.set_texture(placeholder);
     
     poly_shader.set_coefficients(DEFAULT_COEFFICIENTS);
@@ -49,6 +50,7 @@ function draw() {
     background(0);
     poly_shader.draw();
     
+    /*
     stroke(0, 255, 255);
     strokeWeight(4);
     noFill();
@@ -56,6 +58,7 @@ function draw() {
     vertex(0, 0);
     vertex(255, 255);
     endShape();
+    */
 }
 
 function upload_image(e) {
