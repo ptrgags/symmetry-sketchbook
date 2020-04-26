@@ -87,20 +87,22 @@ vec2 compute_polynomial(vec2 z) {
 }
 
 vec2 to_complex(vec2 uv) {
-    return (uv - 0.5) / aspect * zoom;
+    return (uv - 0.5) * aspect * zoom;
 }
 
 vec2 to_uv(vec2 complex) {
-    return complex / zoom * aspect + 0.5;
+    return complex / zoom / aspect + 0.5;
 }
 
 void main() {
     vec2 complex = to_complex(uv);
     vec2 z = compute_polynomial(complex);
     vec2 z_uv = to_uv(z);
-    gl_FragColor = texture2D(texture0, z_uv);
+    gl_FragColor = texture2D(texture0, fract(z_uv));
 }
 `;
+
+// ====================================================================
 
 class PolynomialShader {
     constructor() {
@@ -190,18 +192,21 @@ class PolynomialShader {
         this.enable();
         const program = this._shader;
         
+        const {powers, coeffs} = coefficients.arrays;
+        
         // Since we always need to exactly fill the buffer,
         // add on some terms that are all equal to 0 to make sure
         // the calculation is performed correctly
-        const powers = this._pad_zeros(coefficients.powers);
-        const coeffs = this._pad_zeros(coefficients.coeffs); 
+        const powers_buffer = this._pad_zeros(powers, MAX_TERMS * 2);
+        const coeffs_buffer = this._pad_zeros(coeffs, MAX_TERMS * 2); 
         
-        program.setUniform('powers', powers);
-        program.setUniform('coeffs', coeffs);
+        program.setUniform('powers', powers_buffer);
+        program.setUniform('coeffs', coeffs_buffer);
     }
     
     set_animation(animation_params) {
         this.enable();
-        this._shader.setUniform('animation', animation_params);
+        const animation_buffer = this._pad_zeros(animation_params, MAX_TERMS);
+        this._shader.setUniform('animation', animation_buffer);
     }
 }

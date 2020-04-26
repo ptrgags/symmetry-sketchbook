@@ -2,8 +2,18 @@ let image_input;
 let update_button;
 
 let image_texture;
-let poly_shader = new PolynomialShader();
+const poly_shader = new PolynomialShader();
 const placeholder = new Checkerboard();
+const DEFAULT_COEFFICIENTS = new Coefficients([
+    [1, 0, 1, 0],
+    [2, 0, 1/2, 0],
+    [3, 0, 1/3, 0]
+]);
+const DEFAULT_ANIMATION = [
+    0,
+    1,
+    0
+];
 
 let zoom = 1.0;
 const ZOOM_DELTA = 0.5;
@@ -19,16 +29,8 @@ function setup() {
     poly_shader.init_shader();
     poly_shader.set_texture(placeholder);
     
-    // This is a hack for now, eventually I plan to make a Coefficients class.
-    const default_coefficients = {
-        // z + (1/2)z^2 + 1/3(z^3)
-        powers: [1, 0, 2, 0, 3, 0],
-        coeffs: [1, 0, 1/2, 0, 1/3, 0]
-    };
-    const default_animation = [0, 0, 1,];
-    
-    poly_shader.set_coefficients(default_coefficients);
-    poly_shader.set_animation(default_animation);
+    poly_shader.set_coefficients(DEFAULT_COEFFICIENTS);
+    poly_shader.set_animation(DEFAULT_ANIMATION);
     poly_shader.disable();
     
     // Hook up the image input dialog
@@ -75,12 +77,21 @@ function update_coefficients() {
     const coefficients = parse_coefficients(coeff_input.value);
     poly_shader.set_coefficients(coefficients);
     
-    //const animation_input = document.getElementById('animation');
+    if (coefficients.length > 0) {
+        poly_shader.set_coefficients(coefficients);
+    }
+    
+    const animation_input = document.getElementById('animation');
+    const anim_params = parse_animation_params(animation_input.value);
+    
+    if (anim_params.length > 0) {
+        poly_shader.set_animation(anim_params);
+    }
 }
 
 function * parse_tuples(text) {
     const tuple_regex = /\(([^)]*)\)/g;
-    const separator_regex = /, */;
+    const separator_regex = /,\s*/;
     
     var match = tuple_regex.exec(text);
     while(match) {
@@ -93,8 +104,7 @@ function * parse_tuples(text) {
 }
 
 function parse_coefficients(text) {
-    indices = [];
-    coefficients = [];
+    tuples = [];
     for (const tuple of parse_tuples(text)) {
         if (tuple.length < 2 || 4 < tuple.length) {
             console.warn(`Coefficients should have 2-4 components, got ${tuple} instead`);
@@ -106,25 +116,22 @@ function parse_coefficients(text) {
             coeffs[i] = tuple[i];
         }
         
-        const [n, m, amp, phase_deg] = coeffs;
+        tuples.push(coeffs);
+    }
+    
+    return new Coefficients(tuples);
+}
+
+function parse_animation_params(text) {
+    params = [];
+    for (const token of text.split(/,\s*/)) {
+        if (token === '') {
+            continue;
+        }
         
-        indices.push(n, m);
-        coefficients.push(amp, radians(phase_deg));
+        params.push(parseFloat(token));
     }
-    
-    // Most of the time the user will only enter a few terms. However,
-    // to ensure the polynomial is computed properly, set all the remaining
-    // terms to 0.
-    while (indices.length < 2 * MAX_TERMS) {
-        indices.push(0, 0);
-        coefficients.push(0, 0);
-    }
-    
-    // TODO: Return a Coefficients object eventually
-    return {
-        powers: indices, 
-        coeffs: coefficients
-    };
+    return params;
 }
 
 function mouseWheel(event) {
