@@ -1,0 +1,29 @@
+<html>
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <!-- PLEASE NO CHANGES BELOW THIS LINE (UNTIL I SAY SO) -->
+  <script language="javascript" type="text/javascript" src="libraries/p5.min.js"></script>
+  <script language="javascript" type="text/javascript" src="PolynomialShader.js"></script>
+  <script language="javascript" type="text/javascript" src="Texture.js"></script>
+  <script language="javascript" type="text/javascript" src="polynomial_symmetry.js"></script>
+  <!-- OK, YOU CAN MAKE CHANGES BELOW THIS LINE AGAIN -->
+
+  <!-- This line removes any default padding and style.
+       You might only need one of these values set. -->
+  <style> body { padding: 0; margin: 0; } </style>
+</head>
+<body>
+  <label for="image-input">Choose a PNG or JPEG image texture:</label>
+  <input id="image-input" type="file" accept="image/png, image/jpeg" />
+  <br/>
+  <label for="coeffs">Coefficients (n, m, amp=1, phase_deg=0)</label>
+  <input id="coeffs" type="text" />
+  <br/>
+  <label for="animation">Animation (amp_freq)</label>
+  <input id="animation" type="text" />
+  <button id="update-image">Update Image</button>
+  <br/>
+</body>
+</html>
