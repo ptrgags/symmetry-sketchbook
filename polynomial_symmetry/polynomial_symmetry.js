@@ -15,6 +15,9 @@ const DEFAULT_ANIMATION = [
     0
 ];
 
+console.log(SYMM_NONE.matches_symmetry(DEFAULT_COEFFICIENTS));
+console.log(SYMM_INPUT_MIRROR.matches_symmetry(DEFAULT_COEFFICIENTS));
+
 let zoom = 1.0;
 const ZOOM_DELTA = 0.5;
 

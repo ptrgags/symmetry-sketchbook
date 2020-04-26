@@ -1,0 +1,340 @@
+/**
+ * Simulate symmetry rules of functions from Complex -> Complex.
+ * These rules are of the form:
+ *
+ * f Rotate_k^l Invert^p Mirror^q == Rotate_k^u Mirror^v f
+ *
+ * where:
+ *
+ * - juxtaposition means function composition
+ * - k is an integer that represents k-fold rotations
+ * - p, q, v are either 0 or 1, they indicate if a transformation
+ *   is applied or not. Though these could be booleans, representing
+ *   them as integers is useful in the math.
+ * - l, u are integers that indicate how many times to apply a k-fold
+ *   rotation to either the input or the output.
+ * - Rotate_k(z) is a k-fold rotation, e^(i * 2pi / k)
+ * - Invert(z) is complex inversion, 1/z (circle inversion followed 
+ *   by reflection over the x-axis)
+ * - Mirror(z) is a reflection over the x-axis. By combining this with
+ *   rotations, you can produce other mirror axes.
+ *
+ * That's 2^3 * k^2 = 8k^2 possible patterns! Actually, some of these
+ * are impossible. I'm still exploring this part of the equations.
+ *
+ * GROUP THEORY TIME ========================================================
+ * 
+ * It just so happens that there are group isomorphisms between these
+ * transformations of the complex plane and rewriting rules of the
+ * coefficients:
+ *
+ * Iso_in(Rotate_k(z)) = rotate_k^(n-m)(a_nm) = e^(i * 2pi * (n - m) / k) * a_nm
+ * Iso_in(Invert(z)) = negate(a_nm) = a_(-n)(-m) 
+ * Iso_in(Mirror(z)) = swap(a_nm) = a_mn
+ * Iso_in(AB(z)) = (Ison_in(A), Iso_in(B))(a_nm) = Iso_in(B) Iso_in(A)(a_nm)
+ *
+ * BEFORE YOU GET CONFUSED ================================================
+ * 
+ * Let me point out one potentially confusing thing: The composition order
+ * of transformations is from right to left, but the composition order of
+ * rewriting rules is from _left to right_. So I use a comma to represent
+ * this as a "sequence" of transformations rather than a composition.
+ *
+ * You may ask, Why does the multiplication order reverse? Good question.
+ * Consider the composition:
+ *
+ * F = f A B C
+ * 
+ * if I want to derive the new function F, I would do this by combing the 
+ * formula for f with the transformations one-by-one from left
+ * to right. Every time 
+ *
+ *          <- corresponds to ->
+ * transformations <-> coefficient rewriting rules
+ * f               <-> a_nm
+ * f A             <-> Iso_in(A)(a_nm)
+ * f A B           <-> Iso_in(B) Iso_in(A)(a_nm)
+ *
+ * The order reversed! So if function composition is used for the group
+ * of rewriting rules, then this is an antiisomorphism. (isomorphism except
+ * the multiplication order is opposite)
+ *
+ * To make a true isomorphism, we can just define a "backwards composition"
+ * which is just a "sequence" of transformations. That is, define:
+ * 
+ * a, b := ba
+ * that is,
+ * (a, b)(x) := b(a(x))
+ *
+ * ...anyway, let's get back to the derivation.
+ * 
+ * BACK TO THE DERIVATION ==========================================================
+ * 
+ * Iso_out(Mirror(z)) = conj(swap(a_nm)) = conj(a_mn)
+ * Iso_out(Rotate_k(z)) = rotate_k(a_nm) = e^(i * 2pi / k) * a_nm
+ * Iso_out(AB(z)) = Iso_out(A) Iso_out(B)
+ *
+ * (note that unlike the input, no need to worry about swapping multiplication order!)
+ *
+ * Okay, now let's use these isomorphisms on each side of the original equation
+ *
+ * f Rotate_k^l Invert^p Mirror^q == Rotate_k^u Mirror^v f
+ *
+ * Iso_in(Rotate_k^(l(n-m)) Invert^p Mirror^q) = rotate_k^(l(n-m)), negate^p, swap^q 
+ * Iso_out(Rotate_k^u Mirror^v) = rotate_k^u conj^v swap^v
+ *
+ * The term l(n-m) appears a lot in what follows, so let L = l(n-m)
+ *
+ * Applying these to the coefficients, we get a new equation:
+ *
+ * (rotate_k^L, negate^p, swap^q)(a_nm) === rotate_k^u conj^v swap^v(a_nm)
+ * swap^q negate^p rotate_k^L(a_nm) === rotate_k^u conj^v swap^v(a_nm)
+ *
+ * Let's rearrange this a bit:
+ *
+ *          swap^(-v) conj^(-v) rotate_k^(-u) swap^q negate^p rotate_k^L(a_nm) === a_nm
+ *                swap^v conj^v rotate_k^(-u) swap^q negate^p rotate_k^L(a_nm) === a_nm
+ *        swap^v conj^v rotate_k^(-u) swap^q rotate_k^(L(-1)^p) negate^p(a_nm) === a_nm
+ *  swap^v conj^v rotate_k^(-u) rotate_k^(L(-1)^(p + q)) swap^q negate^p(a_nm) === a_nm
+ *            swap^v conj^v rotate_k^(L(-1)^(p + q) - u) swap^q negate^p(a_nm) === a_nm
+ *  swap^v rotate_k^(L(-1)^(p + q + v) - u(-1)^v) conj^v swap^q negate^p(a_nm) === a_nm
+ * rotate_k^(L(-1)^(p + q + 2v) - u(-1)^v) swap^v conj^v swap^q negate^p(a_nm) === a_nm
+ *      rotate_k^(L(-1)^(p + q) - u(-1)^v) swap^v conj^v swap^q negate^p(a_nm) === a_nm
+ *         rotate_k^(L(-1)^(p + q) - u(-1)^v) conj^v swap^(v+q) negate^p(a_nm) === a_nm
+ *
+ * Using many, many properties of these transformations:
+ *
+ * - swap^(-v) = swap^v
+ * - conj^(-v) = conj^v
+ * - swap conj = conj swap
+ * - rotate_k^a rotate_k^b = rotate_k^(a + b)
+ * - rotate_k^(a(n - m) + b) swap = swap rotate_k^(-a(n - m) + b)
+ * - rotate_k negate = negate rotate_k^(-1)
+ * - rotate_k conj = conj rotate_k^(-1)
+ * - (-1)^(2k) = 1
+ *
+ * To simplify this alphabet soup, 
+ * 
+ * let P = L(-1)^(p + q) - u(-1)^v
+ *       = l(n - m)(-1)^(p + q) - u(-1)^v
+ *
+ * rotate_k^P conj^v swap^(v+q) negate^p(a_nm) === a_nm
+ *
+ * WHAT WAS THE POINT OF ALL THAT? =================================================
+ *
+ * This form gives an easy way to validate if a polynomial's coefficients follow the
+ * symmetry rule:
+ * 
+ * for every coefficient a_nm:
+ *   find its partner b_nm = swap^(v + q) negate^p(a_nm)
+ *   compute B_nm = rotate_k^P conj^v b_nm
+ *   verify that B_nm == a_nm (approximately, these are floats after all)
+ * 
+ * But what if we want to take a set of coefficients and enforce a symmetry? 
+ * Given a_nm We need to ensure that the partner coefficient exists and follows
+ * the rules. We need to rearrange the equation again, but only a little bit:
+ *
+ * rotate_k^P conj^v swap^(v+q) negate^p(a_nm) === a_nm
+ *            conj^v swap^(v+q) negate^p(a_nm) === rotate_k^(-P) a_nm
+ *                   swap^(v+q) negate^p(a_nm) === conj^v rotate_k^(-P) a_nm
+ *
+ * Which suggests the algorithm:
+ *
+ * for every coefficient a_nm:
+ *   locate the partner indices (i, j) = swap^(v + q) negate^p(n, m)
+ *   if (i, j) === (n, m):
+ *     ...This case needs special care. I'll return to this soon.
+ *   otherwise:
+ *     set a_pq = conj^v rotate_k^(-P) a_nm
+ *
+ *
+ *
+ *
+ *
+ *
+ *
+ * WOW YOU'RE STILL HERE? =================================================
+ *
+ * Congrats, you survived a crash course in Applied Group Theory.
+ * Reward: source code to actually implement this!
+ */
+class SymmetryRule {
+    constructor(options) {
+        options = options || {};
+        // Mirror symmetry across the x-axis.
+        this._input_mirror = options.input_mirror || 0;
+        this._output_mirror = options.output_mirror || 0;
+        
+        // Rotational symmetry
+        this._folds = options.folds || 1;
+        this._input_rotation = options.input_rotation || 0;
+        this._output_rotation = options.output_rotation || 0;
+        
+        // I'm only allowing input inversion symmetry since finding
+        // 1/p(x) opens a whole new can of worms.
+        this._input_inversion = options.input_inversion || 0;
+    }
+    
+    matches_symmetry(coefficients) {
+        const terms = new TermMap(coefficients);
+        for (const [n, m, amp, phase] of coefficients) {
+            let [n2, m2] = this._find_corresponding(n, m);
+            let [amp2, phase2] = terms.get_term(n2, m2);
+            
+            if (this._output_mirror) {
+                [amp2, phase2] = SymmetryRule.conjugate(amp2, phase2);
+            }
+            
+            const power = this._compute_rotation_power(n, m);
+            [amp2, phase2] = SymmetryRule.rotate(this._folds, power);
+            
+            if (!SymmetryRule.terms_approx_equal([amp, phase], [amp2, phase2])) {
+                return false;
+            }
+        }
+        return true;
+    }
+    
+    /**
+     * How many times to apply the k-fold rotation in the validation direction.
+     * This is affected by a number of things. See the lengthy derivation at the
+     * top of this file.
+     *
+     *   P = l(n - m)(-1)^(p + q) - u(-1)^v
+     *
+     * where l = input_rotation
+     *       p = input_inversion
+     *       q = input_mirror
+     *       u = output_rotation
+     *       v = output_mirror
+     *       n, m = the indices of this coefficient
+     */
+    _compute_rotation_power(n, m) {
+        // l(n - m)(-1)^(p + q)
+        let term1 = this._input_rotation;
+        term1 *= (n - m);
+        term1 *= Math.pow(-1, this._input_inversion + this._input_mirror);
+        
+        // -u(-1)^v
+        let term2 = - this._output_rotation;
+        term2 *= Math.pow(-1, this._output_mirror);
+        
+        return term1 + term2;
+    }
+    
+    /**
+     * Given a_nm, apply any necessary swapping/negating
+     * given the different mirror symmetries involved.
+     * 
+     * This involves:
+     * - negate the indices if input_inversion = 1
+     * - swap the indices if input_mirror = 1
+     * - swap the indices if output_mirror = 1
+     *
+     * Note that a double swap is possible.
+     */
+    _find_corresponding(n, m) {
+        let [p, q] = [n, m];
+        
+        if (this._input_inversion === 1) {
+            [p, q] = SymmetryRule.negate(p, q);
+        }
+        
+        // Only need to swap if one of the mirror symmetry options is chosen.
+        const reflect_count = this._input_mirror + this._output_mirror;
+        if (reflect_count === 1) {
+            [p, q] = SymmetryRule.swap(p, q);
+        }
+        
+        return [p, q];
+    }
+    
+    static conjugate(amp, phase) {
+        return [amp, -phase];
+    }
+    
+    static negate(n, m) {
+        return [-n, -m];
+    }
+    
+    static swap(n, m) {
+        return [m, n];
+    }
+    
+    static terms_approx_equal(a, b) {
+        const EPSILON = 1e-8;
+        const [amp1, phase1] = a;
+        const [amp2, phase2] = b;
+        if (Math.abs(amp1 - amp2) >= EPSILON) {
+            return false;
+        }
+        
+        if (Math.abs(phase1 - phase2) >= EPSILON) {
+            return false;
+        }
+        
+        return true;
+    }
+}
+
+class TermMap {
+    constructor(coefficients) {
+        this._terms = TermMap.make_terms_map(coefficients);
+    }
+    
+    get size() {
+        return this._terms.size;
+    }
+    
+    get_term(n, m) {
+        const key = `${n}, ${m}`;
+        let coeff = this._terms.get(key);
+        if (coeff === undefined) {
+            coeff = [0, 0];
+        }
+        
+        return coeff;
+    }
+    
+    equals(other) {
+        if (this.size !== other.size) {
+            return false;
+        }
+        
+        for (const [key, value] of this._terms.entries()) {
+            const other_val = other._terms.get(key);
+            if (value !== other_val) {
+                return false;
+            }
+        }
+        
+        for (const[key, value] of other._terms.entries()) {
+            const this_val = this._terms.get(key);
+            if (this_val !== value) {
+                return false;
+            }
+        }
+        
+        return true;
+    }
+    
+    static make_terms_map(coefficients) {
+        const terms = new Map();
+        for (const [n, m, amp, phase] of coefficients) {
+            const key = `${n}, ${m}`;
+            const value = [amp, phase];
+            if (terms.has(key)) {
+                console.warn('Duplicate coefficient detected! clobbering');
+                console.warn('old:', `a[${key}] = ${terms.get(key)}`);
+                console.warn('new:', `a[${key}] = ${value}`);
+            }
+            terms.set(key, value);
+        }
+        return terms;
+    }
+}
+
+const SYMM_NONE = new SymmetryRule();
+const SYMM_INPUT_MIRROR = new SymmetryRule({
+    input_mirror: 1
+});
