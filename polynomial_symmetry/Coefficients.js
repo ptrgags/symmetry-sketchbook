@@ -17,6 +17,15 @@ class Coefficients {
         return this._tuples.length;
     }
     
+    normalize() {
+        let sum = 0;
+        for (const [, , amp] of this) {
+            sum += amp;
+        }
+        
+        this._tuples = this._tuples.map(([n, m, amp, phase]) => [n, m, amp / sum, phase]); 
+    }
+    
     get arrays() {
         const powers = [];
         const coeffs = [];

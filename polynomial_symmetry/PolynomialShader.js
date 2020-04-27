@@ -227,7 +227,7 @@ class PolynomialShader {
         
         // Apply symmetries, which often adds more terms to the polynomial
         const actual_coefficients = this._apply_symmetries(original_coefficients);
-        console.log(actual_coefficients);
+        actual_coefficients.normalize();
         const {powers, coeffs} = actual_coefficients.arrays;
         
         // Since we always need to exactly fill the buffer,
