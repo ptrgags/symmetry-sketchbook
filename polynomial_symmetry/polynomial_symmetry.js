@@ -10,19 +10,28 @@ const DEFAULT_COEFFICIENTS = new Coefficients([
     [3, 0, 1/3, 90]
 ]);
 const DEFAULT_ANIMATION = [
-    0,
+    1,
     0,
     0
 ];
-const SYMM_IN_MIRROR = new SymmetryRule({
+const SYMM_INPUT_MIRROR = new SymmetryRule({
     input_mirror: 1
 });
 
-let zoom = 1.0;
+const SYMM_INPUT_INVERSION = new SymmetryRule({
+    input_inversion: 1
+});
+
+const SYMM_INPUT_CIRCLE_INVERSION = new SymmetryRule({
+    input_mirror: 1,
+    input_inversion: 1
+});
+
+let zoom = 3;
 const ZOOM_DELTA = 0.5;
 
 function setup() {
-    createCanvas(1500 / 4, 2100 / 4, WEBGL);
+    createCanvas(512, 512, WEBGL);
     textureMode(NORMAL);
     
     // Create the placeholder image
@@ -30,7 +39,8 @@ function setup() {
     
     // Setup the shader
     poly_shader.init_shader();
-    poly_shader.symmetries = [SYMM_IN_MIRROR];
+    poly_shader.set_zoom(zoom);
+    poly_shader.symmetries = [SYMM_INPUT_INVERSION, SYMM_INPUT_MIRROR];
     poly_shader.set_texture(placeholder);
     
     poly_shader.set_coefficients(DEFAULT_COEFFICIENTS);

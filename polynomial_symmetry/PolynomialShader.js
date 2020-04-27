@@ -98,7 +98,23 @@ void main() {
     vec2 complex = to_complex(uv);
     vec2 z = compute_polynomial(complex);
     vec2 z_uv = to_uv(z);
-    gl_FragColor = texture2D(texture0, fract(z_uv));
+    vec4 output_color = texture2D(texture0, fract(z_uv));
+    
+    float unit_circle_dist = abs(length(complex) - 1.0);
+    float unit_circle_mask = smoothstep(0.02, 0.01, unit_circle_dist);
+    
+    float modulus = length(z);
+    float far_away = smoothstep(10.0, 50.0, modulus);
+    float near_zero = smoothstep(0.11, 0.1, modulus);
+    
+    const vec4 YELLOW = vec4(1.0, 1.0, 0.0, 1.0);
+    const vec4 BLACK = vec4(0.0, 0.0, 0.0, 1.0);
+    
+    vec4 image = output_color;
+    image = mix(image, YELLOW, unit_circle_mask);
+    image = mix(image, YELLOW, near_zero);
+    image = mix(image, BLACK, far_away);
+    gl_FragColor = image;
 }
 `;
 
