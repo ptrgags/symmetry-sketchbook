@@ -13,7 +13,7 @@ class Coefficients {
         yield* this._tuples;
     }
     
-    get length() {
+    get size() {
         return this._tuples.length;
     }
     

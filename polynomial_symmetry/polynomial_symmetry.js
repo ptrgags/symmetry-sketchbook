@@ -3,25 +3,30 @@ let update_button;
 
 let image_texture;
 const poly_shader = new PolynomialShader();
-const placeholder = new Checkerboard();
+//const placeholder = new Checkerboard();
+const placeholder = new HalfPlanes();
 const DEFAULT_COEFFICIENTS = new Coefficients([
     [1, 0, 1, 0],
     [2, 0, 1/2, 0],
-    [3, 0, 1/3, 90]
+    [3, 0, 1/3, 0],
+    [4, 0, 1/4, 0],
+    [5, 0, 1/5, 0],
+    [6, 0, 1/6, 0],
+    [7, 0, 1/7, 0],
+    [8, 0, 1/8, 0],
+    [9, 0, 1/9, 0]
 ]);
 const DEFAULT_ANIMATION = [
     0,
-    1,
+    0,
     0
 ];
 
 const SYMM_NONE = new SymmetryRule();
 
-/*
 const SYMM_IN_MIRROR = new SymmetryRule({
     input_mirror: 1
 });
-*/
 
 const SYMM_IN_INVERSION = new SymmetryRule({
     input_inversion: 1
@@ -36,19 +41,15 @@ const SYMM_OUT_MIRROR = new SymmetryRule({
     output_mirror: 1
 });
 
-/*
- * Need to handle self-partners
 const SYMM_IN_ROTATION = new SymmetryRule({
-    folds: 3,
+    folds: 8,
     input_rotation: 1
 });
-
 
 const SYMM_IN_MIRROR_OUT_MIRROR = new SymmetryRule({
     input_mirror: 1,
     output_mirror: 1,
 });
-*/
 
 let zoom = 3;
 const ZOOM_DELTA = 0.5;
@@ -63,7 +64,7 @@ function setup() {
     // Setup the shader
     poly_shader.init_shader();
     poly_shader.set_zoom(zoom);
-    poly_shader.symmetries = [SYMM_IN_CIRCLE_INVERSION];
+    poly_shader.symmetries = [SYMM_IN_ROTATION];
     poly_shader.set_texture(placeholder);
     
     poly_shader.set_coefficients(DEFAULT_COEFFICIENTS);

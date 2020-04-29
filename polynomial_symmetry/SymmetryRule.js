@@ -183,12 +183,8 @@ class SymmetryRule {
             let [n2, m2] = this._find_partner(n, m);
             let [amp2, phase2] = terms.get_term(n2, m2);
             
-            if (this._output_mirror) {
-                [amp2, phase2] = SymmetryRule.conjugate(amp2, phase2);
-            }
             
-            const power = this._compute_rotation_power(n, m);
-            [amp2, phase2] = SymmetryRule.rotate(amp2, phase2, this._folds, power);
+            [amp2, phase2] = this._transform_coeff(n, m, amp2, phase2);
             
             if (!SymmetryRule.terms_approx_equal([amp, phase], [amp2, phase2])) {
                 return false;
@@ -196,8 +192,25 @@ class SymmetryRule {
         }
         return true;
     }
+    
+    // Compute rotate_k^P conj^v a_nm
+    _transform_coeff(n, m, amp, phase) {
+        let [amp2, phase2] = [amp, phase];
+        
+        if (this._output_mirror === 1) {
+            [amp2, phase2] = SymmetryRule.conjugate(amp2, phase2);
+        }
+            
+        const power = this._compute_rotation_power(n, m);
+        [amp2, phase2] = SymmetryRule.rotate(amp2, phase2, this._folds, power);
+        
+        return [amp2, phase2];
+    }
+    
     /**
      * Algorithm explained in the long derivation at the top of the file.
+     * 
+     * TODO: Rewrite this doc!
      * 
      * for every coefficient a_nm:
      *   locate the partner indices (i, j) = swap^(v + q) negate^p(n, m)
@@ -211,23 +224,42 @@ class SymmetryRule {
      */
     apply_symmetry(coefficients) {
         const terms = new TermMap(coefficients);
+        const output_terms = new TermMap([]);
         for (const [n, m, amp, phase] of coefficients) {
             let [i, j] = this._find_partner(n, m);
+            let [amp2, phase2] = this._transform_coeff(n, m, amp, phase);
             if (i === n && j === m) {
-                throw new Error(`Not implemented: Coefficient a[${n}, ${m}] is the same as its partner. I need to think about this more. To be continued...`);
+                if (SymmetryRule.terms_approx_equal([amp, phase], [amp2, phase2])) {
+                    output_terms.set_term(n, m, amp, phase);
+                } else {
+                    // Don't add the term to the output, implicitly setting it to 0 
+                    continue;
+                }
             }
             
-            const power = this._compute_rotation_power(n, m);
-            let [amp2, phase2] = SymmetryRule.rotate(amp, phase, this._folds, -power);
-            
-            if (this._output_mirror === 1) {
-                [amp2, phase2] = SymmetryRule.conjugate(amp2, phase2);
+            let [amp3, phase3] = this._transform_coeff(n, m, amp2, phase2);
+            if (SymmetryRule.terms_approx_equal([amp3, phase3], [amp, phase])) {
+                output_terms.set_term(n, m, amp, phase);
+                output_terms.set_term(i, j, amp2, phase2);
+            } else {
+                // Symmetry can't be satisfied, output 0 to implicitly set a 0 term
+                continue;
             }
-            
-            terms.set_term(i, j, amp2, phase2);
         }
         
-        return terms.to_coefficients();
+        const output = output_terms.to_coefficients();
+        if (output.size === 0) {
+            console.warn('no output terms. This might be an impossible symmetry rule');
+        }
+        
+        console.assert(this.matches_symmetry(output), 'sanity check failed. Now running in insane mode');
+        
+        console.log('results');
+        for (const [n, m, amp, phase] of output) {
+            console.log(n, m, amp, phase);
+        }
+        
+        return output;
     }
     
     /**
@@ -318,12 +350,19 @@ class SymmetryRule {
             return false;
         }
         
-        if (Math.abs(phase1 - phase2) >= EPSILON) {
+        const phase1_mod_pi = mod(phase1, PI);
+        const phase2_mod_pi = mod(phase2, PI);
+        
+        if (Math.abs(phase1_mod_pi - phase2_mod_pi) >= EPSILON) {
             return false;
         }
         
         return true;
     }
+}
+
+function mod(x, n) {
+    return ((x % n) + n) % n;
 }
 
 class TermMap {
@@ -353,7 +392,7 @@ class TermMap {
         const value = [amp, phase];
         if (this._terms.has(key)) {
             console.warn('Duplicate coefficient detected! clobbering');
-            console.warn('old:', `a[${key}] = ${terms.get(key)}`);
+            console.warn('old:', `a[${key}] = ${this._terms.get(key)}`);
             console.warn('new:', `a[${key}] = ${value}`);
         }
         this._terms.set(key, value);

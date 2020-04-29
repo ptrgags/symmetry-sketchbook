@@ -111,8 +111,10 @@ void main() {
     const vec4 BLACK = vec4(0.0, 0.0, 0.0, 1.0);
     
     vec4 image = output_color;
+    /*
     image = mix(image, YELLOW, unit_circle_mask);
     image = mix(image, YELLOW, near_zero);
+    */
     image = mix(image, BLACK, far_away);
     gl_FragColor = image;
 }
