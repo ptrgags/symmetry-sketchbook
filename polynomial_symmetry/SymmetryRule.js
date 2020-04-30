@@ -254,10 +254,9 @@ class SymmetryRule {
         
         console.assert(this.matches_symmetry(output), 'sanity check failed. Now running in insane mode');
         
-        console.log('results');
-        for (const [n, m, amp, phase] of output) {
-            console.log(n, m, amp, phase);
-        }
+        log.log('Selected coefficients:');
+        output.log();
+        
         
         return output;
     }
@@ -316,6 +315,12 @@ class SymmetryRule {
         return [p, q];
     }
     
+    log() {
+        const in_tuple = `(l=${this._input_rotation}, p=${this._input_inversion}, q=${this._input_mirror})`;
+        const out_tuple = `(u=${this._output_rotation}, v=${this._output_mirror})`;
+        log.log(`SymmetryRule: k=${this._folds}, ${in_tuple}, ${out_tuple}`); 
+    }
+    
     static conjugate(amp, phase) {
         return [amp, -phase];
     }
@@ -339,7 +344,7 @@ class SymmetryRule {
      */
     static rotate(amp, phase, folds, power) {
         const theta = TWO_PI / folds * power;
-        return [amp, theta + phase];
+        return [amp, mod(theta + phase, TWO_PI)];
     }
     
     static terms_approx_equal(a, b) {
@@ -350,8 +355,8 @@ class SymmetryRule {
             return false;
         }
         
-        const phase1_mod_pi = mod(phase1, PI);
-        const phase2_mod_pi = mod(phase2, PI);
+        const phase1_mod_pi = mod(phase1, TWO_PI);
+        const phase2_mod_pi = mod(phase2, TWO_PI);
         
         if (Math.abs(phase1_mod_pi - phase2_mod_pi) >= EPSILON) {
             return false;

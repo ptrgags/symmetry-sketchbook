@@ -2,6 +2,7 @@ let image_input;
 let update_button;
 
 let image_texture;
+const log = new Log();
 const poly_shader = new PolynomialShader();
 //const placeholder = new Checkerboard();
 const placeholder = new HalfPlanes();
@@ -42,7 +43,7 @@ const SYMM_OUT_MIRROR = new SymmetryRule({
 });
 
 const SYMM_IN_ROTATION = new SymmetryRule({
-    folds: 8,
+    folds: 4,
     input_rotation: 1
 });
 
@@ -55,8 +56,12 @@ let zoom = 3;
 const ZOOM_DELTA = 0.5;
 
 function setup() {
-    createCanvas(512, 512, WEBGL);
+    const canvas = createCanvas(512, 512, WEBGL);
+    canvas.parent('p5-canvas');
+    canvas.canvas.addEventListener('wheel', update_zoom);
     textureMode(NORMAL);
+    
+    log.connect();
     
     // Create the placeholder image
     placeholder.make_graphics(256, 256);
@@ -75,9 +80,17 @@ function setup() {
     image_input = document.getElementById('image-input');
     image_input.addEventListener('change', upload_image);
     
-    //Update coefficients
-    update_button = document.getElementById('update-image');
+    // Update coefficients
+    update_button = document.getElementById('update-params');
     update_button.addEventListener('click', update_coefficients);
+    
+    // Random 10 coefficients
+    random_button = document.getElementById('random-params');
+    random_button.addEventListener('click', set_random_coefficients);
+    
+    // Update Symmetry Rule
+    symmetry_button = document.getElementById('update-symmetry');
+    symmetry_button.addEventListener('click', update_symmetry);
 }
 
 function draw() {
@@ -110,6 +123,20 @@ function update_texture(url) {
         const texture = new ImageTexture(img);
         poly_shader.set_texture(texture);
     });
+}
+
+function set_random_coefficients() {
+    terms = [];
+    for (let i = 0; i < 10; i++) {
+        const n = floor(random(-10, 10 + 1));
+        const m = floor(random(-10, 10 + 1));
+        const amp = 1.0 / (n - m + 1);
+        const phase = random(TWO_PI);
+        terms.push([n, m, amp, phase]);
+    }
+    
+    const coeffs = new Coefficients(terms);
+    poly_shader.set_coefficients(coeffs);
 }
 
 function update_coefficients() {
@@ -174,8 +201,34 @@ function parse_animation_params(text) {
     return params;
 }
 
-function mouseWheel(event) {
+function value_or_default(id, default_val) {
+    const element = document.getElementById(id);
+    const value = parseInt(element.value);
+    
+    if (isFinite(value)) {
+        return value;
+    }
+    
+    return default_val;
+}
+
+function update_symmetry() {
+    const symmetry = new SymmetryRule({
+        folds: value_or_default('folds', 1),
+        input_rotation: value_or_default('in-rotation', 0),
+        input_mirror: value_or_default('in-reflection', 0),
+        input_inversion: value_or_default('inversion', 0),
+        output_rotation: value_or_default('out-rotation', 0),
+        output_mirror: value_or_default('out-reflection', 0),
+    });
+    poly_shader.symmetries = [symmetry];
+    poly_shader.set_coefficients();
+}
+
+function update_zoom(event) {
     zoom += ZOOM_DELTA * -Math.sign(event.wheelDeltaY);
     zoom = max(zoom, ZOOM_DELTA);
     poly_shader.set_zoom(zoom);
+    
+    event.preventDefault();
 }

@@ -45,6 +45,9 @@ uniform float aspect;
 // Scale factor for zooming
 uniform float zoom;
 
+// 1.0 to enable, 0.0 to disable
+uniform float show_ref_geometry;
+
 vec2 to_polar(vec2 rect) {
     float r = length(rect);
     float theta = atan(rect.y, rect.x);
@@ -111,11 +114,9 @@ void main() {
     const vec4 BLACK = vec4(0.0, 0.0, 0.0, 1.0);
     
     vec4 image = output_color;
-    /*
-    image = mix(image, YELLOW, unit_circle_mask);
-    image = mix(image, YELLOW, near_zero);
-    */
-    image = mix(image, BLACK, far_away);
+    image = mix(image, YELLOW, unit_circle_mask * show_ref_geometry);
+    image = mix(image, YELLOW, near_zero * show_ref_geometry);
+    image = mix(image, BLACK, far_away * show_ref_geometry);
     gl_FragColor = image;
 }
 `;
@@ -138,6 +139,7 @@ class PolynomialShader {
         program.setUniform('time', 0.0);
         program.setUniform('zoom', 1.0);
         program.setUniform('aspect', width/height);
+        program.setUniform('show_ref_geometry', 1.0);
     }
     
     get symmetries() {
@@ -146,6 +148,9 @@ class PolynomialShader {
     
     set symmetries(symmetries) {
         this._symmetries = symmetries;
+        for (const symmetry of this._symmetries) {
+            symmetry.log();
+        }
     }
     
     enable() {        
@@ -224,12 +229,14 @@ class PolynomialShader {
     }
     
     set_coefficients(original_coefficients) {
+        this._coeffs = original_coefficients || this._coeffs;
+        
         this.enable();
         const program = this._shader;
         
         // Apply symmetries, which often adds more terms to the polynomial
-        const actual_coefficients = this._apply_symmetries(original_coefficients);
-        actual_coefficients.normalize();
+        const actual_coefficients = this._apply_symmetries(this._coeffs);
+        //actual_coefficients.normalize();
         const {powers, coeffs} = actual_coefficients.arrays;
         
         // Since we always need to exactly fill the buffer,

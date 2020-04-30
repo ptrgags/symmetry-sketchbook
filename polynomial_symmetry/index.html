@@ -6,6 +6,7 @@
   <!-- PLEASE NO CHANGES BELOW THIS LINE (UNTIL I SAY SO) -->
   <script language="javascript" type="text/javascript" src="libraries/p5.min.js"></script>
   <script language="javascript" type="text/javascript" src="Coefficients.js"></script>
+  <script language="javascript" type="text/javascript" src="Log.js"></script>
   <script language="javascript" type="text/javascript" src="PolynomialShader.js"></script>
   <script language="javascript" type="text/javascript" src="SymmetryRule.js"></script>
   <script language="javascript" type="text/javascript" src="Texture.js"></script>
@@ -14,7 +15,24 @@
 
   <!-- This line removes any default padding and style.
        You might only need one of these values set. -->
-  <style> body { padding: 0; margin: 0; } </style>
+  <style> 
+  body { 
+      padding: 0; 
+      margin: 0; 
+  }
+  
+  .log {
+      text-color: black;
+  }
+  
+  .warn {
+      text-color: #999900;
+  }
+  
+  .error {
+      text-color: #990000;
+  }
+  </style>
 </head>
 <body>
   <label for="image-input">Choose a PNG or JPEG image texture:</label>
@@ -26,7 +44,29 @@
   <label for="animation">Animation (amp_freq_rad)</label>
   <input id="animation" type="text" />
   <br/>
-  <button id="update-image">Update Image</button>
+  <button id="update-params">Update Parameters</button>
+  <button id="random-params">Random Parameters</button>
   <br/>
+  <label for="folds">k-fold rotations</label>
+  <input id="folds" type="text" />
+  <br/>
+  <label for="in-rotation">Input Rotation</label>
+  <input id="in-rotation" type="text" />
+  <label for="inversion">Input Inversion</label>
+  <input id="inversion" type="text" />
+  <label for="in-reflection">Input Reflection</label>
+  <input id="in-reflection" type="text" />
+  <br/>
+  <label for="out-rotation">Output Rotation</label>
+  <input id="out-rotation" type="text" />
+  <label for="out-reflection">Output Reflection</label>
+  <input id="out-reflection" type="text" />
+  <br/>
+  <button id="update-symmetry">Change Symmetry Rule</button>
+  
+  <div id="p5-canvas">
+  </div>
+  <div id="log">
+  </div>
 </body>
 </html>
