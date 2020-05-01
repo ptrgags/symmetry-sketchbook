@@ -116,7 +116,7 @@ void main() {
     vec4 image = output_color;
     image = mix(image, YELLOW, unit_circle_mask * show_ref_geometry);
     image = mix(image, YELLOW, near_zero * show_ref_geometry);
-    image = mix(image, BLACK, far_away * show_ref_geometry);
+    image = mix(image, BLACK, far_away);
     gl_FragColor = image;
 }
 `;
@@ -139,7 +139,7 @@ class PolynomialShader {
         program.setUniform('time', 0.0);
         program.setUniform('zoom', 1.0);
         program.setUniform('aspect', width/height);
-        program.setUniform('show_ref_geometry', 1.0);
+        program.setUniform('show_ref_geometry', 0.0);
     }
     
     get symmetries() {

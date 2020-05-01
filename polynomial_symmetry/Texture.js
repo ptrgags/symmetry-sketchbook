@@ -58,16 +58,35 @@ class ImageTexture extends Texture {
         this._img = img;
     }
     
-    make_graphics(width, height) {
-        console.warn("No need to call make_graphics with an ImageTexture :)");
+    make_graphics() {
+        // Nothing to be done here
     }
     
     get texture() {
         return this._img;
     }
     
+    set_wrapping() { 
+        textureWrap(CLAMP);
+    }
+}
+
+class WebcamTexture extends Texture {
+    constructor() {
+        super();
+        this._camera = undefined;
+    }
+    
+    make_graphics() {
+        this._camera = createCapture(VIDEO);
+        this._camera.hide();
+    }
+    
+    get texture() {
+        return this._camera;
+    }
+    
     set_wrapping() {
-        // Since most images don't have powers of 2, 
         textureWrap(CLAMP);
     }
 }

@@ -4,8 +4,8 @@ let update_button;
 let image_texture;
 const log = new Log();
 const poly_shader = new PolynomialShader();
-//const placeholder = new Checkerboard();
-const placeholder = new HalfPlanes();
+const placeholder = new Checkerboard();
+//const placeholder = new HalfPlanes();
 const DEFAULT_COEFFICIENTS = new Coefficients([
     [1, 0, 1, 0],
     [2, 0, 1/2, 0],
@@ -61,6 +61,9 @@ function setup() {
     canvas.canvas.addEventListener('wheel', update_zoom);
     textureMode(NORMAL);
     
+    const camera_texture = new WebcamTexture();
+    camera_texture.make_graphics();
+    
     log.connect();
     
     // Create the placeholder image
@@ -70,7 +73,8 @@ function setup() {
     poly_shader.init_shader();
     poly_shader.set_zoom(zoom);
     poly_shader.symmetries = [SYMM_IN_ROTATION];
-    poly_shader.set_texture(placeholder);
+    //poly_shader.set_texture(placeholder);
+    poly_shader.set_texture(camera_texture);
     
     poly_shader.set_coefficients(DEFAULT_COEFFICIENTS);
     poly_shader.set_animation(DEFAULT_ANIMATION);
