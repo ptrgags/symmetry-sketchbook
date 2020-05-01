@@ -1,29 +1,8 @@
-const MAX_TERMS = 64;
-const POLYNOMIAL_VERT_SHADER = `
-attribute vec3 aPosition;
-attribute vec2 aTexCoord;
-
-varying vec2 uv;
-
-void main() {
-    vec4 position = vec4(aPosition, 1.0);
-    gl_Position = position;
-    uv = aTexCoord;
-    
-    // Flip y.
-    uv.y = 1.0 - uv.y;
-}
-`;
-
-const POLYNOMIAL_FRAG_SHADER = `
+const ROSETTE_CURVE_VERT_SHADER = `
 #define MAX_TERMS ${MAX_TERMS}
 #define PI 3.1415
-precision highp float;
-
-varying vec2 uv;
-
-// Texture from p5.js
-uniform sampler2D texture0;
+attribute vec3 aPosition;
+attribute vec2 aTexCoord;
 
 // n = powers[i].x = exponent of z
 // m = powers[i].y = exponent of conj(z)
@@ -45,85 +24,32 @@ uniform float aspect;
 // Scale factor for zooming
 uniform float zoom;
 
-// 1.0 to enable, 0.0 to disable
-uniform float show_ref_geometry;
-
-vec2 to_polar(vec2 rect) {
-    float r = length(rect);
-    float theta = atan(rect.y, rect.x);
-    return vec2(r, theta);
-}
-
-vec2 to_rect(vec2 polar) {
-    float x = polar.x * cos(polar.y);
-    float y = polar.x * sin(polar.y);
-    return vec2(x, y);
-}
-
-vec2 compute_polynomial(vec2 z) {
-    vec2 z_polar = to_polar(z);
-    vec2 sum = vec2(0.0);
-    for (int i = 0; i < MAX_TERMS; i++) {
-        // compute a_nm z^n conj(z)^m
-        // which can be written as 
-        // a_nm.r * z.r^n * exp(i * ((n - m) * z.theta + a_nm.theta)) 
-        
-        // powers
-        vec2 nm = powers[i];
-        float n = nm.x;
-        float m = nm.y;
-        
-        // amplitude, phase
-        vec2 coeff = coeffs[i];
-        
-        // Animate the coefficients for a fun twist.
-        // (sometimes literally)
-        coeff.y += animation[i] * time;
-        
-        float r = coeff.x * pow(z_polar.x, n + m);
-        float theta = z_polar.y * (n - m) + coeff.y;
-        
-        vec2 rect = to_rect(vec2(r, theta));
-        sum += rect;
-    }
-    return sum;
-}
-
-vec2 to_complex(vec2 uv) {
-    return (uv - 0.5) * aspect * zoom;
-}
-
-vec2 to_uv(vec2 complex) {
-    return complex / zoom / aspect + 0.5;
-}
+varying vec2 uv;
 
 void main() {
-    vec2 complex = to_complex(uv);
-    vec2 z = compute_polynomial(complex);
-    vec2 z_uv = to_uv(z);
-    vec4 output_color = texture2D(texture0, fract(z_uv));
+    float t = max(aTexCoord.x, aTexCoord.y);
     
-    float unit_circle_dist = abs(length(complex) - 1.0);
-    float unit_circle_mask = smoothstep(0.02, 0.01, unit_circle_dist);
-    
-    float modulus = length(z);
-    float far_away = smoothstep(10.0, 50.0, modulus);
-    float near_zero = smoothstep(0.11, 0.1, modulus);
-    
-    const vec4 YELLOW = vec4(1.0, 1.0, 0.0, 1.0);
-    const vec4 BLACK = vec4(0.0, 0.0, 0.0, 1.0);
-    
-    vec4 image = output_color;
-    image = mix(image, YELLOW, unit_circle_mask * show_ref_geometry);
-    image = mix(image, YELLOW, near_zero * show_ref_geometry);
-    image = mix(image, BLACK, far_away);
-    gl_FragColor = image;
+    float x = cos(t * 2.0 * PI);
+    float y = sin(t * 2.0 * PI);
+    vec4 position = vec4(aPosition, 1.0);
+    gl_Position = vec4(aTexCoord.x, 0.01 * aTexCoord.y, 0.0, 1.0);
+    uv = aTexCoord;
 }
 `;
 
-// ====================================================================
+const ROSETTE_CURVE_FRAG_SHADER = `
+#define MAX_TERMS ${MAX_TERMS}
+#define PI 3.1415
+precision highp float;
 
-class PolynomialShader {
+varying vec2 uv;
+
+void main() {
+    gl_FragColor = vec4(1.0, 0.0, .0, 1.0);
+}
+`;
+
+class RosetteCurveShader {
     constructor() {
         this._shader = undefined;
         this._enabled = false;
@@ -132,7 +58,7 @@ class PolynomialShader {
     }
     
     init_shader() {
-        const program = createShader(POLYNOMIAL_VERT_SHADER, POLYNOMIAL_FRAG_SHADER);
+        const program = createShader(ROSETTE_CURVE_VERT_SHADER, ROSETTE_CURVE_FRAG_SHADER);
         this._shader = program;
         this.enable();
         
@@ -169,17 +95,18 @@ class PolynomialShader {
     
    draw() {
         this.update_time();
-        noStroke();
         
-        // This makes sure the alpha channel is enabled for
-        // transparent images.
-        fill(0, 0, 0, 0);
+        const NUM_VERTICES = 256;
         
-        // Draw a quad that spans the canvas. Since the vertex shader
-        // ignores the model matrix, use clip coordinates
-        const hw = 1;
-        const hh = 1;
-        quad(-hw, -hh, hw, -hh, hw, hh, -hw, hh);
+        //quad(0, 0, 1, 0, 1, 1, 0, 1);
+        beginShape();
+        for (let i = 0; i < NUM_VERTICES; i++) {
+            const t = i / (NUM_VERTICES - 1);
+            const x = cos(t);
+            const y = sin(t);
+            vertex(x, y, 0, t, 0);
+        }
+        endShape();
         
         // Disable when done to get ready for the next shader
         this.disable();
@@ -197,12 +124,6 @@ class PolynomialShader {
     update_time() {
         this.enable();
         this._shader.setUniform('time', millis() / 1000.0);
-    }
-    
-    set_texture(texture) {
-        this.enable();
-        texture.set_wrapping();
-        this._shader.setUniform('texture0', texture.texture);
     }
      
     _pad_zeros(values, desired_length) {

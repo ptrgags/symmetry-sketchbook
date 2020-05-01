@@ -4,6 +4,7 @@ let update_button;
 let image_texture;
 const log = new Log();
 const poly_shader = new PolynomialShader();
+const rosette_curve_shader = new RosetteCurveShader();
 const placeholder = new Checkerboard();
 //const placeholder = new HalfPlanes();
 const DEFAULT_COEFFICIENTS = new Coefficients([
@@ -80,6 +81,13 @@ function setup() {
     poly_shader.set_animation(DEFAULT_ANIMATION);
     poly_shader.disable();
     
+    rosette_curve_shader.init_shader();
+    rosette_curve_shader.set_zoom(zoom);
+    rosette_curve_shader.symmetries = [SYMM_IN_ROTATION];
+    rosette_curve_shader.set_coefficients(DEFAULT_COEFFICIENTS);
+    rosette_curve_shader.set_animation(DEFAULT_ANIMATION);
+    rosette_curve_shader.disable();
+    
     // Hook up the image input dialog
     image_input = document.getElementById('image-input');
     image_input.addEventListener('change', upload_image);
@@ -99,17 +107,8 @@ function setup() {
 
 function draw() {
     background(0);
-    poly_shader.draw();
-    
-    /*
-    stroke(0, 255, 255);
-    strokeWeight(4);
-    noFill();
-    beginShape(LINES);
-    vertex(0, 0);
-    vertex(255, 255);
-    endShape();
-    */
+    //poly_shader.draw();
+    rosette_curve_shader.draw();
 }
 
 function upload_image(e) {
@@ -141,16 +140,14 @@ function set_random_coefficients() {
     
     const coeffs = new Coefficients(terms);
     poly_shader.set_coefficients(coeffs);
+    rosette_curve_shader.set_coefficients(coeffs);
 }
 
 function update_coefficients() {
     const coeff_input = document.getElementById('coeffs');
     const coefficients = parse_coefficients(coeff_input.value);
     poly_shader.set_coefficients(coefficients);
-    
-    if (coefficients.length > 0) {
-        poly_shader.set_coefficients(coefficients);
-    }
+    rosette_curve_shader.set_coefficients(coefficients);
     
     const animation_input = document.getElementById('animation');
     const anim_params = parse_animation_params(animation_input.value);
@@ -227,12 +224,16 @@ function update_symmetry() {
     });
     poly_shader.symmetries = [symmetry];
     poly_shader.set_coefficients();
+    
+    rosette_curve_shader.symmetries = [symmetry];
+    rosette_curve_shader.set_coefficients();
 }
 
 function update_zoom(event) {
     zoom += ZOOM_DELTA * -Math.sign(event.wheelDeltaY);
     zoom = max(zoom, ZOOM_DELTA);
     poly_shader.set_zoom(zoom);
+    rosette_curve_shader.set_zoom(zoom);
     
     event.preventDefault();
 }
