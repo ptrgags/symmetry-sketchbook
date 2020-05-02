@@ -66,7 +66,7 @@ vec2 compute_polynomial(vec2 z) {
     for (int i = 0; i < MAX_TERMS; i++) {
         // compute a_nm z^n conj(z)^m
         // which can be written as 
-        // a_nm.r * z.r^n * exp(i * ((n - m) * z.theta + a_nm.theta)) 
+        // a_nm.r * z.r^(n + m) * exp(i * ((n - m) * z.theta + a_nm.theta)) 
         
         // powers
         vec2 nm = powers[i];

@@ -1,8 +1,8 @@
 const ROSETTE_CURVE_VERT_SHADER = `
 #define MAX_TERMS ${MAX_TERMS}
+#define THICKNESS 0.01
 #define PI 3.1415
 attribute vec3 aPosition;
-attribute vec2 aTexCoord;
 
 // n = powers[i].x = exponent of z
 // m = powers[i].y = exponent of conj(z)
@@ -24,28 +24,102 @@ uniform float aspect;
 // Scale factor for zooming
 uniform float zoom;
 
+// Mouse position across the canvas. Might be outside
+// [0, 1] if the mouse is outside the canvas.
+uniform vec2 mouse_uv;
+
 varying vec2 uv;
 
+vec2 to_complex(vec2 uv) {
+    return (uv - 0.5) * aspect * zoom;
+}
+
+vec2 to_uv(vec2 complex) {
+    return complex / zoom / aspect + 0.5;
+}
+
+vec2 complex_to_clip(vec2 complex) {
+    vec2 uv = to_uv(complex);
+    return 2.0 * uv - 1.0;
+}
+
+vec2 to_polar(vec2 rect) {
+    float r = length(rect);
+    float theta = atan(rect.y, rect.x);
+    return vec2(r, theta);
+}
+
+vec2 to_rect(vec2 polar) {
+    float x = polar.x * cos(polar.y);
+    float y = polar.x * sin(polar.y);
+    return vec2(x, y);
+}
+
+vec2 compute_rosette(vec2 z, float t) {
+    vec2 z_polar = to_polar(z);
+    vec2 sum = vec2(0.0);
+    for (int i = 0; i < MAX_TERMS; i++) {
+        // Similar to the polynomial shader, except now
+        // we're plugging in the circle z*e^(i * 2pi * t) = r * exp(i * 2pi * t + phase)
+        // a_nm circle(z, t)^n conj(circle(z, t))^m
+        // = a_nm.r * expi(a_nm.theta) * z.r^n * expi(n * (2pi * t + phase)) * z.r^m * expi(-m * (2pi * t + phase))  
+        // = a_nm.r * z.r^(n + m) * expi((n - m) * (2pi * t + phase) + a_nm.theta)
+        
+        // powers
+        vec2 nm = powers[i];
+        float n = nm.x;
+        float m = nm.y;
+        
+        // amplitude, phase
+        vec2 coeff = coeffs[i];
+        
+        // Animate the coefficients for a fun twist.
+        // (sometimes literally)
+        coeff.y += animation[i] * time;
+        
+        float r = coeff.x * pow(z_polar.x, n + m);
+        float theta = (n - m) * (2.0 * PI * t + z_polar.y) + coeff.y;
+        
+        vec2 rect = to_rect(vec2(r, theta));
+        sum += rect;
+    }
+    return sum;
+}
+
 void main() {
-    float t = max(aTexCoord.x, aTexCoord.y);
+    // Starting point is mouse position. however, offset the line slightly to create some thickness.
+    float row = aPosition.y;
+    float sidestep = mix(-THICKNESS, THICKNESS, row);
+    vec2 direction = normalize(mouse_uv - 0.5);
+    vec2 offset_uv = mouse_uv + sidestep * direction;
+    vec2 z = to_complex(offset_uv);
     
-    float x = cos(t * 2.0 * PI);
-    float y = sin(t * 2.0 * PI);
-    vec4 position = vec4(aPosition, 1.0);
-    gl_Position = vec4(aTexCoord.x, 0.01 * aTexCoord.y, 0.0, 1.0);
-    uv = aTexCoord;
+    float t = aPosition.x;
+    
+    vec2 curve = compute_rosette(z, t);
+    vec2 clip_position = complex_to_clip(curve);
+    
+    gl_Position = vec4(clip_position, 0.0, 1.0);
+    uv = aPosition.xy;
 }
 `;
 
 const ROSETTE_CURVE_FRAG_SHADER = `
 #define MAX_TERMS ${MAX_TERMS}
 #define PI 3.1415
+#define HALF_WIDTH 0.05
 precision highp float;
 
 varying vec2 uv;
 
 void main() {
-    gl_FragColor = vec4(1.0, 0.0, .0, 1.0);
+    float t = uv.x;
+    float center_dist = abs(uv.y - 0.5);
+    float center_mask = 1.0 - step(HALF_WIDTH, center_dist);
+    
+    vec4 color = vec4(1.0);
+    vec4 bg_color = vec4(0.5, 0.0, 1.0, 0.0);
+    gl_FragColor = mix(bg_color, color, center_mask);
 }
 `;
 
@@ -95,18 +169,7 @@ class RosetteCurveShader {
     
    draw() {
         this.update_time();
-        
-        const NUM_VERTICES = 256;
-        
-        //quad(0, 0, 1, 0, 1, 1, 0, 1);
-        beginShape();
-        for (let i = 0; i < NUM_VERTICES; i++) {
-            const t = i / (NUM_VERTICES - 1);
-            const x = cos(t);
-            const y = sin(t);
-            vertex(x, y, 0, t, 0);
-        }
-        endShape();
+        model(polyline_model);
         
         // Disable when done to get ready for the next shader
         this.disable();
@@ -174,5 +237,10 @@ class RosetteCurveShader {
         this.enable();
         const animation_buffer = this._pad_zeros(animation_params, MAX_TERMS);
         this._shader.setUniform('animation', animation_buffer);
+    }
+    
+    set_mouse_uv(mouse_uv) {
+        this.enable();
+        this._shader.setUniform('mouse_uv', mouse_uv);
     }
 }

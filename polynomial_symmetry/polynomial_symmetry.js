@@ -1,6 +1,8 @@
 let image_input;
 let update_button;
 
+let polyline_model;
+
 let image_texture;
 const log = new Log();
 const poly_shader = new PolynomialShader();
@@ -56,6 +58,10 @@ const SYMM_IN_MIRROR_OUT_MIRROR = new SymmetryRule({
 let zoom = 3;
 const ZOOM_DELTA = 0.5;
 
+function preload() {
+    polyline_model = loadModel('assets/polyline.obj');
+}
+
 function setup() {
     const canvas = createCanvas(512, 512, WEBGL);
     canvas.parent('p5-canvas');
@@ -74,8 +80,8 @@ function setup() {
     poly_shader.init_shader();
     poly_shader.set_zoom(zoom);
     poly_shader.symmetries = [SYMM_IN_ROTATION];
-    //poly_shader.set_texture(placeholder);
-    poly_shader.set_texture(camera_texture);
+    poly_shader.set_texture(placeholder);
+    //poly_shader.set_texture(camera_texture);
     
     poly_shader.set_coefficients(DEFAULT_COEFFICIENTS);
     poly_shader.set_animation(DEFAULT_ANIMATION);
@@ -107,7 +113,7 @@ function setup() {
 
 function draw() {
     background(0);
-    //poly_shader.draw();
+    poly_shader.draw();
     rosette_curve_shader.draw();
 }
 
@@ -236,4 +242,9 @@ function update_zoom(event) {
     rosette_curve_shader.set_zoom(zoom);
     
     event.preventDefault();
+}
+
+function mouseMoved() {
+    const mouse_uv = [mouseX / width, 1.0 - mouseY / height];
+    rosette_curve_shader.set_mouse_uv(mouse_uv);
 }
