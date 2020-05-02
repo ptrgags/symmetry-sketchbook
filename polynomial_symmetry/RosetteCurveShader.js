@@ -117,7 +117,7 @@ void main() {
     float center_dist = abs(uv.y - 0.5);
     float center_mask = 1.0 - step(HALF_WIDTH, center_dist);
     
-    vec4 color = vec4(1.0);
+    vec4 color = vec4(t, t, t, 1.0);
     vec4 bg_color = vec4(0.5, 0.0, 1.0, 0.0);
     gl_FragColor = mix(bg_color, color, center_mask);
 }

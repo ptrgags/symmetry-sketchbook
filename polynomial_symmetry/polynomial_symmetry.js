@@ -190,7 +190,10 @@ function parse_coefficients(text) {
             coeffs[i] = tuple[i];
         }
         
-        tuples.push(coeffs);
+        const [n, m, amp, phase] = coeffs;
+        const adjusted_phase = mod(radians(phase), TWO_PI);
+        
+        tuples.push([n, m, amp, adjusted_phase]);
     }
     
     return new Coefficients(tuples);
