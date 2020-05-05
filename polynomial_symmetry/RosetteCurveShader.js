@@ -29,6 +29,7 @@ uniform float zoom;
 uniform vec2 mouse_uv;
 
 varying vec2 uv;
+varying vec2 curve;
 
 vec2 to_complex(vec2 uv) {
     return (uv - 0.5) * aspect * zoom;
@@ -96,7 +97,7 @@ void main() {
     
     float t = aPosition.x;
     
-    vec2 curve = compute_rosette(z, t);
+    curve = compute_rosette(z, t);
     vec2 clip_position = complex_to_clip(curve);
     
     gl_Position = vec4(clip_position, 0.0, 1.0);
@@ -107,19 +108,39 @@ void main() {
 const ROSETTE_CURVE_FRAG_SHADER = `
 #define MAX_TERMS ${MAX_TERMS}
 #define PI 3.1415
-#define HALF_WIDTH 0.05
 precision highp float;
 
 varying vec2 uv;
+varying vec2 curve;
+
+// current canvas aspect ratio (width / height);
+uniform float aspect;
+// Scale factor for zooming
+uniform float zoom;
+
+// Texture from p5.js
+uniform sampler2D texture0;
+
+vec2 to_uv(vec2 complex) {
+    return complex / zoom / aspect + 0.5;
+}
 
 void main() {
     float t = uv.x;
     float center_dist = abs(uv.y - 0.5);
-    float center_mask = 1.0 - step(HALF_WIDTH, center_dist);
+    float outer_strip = 1.0 - step(0.15, center_dist);
+    float inner_strip = 1.0 - step(0.1, center_dist);
     
-    vec4 color = vec4(t, t, t, 1.0);
-    vec4 bg_color = vec4(0.5, 0.0, 1.0, 0.0);
-    gl_FragColor = mix(bg_color, color, center_mask);
+    vec2 z_uv = to_uv(curve);
+    z_uv.y = 1.0 - z_uv.y;
+    
+    vec4 value_color = texture2D(texture0, z_uv);
+    vec4 direction_color = vec4(t);
+    
+    vec4 image = vec4(0.0);
+    image = mix(image, direction_color, outer_strip);
+    image = mix(image, value_color, inner_strip);
+    gl_FragColor = image;
 }
 `;
 
@@ -127,6 +148,7 @@ class RosetteCurveShader {
     constructor() {
         this._shader = undefined;
         this._enabled = false;
+        this._initialized = false;
         this._coeffs = undefined;
         this._symmetries = [];
     }
@@ -140,6 +162,8 @@ class RosetteCurveShader {
         program.setUniform('zoom', 1.0);
         program.setUniform('aspect', width/height);
         program.setUniform('show_ref_geometry', 0.0);
+        
+        this._initialized = true;
     }
     
     get symmetries() {
@@ -148,9 +172,6 @@ class RosetteCurveShader {
     
     set symmetries(symmetries) {
         this._symmetries = symmetries;
-        for (const symmetry of this._symmetries) {
-            symmetry.log();
-        }
     }
     
     enable() {        
@@ -240,7 +261,17 @@ class RosetteCurveShader {
     }
     
     set_mouse_uv(mouse_uv) {
+        // Sometimes mouse events are triggered too early
+        if (!this._initialized) {
+            return;
+        }
         this.enable();
         this._shader.setUniform('mouse_uv', mouse_uv);
+    }
+    
+    set_texture(texture) {
+        this.enable();
+        texture.set_wrapping();
+        this._shader.setUniform('texture0', texture.texture);
     }
 }

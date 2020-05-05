@@ -148,9 +148,6 @@ class PolynomialShader {
     
     set symmetries(symmetries) {
         this._symmetries = symmetries;
-        for (const symmetry of this._symmetries) {
-            symmetry.log();
-        }
     }
     
     enable() {        
@@ -192,6 +189,11 @@ class PolynomialShader {
     set_zoom(zoom) {
         this.enable();
         this._shader.setUniform('zoom', zoom);
+    }
+    
+    set_show_ref_geometry(show) {
+        this.enable();
+        this._shader.setUniform('show_ref_geometry', show);
     }
     
     update_time() {

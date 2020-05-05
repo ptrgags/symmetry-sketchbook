@@ -40,11 +40,14 @@ class Coefficients {
         };
     }
     
-    log() {
+    to_html() {
+        const parts = [];
         for (const [n, m, amp, phase] of this) {
             const amp3 = amp.toPrecision(3);
             const phase_deg3 = degrees(phase).toPrecision(3);
-            log.log(`(${n}, ${m}, ${amp3}, ${phase_deg3}°)`);
+            const tuple = `(${n}, ${m}, ${amp3}, ${phase_deg3}°)`;
+            parts.push(tuple);
         }
+        return parts.join('<br/>');
     }
 }

@@ -20,7 +20,7 @@ class Log {
             console.log(level, message);
         }
         
-        const colored = `<span class="level">${message}</span>`;
+        const colored = `<span class="${level}">${message}</span>`;
         this._lines.push(colored);
         if (this._lines.length > this._max_lines) {
             this._lines.shift();

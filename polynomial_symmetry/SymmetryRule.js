@@ -249,15 +249,10 @@ class SymmetryRule {
         
         const output = output_terms.to_coefficients();
         if (output.size === 0) {
-            console.warn('no output terms. This might be an impossible symmetry rule');
+            log.warn('No output terms. Try starting with more coefficients');
         }
         
         console.assert(this.matches_symmetry(output), 'sanity check failed. Now running in insane mode');
-        
-        log.log('Selected coefficients:');
-        output.log();
-        
-        
         return output;
     }
     
@@ -315,10 +310,10 @@ class SymmetryRule {
         return [p, q];
     }
     
-    log() {
+    to_string() {
         const in_tuple = `(l=${this._input_rotation}, p=${this._input_inversion}, q=${this._input_mirror})`;
         const out_tuple = `(u=${this._output_rotation}, v=${this._output_mirror})`;
-        log.log(`SymmetryRule: k=${this._folds}, ${in_tuple}, ${out_tuple}`); 
+        return `PointSymmetry: k=${this._folds}, ${in_tuple}, ${out_tuple}`; 
     }
     
     static conjugate(amp, phase) {
@@ -395,11 +390,14 @@ class TermMap {
     set_term(n, m, amp, phase) {
         const key = `${n}, ${m}`;
         const value = [amp, phase];
+        // Still need to deal with this, but it's kinda noisy right now
+        /*
         if (this._terms.has(key)) {
             console.warn('Duplicate coefficient detected! clobbering');
             console.warn('old:', `a[${key}] = ${this._terms.get(key)}`);
             console.warn('new:', `a[${key}] = ${value}`);
         }
+        */
         this._terms.set(key, value);
     }
     
@@ -411,28 +409,48 @@ class TermMap {
         }
         return new Coefficients(terms);
     }
-    
-    /*
-    equals(other) {
-        if (this.size !== other.size) {
-            return false;
-        }
-        
-        for (const [key, value] of this._terms.entries()) {
-            const other_val = other._terms.get(key);
-            if (value !== other_val) {
-                return false;
-            }
-        }
-        
-        for (const[key, value] of other._terms.entries()) {
-            const this_val = this._terms.get(key);
-            if (this_val !== value) {
-                return false;
-            }
-        }
-        
-        return true;
+}
+
+class SymmetryManager {
+    constructor() {
+        this._symmetries = [];
+        this._shaders = [];
     }
-    */
+    
+    get symmetries() {
+        return this._symmetries();
+    }
+    
+    add_symmetry(symmetry) {
+        this._symmetries.push(symmetry);
+        this._update_shaders();
+        this.update_panel();
+    }
+    
+    clear_symmetries() {
+        this._symmetries = [];
+        this._update_shaders();
+        this.update_panel();
+    }
+    
+    get shaders() {
+        return this._shaders;
+    }
+    
+    set shaders(shaders) {
+        this._shaders = shaders;
+    }
+    
+    _update_shaders() {
+        for (const shader of this._shaders) {
+            shader.symmetries = this._symmetries;
+            shader.set_coefficients();
+        }
+    }
+    
+    update_panel() {
+        const panel = document.getElementById('current-symmetries');
+        const lines = this._symmetries.map(x => x.to_string()).join('<br/>');
+        panel.innerHTML = `Current Symmetries:<br/>${lines}`;
+    }
 }
