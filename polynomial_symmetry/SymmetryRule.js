@@ -152,7 +152,7 @@
  * Congrats, you survived a crash course in Applied Group Theory.
  * Reward: source code to actually implement this!
  */
-class SymmetryRule {
+class PointSymmetry {
     constructor(options) {
         options = options || {};
         // Mirror symmetry across the x-axis.
@@ -186,7 +186,7 @@ class SymmetryRule {
             
             [amp2, phase2] = this._transform_coeff(n, m, amp2, phase2);
             
-            if (!SymmetryRule.terms_approx_equal([amp, phase], [amp2, phase2])) {
+            if (!PointSymmetry.terms_approx_equal([amp, phase], [amp2, phase2])) {
                 return false;
             }
         }
@@ -198,11 +198,11 @@ class SymmetryRule {
         let [amp2, phase2] = [amp, phase];
         
         if (this._output_mirror === 1) {
-            [amp2, phase2] = SymmetryRule.conjugate(amp2, phase2);
+            [amp2, phase2] = PointSymmetry.conjugate(amp2, phase2);
         }
             
         const power = this._compute_rotation_power(n, m);
-        [amp2, phase2] = SymmetryRule.rotate(amp2, phase2, this._folds, power);
+        [amp2, phase2] = PointSymmetry.rotate(amp2, phase2, this._folds, power);
         
         return [amp2, phase2];
     }
@@ -229,7 +229,7 @@ class SymmetryRule {
             let [i, j] = this._find_partner(n, m);
             let [amp2, phase2] = this._transform_coeff(n, m, amp, phase);
             if (i === n && j === m) {
-                if (SymmetryRule.terms_approx_equal([amp, phase], [amp2, phase2])) {
+                if (PointSymmetry.terms_approx_equal([amp, phase], [amp2, phase2])) {
                     output_terms.set_term(n, m, amp, phase);
                 } else {
                     // Don't add the term to the output, implicitly setting it to 0 
@@ -238,7 +238,7 @@ class SymmetryRule {
             }
             
             let [amp3, phase3] = this._transform_coeff(n, m, amp2, phase2);
-            if (SymmetryRule.terms_approx_equal([amp3, phase3], [amp, phase])) {
+            if (PointSymmetry.terms_approx_equal([amp3, phase3], [amp, phase])) {
                 output_terms.set_term(n, m, amp, phase);
                 output_terms.set_term(i, j, amp2, phase2);
             } else {
@@ -298,13 +298,13 @@ class SymmetryRule {
         let [p, q] = [n, m];
         
         if (this._input_inversion === 1) {
-            [p, q] = SymmetryRule.negate(p, q);
+            [p, q] = PointSymmetry.negate(p, q);
         }
         
         // Only need to swap if one of the mirror symmetry options is chosen.
         const reflect_count = this._input_mirror + this._output_mirror;
         if (reflect_count === 1) {
-            [p, q] = SymmetryRule.swap(p, q);
+            [p, q] = PointSymmetry.swap(p, q);
         }
         
         return [p, q];
@@ -409,6 +409,15 @@ class TermMap {
         }
         return new Coefficients(terms);
     }
+}
+
+/**
+ * Frieze symmetry is created by plugging Phi(z) = e^iz
+ * into the same polynomial f(z) = sum_nm a_nm z^n conj(z)^m
+ *
+ * This limits 
+ */
+class FriezeSymmetry extends PointSymmetry {
 }
 
 class SymmetryManager {

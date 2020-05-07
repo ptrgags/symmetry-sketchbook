@@ -1,29 +1,16 @@
-const POLYNOMIAL_VERT_SHADER = `
+const MAX_TERMS = 64;
+
+const PATTERN_TYPES = {
+    ROSETTE: 0,
+    FRIEZE: 1
+};
+
+const DEMO_VERT_SHADER = (type) => `
+#define PATTERN_TYPE ${type}
+#define MAX_TERMS ${MAX_TERMS}
+#define PI 3.141592
 attribute vec3 aPosition;
 attribute vec2 aTexCoord;
-
-varying vec2 uv;
-
-void main() {
-    vec4 position = vec4(aPosition, 1.0);
-    gl_Position = position;
-    uv = aTexCoord;
-    
-    // Flip y.
-    uv.y = 1.0 - uv.y;
-}
-`;
-
-const POLYNOMIAL_FRAG_SHADER = (type) => `
-#define MAX_TERMS ${MAX_TERMS}
-#define PATTERN_TYPE ${type}
-#define PI 3.1415
-precision highp float;
-
-varying vec2 uv;
-
-// Texture from p5.js
-uniform sampler2D texture0;
 
 // n = powers[i].x = exponent of z
 // m = powers[i].y = exponent of conj(z)
@@ -33,20 +20,19 @@ uniform vec2 powers[MAX_TERMS];
 // These are stored as (amplitude, phase). phase is
 // in radians.
 uniform vec2 coeffs[MAX_TERMS];
-// animation parameters. for each (n, m) term
-// we have a phase delta, which turns the coefficient into:
-// (r, theta + phase_delta * time))
-uniform float animation[MAX_TERMS];
+
+uniform float aspect;
+uniform float zoom;
+
 // Elapsed time since the page load in seconds.
 uniform float time;
 
-// current canvas aspect ratio (width / height);
-uniform float aspect;
-// Scale factor for zooming
-uniform float zoom;
+varying vec2 uv;
+varying vec2 warped_pos;
 
-// 1.0 to enable, 0.0 to disable
-uniform float show_ref_geometry;
+// Mouse position across the canvas. Might be outside
+// [0, 1] if the mouse is outside the canvas.
+uniform vec2 mouse_uv;
 
 vec2 to_polar(vec2 rect) {
     float r = length(rect);
@@ -76,10 +62,6 @@ vec2 compute_polynomial(vec2 z) {
         
         // amplitude, phase
         vec2 coeff = coeffs[i];
-        
-        // Animate the coefficients for a fun twist.
-        // (sometimes literally)
-        coeff.y += animation[i] * time;
         
         float r = coeff.x * pow(z_polar.x, n + m);
         float theta = z_polar.y * (n - m) + coeff.y;
@@ -126,50 +108,92 @@ vec2 to_uv(vec2 complex) {
     return complex / zoom / aspect + 0.5;
 }
 
+vec2 complex_to_clip(vec2 complex) {
+    vec2 uv = to_uv(complex);
+    return 2.0 * uv - 1.0;
+}
+
 void main() {
+    uv = aTexCoord;
+    
+    vec2 grid_position = aPosition.xy;
     vec2 complex = to_complex(uv);
     vec2 z = compute_polynomial(complex);
-    vec2 z_uv = to_uv(z);
-    vec4 output_color = texture2D(texture0, fract(z_uv));
     
-    float unit_circle_dist = abs(length(complex) - 1.0);
-    float unit_circle_mask = smoothstep(0.02, 0.01, unit_circle_dist);
+    warped_pos = complex_to_clip(z);
     
-    float modulus = length(z);
-    float far_away = smoothstep(10.0, 50.0, modulus);
-    float near_zero = smoothstep(0.11, 0.1, modulus);
+    float t = clamp(mouse_uv.x, 0.0, 1.0);
+    vec2 pos = mix(grid_position, warped_pos, t);
     
-    const vec4 YELLOW = vec4(1.0, 1.0, 0.0, 1.0);
-    const vec4 BLACK = vec4(0.0, 0.0, 0.0, 1.0);
-    
-    vec4 image = output_color;
-    image = mix(image, YELLOW, unit_circle_mask * show_ref_geometry);
-    image = mix(image, YELLOW, near_zero * show_ref_geometry);
-    image = mix(image, BLACK, far_away);
-    gl_FragColor = image;
+    gl_Position = vec4(pos, 0.0, 1.0); 
 }
 `;
 
-// ====================================================================
+const DEMO_FRAG_SHADER = `
+#define GRID_WIDTH 49.0
+precision highp float;
 
-class PolynomialShader {
+varying vec2 uv;
+varying vec2 warped_pos;
+
+// Texture from p5.js
+uniform sampler2D texture0;
+
+
+// Elapsed time since the page load in seconds.
+uniform float time;
+
+// current canvas aspect ratio (widt / height);
+uniform float aspect;
+// Scale factor for zooming
+uniform float zoom;
+
+uniform vec2 mouse_uv;
+
+vec2 to_complex(vec2 uv) {
+    return (uv - 0.5) * aspect * zoom;
+}
+
+vec2 to_uv(vec2 complex) {
+    return complex / zoom / aspect + 0.5;
+}
+
+void main() {
+    vec2 z_uv = to_uv(warped_pos);
+    z_uv.y = 1.0 - z_uv.y;
+    vec4 tex_color = texture2D(texture0, fract(z_uv));
+    vec4 grid_lines = vec4(1.0);
+    float t = clamp(mouse_uv.y, 0.0, 1.0);
+    vec4 color = mix(grid_lines, tex_color, t); 
+    
+    vec2 cell_uv = fract(GRID_WIDTH * uv);
+    vec2 from_center = 2.0 * abs(cell_uv - 0.5);
+    float dist_from_center = max(from_center.x, from_center.y);
+    float mask = 1.0 - step(dist_from_center, 0.8);
+    
+    gl_FragColor = mask * color;
+}
+`;
+
+class DemoShader {
     constructor(type) {
         this._shader_type = type;
         this._shader = undefined;
         this._enabled = false;
         this._coeffs = undefined;
+        this._initialized = false;
         this._symmetries = [];
     }
     
     init_shader() {
-        const program = createShader(POLYNOMIAL_VERT_SHADER, POLYNOMIAL_FRAG_SHADER(this._shader_type));
+        const program = createShader(DEMO_VERT_SHADER(this._shader_type), DEMO_FRAG_SHADER);
         this._shader = program;
         this.enable();
         
         program.setUniform('time', 0.0);
         program.setUniform('zoom', 1.0);
         program.setUniform('aspect', width/height);
-        program.setUniform('show_ref_geometry', 0.0);
+        this._initialized = true;
     }
     
     get symmetries() {
@@ -196,17 +220,8 @@ class PolynomialShader {
     
    draw() {
         this.update_time();
-        noStroke();
-        
-        // This makes sure the alpha channel is enabled for
-        // transparent images.
         fill(0, 0, 0, 0);
-        
-        // Draw a quad that spans the canvas. Since the vertex shader
-        // ignores the model matrix, use clip coordinates
-        const hw = 1;
-        const hh = 1;
-        quad(-hw, -hh, hw, -hh, hw, hh, -hw, hh);
+        model(grid_model);
         
         // Disable when done to get ready for the next shader
         this.disable();
@@ -219,11 +234,6 @@ class PolynomialShader {
     set_zoom(zoom) {
         this.enable();
         this._shader.setUniform('zoom', zoom);
-    }
-    
-    set_show_ref_geometry(show) {
-        this.enable();
-        this._shader.setUniform('show_ref_geometry', show);
     }
     
     update_time() {
@@ -281,9 +291,12 @@ class PolynomialShader {
         program.setUniform('coeffs', coeffs_buffer);
     }
     
-    set_animation(animation_params) {
+    set_mouse_uv(mouse_uv) {
+        // Sometimes mouse events are triggered too early
+        if (!this._initialized) {
+            return;
+        }
         this.enable();
-        const animation_buffer = this._pad_zeros(animation_params, MAX_TERMS);
-        this._shader.setUniform('animation', animation_buffer);
+        this._shader.setUniform('mouse_uv', mouse_uv);
     }
 }

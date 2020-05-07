@@ -1,9 +1,11 @@
 let polyline_model;
+let grid_model;
 
 const log = new Log();
 const symmetries = new SymmetryManager();
 const textures = new TextureManager([256, 256]);
-const poly_shader = new PolynomialShader();
+const poly_shader = new PolynomialShader(PATTERN_TYPES.ROSETTE);
+const demo_shader = new DemoShader(PATTERN_TYPES.ROSETTE);
 const rosette_curve_shader = new RosetteCurveShader();
 
 let image_texture;
@@ -33,7 +35,7 @@ const DEFAULT_ANIMATION = [
     0
 ];
 
-const DEFAULT_SYMMETRY = new SymmetryRule({
+const DEFAULT_SYMMETRY = new PointSymmetry({
     folds: 4,
     input_rotation: 1
 });
@@ -43,9 +45,11 @@ const ZOOM_DELTA = 0.5;
 
 function preload() {
     polyline_model = loadModel('assets/polyline.obj');
+    grid_model = loadModel('assets/grid.obj');
 }
 
 function setup() {
+    //const canvas = createCanvas(800, 400, WEBGL);
     const canvas = createCanvas(400, 400, WEBGL);
     canvas.parent('p5-canvas');
     canvas.canvas.addEventListener('wheel', update_zoom);
@@ -60,17 +64,22 @@ function setup() {
     poly_shader.set_animation(DEFAULT_ANIMATION);
     poly_shader.disable();
     
+    demo_shader.init_shader();
+    demo_shader.set_zoom(zoom);
+    demo_shader.set_coefficients(DEFAULT_COEFFICIENTS);
+    demo_shader.disable();
+    
     rosette_curve_shader.init_shader();
     rosette_curve_shader.set_zoom(zoom);
     rosette_curve_shader.set_coefficients(DEFAULT_COEFFICIENTS);
     rosette_curve_shader.set_animation(DEFAULT_ANIMATION);
     rosette_curve_shader.disable();
     
-    symmetries.shaders = [poly_shader, rosette_curve_shader];
+    symmetries.shaders = [demo_shader, poly_shader, rosette_curve_shader];
     symmetries.add_symmetry(DEFAULT_SYMMETRY);
     symmetries.update_panel();
     
-    textures.shaders = [poly_shader, rosette_curve_shader];
+    textures.shaders = [demo_shader, poly_shader, rosette_curve_shader];
     textures.texture = BUILT_IN_TEXTURES.checkerboard;
     
     attach_handlers();
@@ -138,8 +147,9 @@ function update_display_curves(e) {
 }
 
 function draw() {
-    background(0);
-    poly_shader.draw();
+    background(0, 40, 45);
+    //poly_shader.draw();
+    demo_shader.draw();
     
     if (show_curves) {
         rosette_curve_shader.draw();
@@ -175,13 +185,16 @@ function set_random_coefficients() {
     
     const coeffs = new Coefficients(terms);
     poly_shader.set_coefficients(coeffs);
+    demo_shader.set_coefficients(coeffs);
     rosette_curve_shader.set_coefficients(coeffs);
+    
 }
 
 function update_coefficients() {
     const coeff_input = document.getElementById('coeffs');
     const coefficients = parse_coefficients(coeff_input.value);
     poly_shader.set_coefficients(coefficients);
+    demo_shader.set_coefficients(coefficients);
     rosette_curve_shader.set_coefficients(coefficients);
     
     /*
@@ -254,7 +267,7 @@ function value_or_default(id, default_val) {
 }
 
 function add_point_symmetry() {
-    const symmetry = new SymmetryRule({
+    const symmetry = new PointSymmetry({
         folds: value_or_default('folds', 1),
         input_rotation: value_or_default('in-rotation', 0),
         input_mirror: value_or_default('in-reflection', 0),
@@ -274,6 +287,7 @@ function update_zoom(event) {
     zoom = max(zoom, ZOOM_DELTA);
     poly_shader.set_zoom(zoom);
     rosette_curve_shader.set_zoom(zoom);
+    demo_shader.set_zoom(zoom);
     
     event.preventDefault();
 }
@@ -281,4 +295,5 @@ function update_zoom(event) {
 function mouseMoved() {
     const mouse_uv = [mouseX / width, 1.0 - mouseY / height];
     rosette_curve_shader.set_mouse_uv(mouse_uv);
+    demo_shader.set_mouse_uv(mouse_uv);
 }
