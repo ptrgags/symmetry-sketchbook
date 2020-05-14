@@ -10,6 +10,7 @@ const rosette_curve_shader = new RosetteCurveShader();
 
 let image_texture;
 let show_curves = false;
+let show_demo = false;
 
 const BUILT_IN_TEXTURES = {
     checkerboard: new Checkerboard(),
@@ -130,6 +131,9 @@ function attach_handlers() {
     const toggle_curve = document.getElementById('toggle-display-curves');
     toggle_curve.addEventListener('click', update_display_curves);
     
+    const toggle_demo = document.getElementById('toggle-demo-mode');
+    toggle_demo.addEventListener('click', update_demo_mode);
+    
     setup_texture_dropdown();
 }
 
@@ -142,14 +146,22 @@ function update_ref_geometry(e) {
     poly_shader.set_show_ref_geometry(show_ref_geometry);
 }
 
+function update_demo_mode(e) {
+    show_demo = e.target.checked;
+}
+
 function update_display_curves(e) {
     show_curves = e.target.checked;
 }
 
 function draw() {
     background(0, 40, 45);
-    //poly_shader.draw();
-    demo_shader.draw();
+    
+    if (show_demo) {
+        demo_shader.draw();
+    } else {
+        poly_shader.draw();
+    }
     
     if (show_curves) {
         rosette_curve_shader.draw();

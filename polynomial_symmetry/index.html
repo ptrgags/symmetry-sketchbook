@@ -68,6 +68,14 @@
       font-weight: bold;
   }
   
+  .hidden {
+      display: none
+  }
+  
+  #p5-canvas {
+      margin: 16px;
+  }
+  
   </style>
 </head>
 <body>
@@ -87,8 +95,8 @@
         <label for="image-input">Choose a PNG or JPEG image texture:</label>
         <input id="image-input" type="file" accept="image/png, image/jpeg" />
         <br/>
-        <span class="or">OR</span>
-        <button id="use-webcam">Use Webcam</button>
+        <span class="or hidden">OR</span>
+        <button id="use-webcam" class="hidden">Use Webcam</button>
       </div>
       <div id="coefficient-settings">
         <h3>Coefficient Settings</h3>
@@ -138,6 +146,9 @@
        <br/>
        <label for="toggle-display-curves" type="checkbox">Display Rosette Curves</input>
        <input id="toggle-display-curves" type="checkbox" />
+       <br/>
+       <label for="toggle-demo-mode" type="checkbox">Enable Demo Mode</input>
+       <input id="toggle-demo-mode" type="checkbox" />
       </div>
       <div id="log-panel">
         <h3>Log</h3>
