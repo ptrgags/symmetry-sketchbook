@@ -1,29 +1,8 @@
-const POLYNOMIAL_VERT_SHADER = `
-attribute vec3 aPosition;
-attribute vec2 aTexCoord;
-
-varying vec2 uv;
-
-void main() {
-    vec4 position = vec4(aPosition, 1.0);
-    gl_Position = position;
-    uv = aTexCoord;
-    
-    // Flip y.
-    uv.y = 1.0 - uv.y;
-}
-`;
-
-const POLYNOMIAL_FRAG_SHADER = (type) => `
+const ROSETTE_CURVE_VERT_SHADER = `
 #define MAX_TERMS ${MAX_TERMS}
-#define PATTERN_TYPE ${type}
+#define THICKNESS 0.01
 #define PI 3.1415
-precision highp float;
-
-varying vec2 uv;
-
-// Texture from p5.js
-uniform sampler2D texture0;
+attribute vec3 aPosition;
 
 // n = powers[i].x = exponent of z
 // m = powers[i].y = exponent of conj(z)
@@ -45,8 +24,25 @@ uniform float aspect;
 // Scale factor for zooming
 uniform float zoom;
 
-// 1.0 to enable, 0.0 to disable
-uniform float show_ref_geometry;
+// Mouse position across the canvas. Might be outside
+// [0, 1] if the mouse is outside the canvas.
+uniform vec2 mouse_uv;
+
+varying vec2 uv;
+varying vec2 curve;
+
+vec2 to_complex(vec2 uv) {
+    return (uv - 0.5) * aspect * zoom;
+}
+
+vec2 to_uv(vec2 complex) {
+    return complex / zoom / aspect + 0.5;
+}
+
+vec2 complex_to_clip(vec2 complex) {
+    vec2 uv = to_uv(complex);
+    return 2.0 * uv - 1.0;
+}
 
 vec2 to_polar(vec2 rect) {
     float r = length(rect);
@@ -60,14 +56,15 @@ vec2 to_rect(vec2 polar) {
     return vec2(x, y);
 }
 
-#if PATTERN_TYPE == ${PATTERN_TYPES.ROSETTE}
-vec2 compute_polynomial(vec2 z) {
+vec2 compute_rosette(vec2 z, float t) {
     vec2 z_polar = to_polar(z);
     vec2 sum = vec2(0.0);
     for (int i = 0; i < MAX_TERMS; i++) {
-        // compute a_nm z^n conj(z)^m
-        // which can be written as 
-        // a_nm.r * z.r^(n + m) * exp(i * ((n - m) * z.theta + a_nm.theta)) 
+        // Similar to the polynomial shader, except now
+        // we're plugging in the circle z*e^(i * 2pi * t) = r * exp(i * 2pi * t + phase)
+        // a_nm circle(z, t)^n conj(circle(z, t))^m
+        // = a_nm.r * expi(a_nm.theta) * z.r^n * expi(n * (2pi * t + phase)) * z.r^m * expi(-m * (2pi * t + phase))  
+        // = a_nm.r * z.r^(n + m) * expi((n - m) * (2pi * t + phase) + a_nm.theta)
         
         // powers
         vec2 nm = powers[i];
@@ -82,87 +79,82 @@ vec2 compute_polynomial(vec2 z) {
         coeff.y += animation[i] * time;
         
         float r = coeff.x * pow(z_polar.x, n + m);
-        float theta = z_polar.y * (n - m) + coeff.y;
+        float theta = (n - m) * (2.0 * PI * t + z_polar.y) + coeff.y;
         
         vec2 rect = to_rect(vec2(r, theta));
         sum += rect;
     }
     return sum;
 }
-#elif PATTERN_TYPE == ${PATTERN_TYPES.FRIEZE}
-vec2 compute_polynomial(vec2 z) {    
-    vec2 sum = vec2(0.0);
-    for (int i = 0; i < MAX_TERMS; i++) {
-        // Frieze symmetry is taken by composing the
-        // rosette symmetry polynomial f(z) with Phi(z) = e^iz
-        // to form f(Phi(z)) which expands to
-        // a_nm.r * exp(-z.y * (n + m)) * expi(z.x * (n - m) + a_nm.theta)
-        
-        vec2 nm = powers[i];
-        float n = nm.x;
-        float m = nm.y;
-        
-        // amplitude, phase
-        vec2 a_nm = coeffs[i];
-        // Animate the phase
-        a_nm.y += animation[i] * time;
-        
-        float r =  a_nm.x * exp(-z.y * (n + m));
-        float theta = z.x * (n - m) + a_nm.y;
-        
-        vec2 rect = to_rect(vec2(r, theta));
-        sum += rect;
-        
-    }
-    return sum;
-}
-#endif
 
-vec2 to_complex(vec2 uv) {
-    return (uv - 0.5) * aspect * zoom;
+void main() {
+    // Starting point is mouse position. however, offset the line slightly to create some thickness.
+    float row = aPosition.y;
+    float sidestep = mix(-THICKNESS, THICKNESS, row);
+    vec2 direction = normalize(mouse_uv - 0.5);
+    vec2 offset_uv = mouse_uv + sidestep * direction;
+    vec2 z = to_complex(offset_uv);
+    
+    float t = aPosition.x;
+    
+    curve = compute_rosette(z, t);
+    vec2 clip_position = complex_to_clip(curve);
+    
+    gl_Position = vec4(clip_position, 0.0, 1.0);
+    uv = aPosition.xy;
 }
+`;
+
+const ROSETTE_CURVE_FRAG_SHADER = `
+#define MAX_TERMS ${MAX_TERMS}
+#define PI 3.1415
+precision highp float;
+
+varying vec2 uv;
+varying vec2 curve;
+
+// current canvas aspect ratio (width / height);
+uniform float aspect;
+// Scale factor for zooming
+uniform float zoom;
+
+// Texture from p5.js
+uniform sampler2D texture0;
 
 vec2 to_uv(vec2 complex) {
     return complex / zoom / aspect + 0.5;
 }
 
 void main() {
-    vec2 complex = to_complex(uv);
-    vec2 z = compute_polynomial(complex);
-    vec2 z_uv = to_uv(z);
-    vec4 output_color = texture2D(texture0, fract(z_uv));
+    float t = uv.x;
+    float center_dist = abs(uv.y - 0.5);
+    float outer_strip = 1.0 - step(0.15, center_dist);
+    float inner_strip = 1.0 - step(0.1, center_dist);
     
-    float unit_circle_dist = abs(length(complex) - 1.0);
-    float unit_circle_mask = smoothstep(0.02, 0.01, unit_circle_dist);
+    vec2 z_uv = to_uv(curve);
+    z_uv.y = 1.0 - z_uv.y;
     
-    float modulus = length(z);
-    float far_away = smoothstep(10.0, 50.0, modulus);
-    float near_zero = smoothstep(0.11, 0.1, modulus);
+    vec4 value_color = texture2D(texture0, z_uv);
+    vec4 direction_color = vec4(t);
     
-    const vec4 YELLOW = vec4(1.0, 1.0, 0.0, 1.0);
-    const vec4 BLACK = vec4(0.0, 0.0, 0.0, 1.0);
-    
-    vec4 image = output_color;
-    image = mix(image, YELLOW, unit_circle_mask * show_ref_geometry);
-    image = mix(image, YELLOW, near_zero * show_ref_geometry);
-    image = mix(image, BLACK, far_away);
+    vec4 image = vec4(0.0);
+    image = mix(image, direction_color, outer_strip);
+    image = mix(image, value_color, inner_strip);
     gl_FragColor = image;
 }
 `;
 
-// ====================================================================
-
-class PolynomialShader {
-    constructor(type) {
-        this._shader_type = type;
+class RosetteCurveShader {
+    constructor() {
         this._shader = undefined;
         this._enabled = false;
+        this._initialized = false;
         this._coeffs = undefined;
         this._symmetries = [];
     }
     
     init_shader() {
-        const program = createShader(POLYNOMIAL_VERT_SHADER, POLYNOMIAL_FRAG_SHADER(this._shader_type));
+        const program = createShader(ROSETTE_CURVE_VERT_SHADER, ROSETTE_CURVE_FRAG_SHADER);
         this._shader = program;
         this.enable();
         
@@ -170,6 +162,8 @@ class PolynomialShader {
         program.setUniform('zoom', 1.0);
         program.setUniform('aspect', width/height);
         program.setUniform('show_ref_geometry', 0.0);
+        
+        this._initialized = true;
     }
     
     get symmetries() {
@@ -196,17 +190,7 @@ class PolynomialShader {
     
    draw() {
         this.update_time();
-        noStroke();
-        
-        // This makes sure the alpha channel is enabled for
-        // transparent images.
-        fill(0, 0, 0, 0);
-        
-        // Draw a quad that spans the canvas. Since the vertex shader
-        // ignores the model matrix, use clip coordinates
-        const hw = 1;
-        const hh = 1;
-        quad(-hw, -hh, hw, -hh, hw, hh, -hw, hh);
+        model(polyline_model);
         
         // Disable when done to get ready for the next shader
         this.disable();
@@ -221,20 +205,9 @@ class PolynomialShader {
         this._shader.setUniform('zoom', zoom);
     }
     
-    set_show_ref_geometry(show) {
-        this.enable();
-        this._shader.setUniform('show_ref_geometry', show);
-    }
-    
     update_time() {
         this.enable();
         this._shader.setUniform('time', millis() / 1000.0);
-    }
-    
-    set_texture(texture) {
-        this.enable();
-        texture.set_wrapping();
-        this._shader.setUniform('texture0', texture.texture);
     }
      
     _pad_zeros(values, desired_length) {
@@ -285,5 +258,20 @@ class PolynomialShader {
         this.enable();
         const animation_buffer = this._pad_zeros(animation_params, MAX_TERMS);
         this._shader.setUniform('animation', animation_buffer);
+    }
+    
+    set_mouse_uv(mouse_uv) {
+        // Sometimes mouse events are triggered too early
+        if (!this._initialized) {
+            return;
+        }
+        this.enable();
+        this._shader.setUniform('mouse_uv', mouse_uv);
+    }
+    
+    set_texture(texture) {
+        this.enable();
+        texture.set_wrapping();
+        this._shader.setUniform('texture0', texture.texture);
     }
 }

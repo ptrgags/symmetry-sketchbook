@@ -152,7 +152,7 @@
  * Congrats, you survived a crash course in Applied Group Theory.
  * Reward: source code to actually implement this!
  */
-class SymmetryRule {
+class PointSymmetry {
     constructor(options) {
         options = options || {};
         // Mirror symmetry across the x-axis.
@@ -186,7 +186,7 @@ class SymmetryRule {
             
             [amp2, phase2] = this._transform_coeff(n, m, amp2, phase2);
             
-            if (!SymmetryRule.terms_approx_equal([amp, phase], [amp2, phase2])) {
+            if (!PointSymmetry.terms_approx_equal([amp, phase], [amp2, phase2])) {
                 return false;
             }
         }
@@ -198,11 +198,11 @@ class SymmetryRule {
         let [amp2, phase2] = [amp, phase];
         
         if (this._output_mirror === 1) {
-            [amp2, phase2] = SymmetryRule.conjugate(amp2, phase2);
+            [amp2, phase2] = PointSymmetry.conjugate(amp2, phase2);
         }
             
         const power = this._compute_rotation_power(n, m);
-        [amp2, phase2] = SymmetryRule.rotate(amp2, phase2, this._folds, power);
+        [amp2, phase2] = PointSymmetry.rotate(amp2, phase2, this._folds, power);
         
         return [amp2, phase2];
     }
@@ -229,7 +229,7 @@ class SymmetryRule {
             let [i, j] = this._find_partner(n, m);
             let [amp2, phase2] = this._transform_coeff(n, m, amp, phase);
             if (i === n && j === m) {
-                if (SymmetryRule.terms_approx_equal([amp, phase], [amp2, phase2])) {
+                if (PointSymmetry.terms_approx_equal([amp, phase], [amp2, phase2])) {
                     output_terms.set_term(n, m, amp, phase);
                 } else {
                     // Don't add the term to the output, implicitly setting it to 0 
@@ -238,7 +238,7 @@ class SymmetryRule {
             }
             
             let [amp3, phase3] = this._transform_coeff(n, m, amp2, phase2);
-            if (SymmetryRule.terms_approx_equal([amp3, phase3], [amp, phase])) {
+            if (PointSymmetry.terms_approx_equal([amp3, phase3], [amp, phase])) {
                 output_terms.set_term(n, m, amp, phase);
                 output_terms.set_term(i, j, amp2, phase2);
             } else {
@@ -249,15 +249,10 @@ class SymmetryRule {
         
         const output = output_terms.to_coefficients();
         if (output.size === 0) {
-            console.warn('no output terms. This might be an impossible symmetry rule');
+            log.warn('No output terms. Try starting with more coefficients');
         }
         
         console.assert(this.matches_symmetry(output), 'sanity check failed. Now running in insane mode');
-        
-        log.log('Selected coefficients:');
-        output.log();
-        
-        
         return output;
     }
     
@@ -303,22 +298,22 @@ class SymmetryRule {
         let [p, q] = [n, m];
         
         if (this._input_inversion === 1) {
-            [p, q] = SymmetryRule.negate(p, q);
+            [p, q] = PointSymmetry.negate(p, q);
         }
         
         // Only need to swap if one of the mirror symmetry options is chosen.
         const reflect_count = this._input_mirror + this._output_mirror;
         if (reflect_count === 1) {
-            [p, q] = SymmetryRule.swap(p, q);
+            [p, q] = PointSymmetry.swap(p, q);
         }
         
         return [p, q];
     }
     
-    log() {
+    to_string() {
         const in_tuple = `(l=${this._input_rotation}, p=${this._input_inversion}, q=${this._input_mirror})`;
         const out_tuple = `(u=${this._output_rotation}, v=${this._output_mirror})`;
-        log.log(`SymmetryRule: k=${this._folds}, ${in_tuple}, ${out_tuple}`); 
+        return `PointSymmetry: k=${this._folds}, ${in_tuple}, ${out_tuple}`; 
     }
     
     static conjugate(amp, phase) {
@@ -395,11 +390,14 @@ class TermMap {
     set_term(n, m, amp, phase) {
         const key = `${n}, ${m}`;
         const value = [amp, phase];
+        // Still need to deal with this, but it's kinda noisy right now
+        /*
         if (this._terms.has(key)) {
             console.warn('Duplicate coefficient detected! clobbering');
             console.warn('old:', `a[${key}] = ${this._terms.get(key)}`);
             console.warn('new:', `a[${key}] = ${value}`);
         }
+        */
         this._terms.set(key, value);
     }
     
@@ -411,28 +409,57 @@ class TermMap {
         }
         return new Coefficients(terms);
     }
-    
-    /*
-    equals(other) {
-        if (this.size !== other.size) {
-            return false;
-        }
-        
-        for (const [key, value] of this._terms.entries()) {
-            const other_val = other._terms.get(key);
-            if (value !== other_val) {
-                return false;
-            }
-        }
-        
-        for (const[key, value] of other._terms.entries()) {
-            const this_val = this._terms.get(key);
-            if (this_val !== value) {
-                return false;
-            }
-        }
-        
-        return true;
+}
+
+/**
+ * Frieze symmetry is created by plugging Phi(z) = e^iz
+ * into the same polynomial f(z) = sum_nm a_nm z^n conj(z)^m
+ *
+ * This limits 
+ */
+class FriezeSymmetry extends PointSymmetry {
+}
+
+class SymmetryManager {
+    constructor() {
+        this._symmetries = [];
+        this._shaders = [];
     }
-    */
+    
+    get symmetries() {
+        return this._symmetries();
+    }
+    
+    add_symmetry(symmetry) {
+        this._symmetries.push(symmetry);
+        this._update_shaders();
+        this.update_panel();
+    }
+    
+    clear_symmetries() {
+        this._symmetries = [];
+        this._update_shaders();
+        this.update_panel();
+    }
+    
+    get shaders() {
+        return this._shaders;
+    }
+    
+    set shaders(shaders) {
+        this._shaders = shaders;
+    }
+    
+    _update_shaders() {
+        for (const shader of this._shaders) {
+            shader.symmetries = this._symmetries;
+            shader.set_coefficients();
+        }
+    }
+    
+    update_panel() {
+        const panel = document.getElementById('current-symmetries');
+        const lines = this._symmetries.map(x => x.to_string()).join('<br/>');
+        panel.innerHTML = `Current Symmetries:<br/>${lines}`;
+    }
 }

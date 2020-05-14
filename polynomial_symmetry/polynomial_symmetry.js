@@ -1,11 +1,24 @@
-let image_input;
-let update_button;
+let polyline_model;
+let grid_model;
+
+const log = new Log();
+const symmetries = new SymmetryManager();
+const textures = new TextureManager([256, 256]);
+const poly_shader = new PolynomialShader(PATTERN_TYPES.ROSETTE);
+const demo_shader = new DemoShader(PATTERN_TYPES.ROSETTE);
+const rosette_curve_shader = new RosetteCurveShader();
 
 let image_texture;
-const log = new Log();
-const poly_shader = new PolynomialShader();
-const placeholder = new Checkerboard();
-//const placeholder = new HalfPlanes();
+let show_curves = false;
+let show_demo = false;
+
+const BUILT_IN_TEXTURES = {
+    checkerboard: new Checkerboard(),
+    half_planes: new HalfPlanes()
+};
+
+const webcam = new WebcamTexture();
+
 const DEFAULT_COEFFICIENTS = new Coefficients([
     [1, 0, 1, 0],
     [2, 0, 1/2, 0],
@@ -23,93 +36,136 @@ const DEFAULT_ANIMATION = [
     0
 ];
 
-const SYMM_NONE = new SymmetryRule();
-
-const SYMM_IN_MIRROR = new SymmetryRule({
-    input_mirror: 1
-});
-
-const SYMM_IN_INVERSION = new SymmetryRule({
-    input_inversion: 1
-});
-
-const SYMM_IN_CIRCLE_INVERSION = new SymmetryRule({
-    input_mirror: 1,
-    input_inversion: 1
-});
-
-const SYMM_OUT_MIRROR = new SymmetryRule({
-    output_mirror: 1
-});
-
-const SYMM_IN_ROTATION = new SymmetryRule({
+const DEFAULT_SYMMETRY = new PointSymmetry({
     folds: 4,
     input_rotation: 1
-});
-
-const SYMM_IN_MIRROR_OUT_MIRROR = new SymmetryRule({
-    input_mirror: 1,
-    output_mirror: 1,
 });
 
 let zoom = 3;
 const ZOOM_DELTA = 0.5;
 
+function preload() {
+    polyline_model = loadModel('assets/polyline.obj');
+    grid_model = loadModel('assets/grid.obj');
+}
+
 function setup() {
-    const canvas = createCanvas(512, 512, WEBGL);
+    //const canvas = createCanvas(800, 400, WEBGL);
+    const canvas = createCanvas(400, 400, WEBGL);
     canvas.parent('p5-canvas');
     canvas.canvas.addEventListener('wheel', update_zoom);
     textureMode(NORMAL);
     
-    const camera_texture = new WebcamTexture();
-    camera_texture.make_graphics();
-    
     log.connect();
-    
-    // Create the placeholder image
-    placeholder.make_graphics(256, 256);
     
     // Setup the shader
     poly_shader.init_shader();
     poly_shader.set_zoom(zoom);
-    poly_shader.symmetries = [SYMM_IN_ROTATION];
-    //poly_shader.set_texture(placeholder);
-    poly_shader.set_texture(camera_texture);
-    
     poly_shader.set_coefficients(DEFAULT_COEFFICIENTS);
     poly_shader.set_animation(DEFAULT_ANIMATION);
     poly_shader.disable();
     
+    demo_shader.init_shader();
+    demo_shader.set_zoom(zoom);
+    demo_shader.set_coefficients(DEFAULT_COEFFICIENTS);
+    demo_shader.disable();
+    
+    rosette_curve_shader.init_shader();
+    rosette_curve_shader.set_zoom(zoom);
+    rosette_curve_shader.set_coefficients(DEFAULT_COEFFICIENTS);
+    rosette_curve_shader.set_animation(DEFAULT_ANIMATION);
+    rosette_curve_shader.disable();
+    
+    symmetries.shaders = [demo_shader, poly_shader, rosette_curve_shader];
+    symmetries.add_symmetry(DEFAULT_SYMMETRY);
+    symmetries.update_panel();
+    
+    textures.shaders = [demo_shader, poly_shader, rosette_curve_shader];
+    textures.texture = BUILT_IN_TEXTURES.checkerboard;
+    
+    attach_handlers();
+}
+
+function setup_texture_dropdown() {
+    const dropdown = document.getElementById('builtin-select');
+    for (const key of Object.keys(BUILT_IN_TEXTURES)) {
+        const option = document.createElement('option');
+        option.value = key;
+        option.innerHTML = key;
+        dropdown.appendChild(option);
+    }
+    
+    dropdown.addEventListener('change', select_texture);
+}
+
+function select_texture(e) {
+    textures.texture = BUILT_IN_TEXTURES[e.target.value];
+}
+
+function attach_handlers() {
     // Hook up the image input dialog
-    image_input = document.getElementById('image-input');
+    const image_input = document.getElementById('image-input');
     image_input.addEventListener('change', upload_image);
     
     // Update coefficients
-    update_button = document.getElementById('update-params');
+    const update_button = document.getElementById('update-params');
     update_button.addEventListener('click', update_coefficients);
     
     // Random 10 coefficients
-    random_button = document.getElementById('random-params');
+    const random_button = document.getElementById('random-params');
     random_button.addEventListener('click', set_random_coefficients);
     
     // Update Symmetry Rule
-    symmetry_button = document.getElementById('update-symmetry');
-    symmetry_button.addEventListener('click', update_symmetry);
+    const symmetry_button = document.getElementById('add-point-symmetry');
+    symmetry_button.addEventListener('click', add_point_symmetry);
+    
+    const webcam_button = document.getElementById('use-webcam');
+    webcam_button.addEventListener('click', use_webcam);
+    
+    const clear_symmetry_button = document.getElementById('clear-symmetries');
+    clear_symmetry_button.addEventListener('click', clear_symmetries);
+    
+    const toggle_ref_geometry = document.getElementById('toggle-ref-geometry');
+    toggle_ref_geometry.addEventListener('click', update_ref_geometry);
+    
+    const toggle_curve = document.getElementById('toggle-display-curves');
+    toggle_curve.addEventListener('click', update_display_curves);
+    
+    const toggle_demo = document.getElementById('toggle-demo-mode');
+    toggle_demo.addEventListener('click', update_demo_mode);
+    
+    setup_texture_dropdown();
+}
+
+function use_webcam() {
+    textures.texture = webcam;
+}
+
+function update_ref_geometry(e) {
+    const show_ref_geometry = e.target.checked;
+    poly_shader.set_show_ref_geometry(show_ref_geometry);
+}
+
+function update_demo_mode(e) {
+    show_demo = e.target.checked;
+}
+
+function update_display_curves(e) {
+    show_curves = e.target.checked;
 }
 
 function draw() {
-    background(0);
-    poly_shader.draw();
+    background(0, 40, 45);
     
-    /*
-    stroke(0, 255, 255);
-    strokeWeight(4);
-    noFill();
-    beginShape(LINES);
-    vertex(0, 0);
-    vertex(255, 255);
-    endShape();
-    */
+    if (show_demo) {
+        demo_shader.draw();
+    } else {
+        poly_shader.draw();
+    }
+    
+    if (show_curves) {
+        rosette_curve_shader.draw();
+    }
 }
 
 function upload_image(e) {
@@ -124,8 +180,8 @@ function upload_image(e) {
 
 function update_texture(url) {
     loadImage(url, img => {
-        const texture = new ImageTexture(img);
-        poly_shader.set_texture(texture);
+        const tex = new ImageTexture(img);
+        textures.texture = tex;
     });
 }
 
@@ -141,23 +197,26 @@ function set_random_coefficients() {
     
     const coeffs = new Coefficients(terms);
     poly_shader.set_coefficients(coeffs);
+    demo_shader.set_coefficients(coeffs);
+    rosette_curve_shader.set_coefficients(coeffs);
+    
 }
 
 function update_coefficients() {
     const coeff_input = document.getElementById('coeffs');
     const coefficients = parse_coefficients(coeff_input.value);
     poly_shader.set_coefficients(coefficients);
+    demo_shader.set_coefficients(coefficients);
+    rosette_curve_shader.set_coefficients(coefficients);
     
-    if (coefficients.length > 0) {
-        poly_shader.set_coefficients(coefficients);
-    }
-    
+    /*
     const animation_input = document.getElementById('animation');
     const anim_params = parse_animation_params(animation_input.value);
     
     if (anim_params.length > 0) {
         poly_shader.set_animation(anim_params);
     }
+    */
 }
 
 function * parse_tuples(text) {
@@ -187,7 +246,10 @@ function parse_coefficients(text) {
             coeffs[i] = tuple[i];
         }
         
-        tuples.push(coeffs);
+        const [n, m, amp, phase] = coeffs;
+        const adjusted_phase = mod(radians(phase), TWO_PI);
+        
+        tuples.push([n, m, amp, adjusted_phase]);
     }
     
     return new Coefficients(tuples);
@@ -216,8 +278,8 @@ function value_or_default(id, default_val) {
     return default_val;
 }
 
-function update_symmetry() {
-    const symmetry = new SymmetryRule({
+function add_point_symmetry() {
+    const symmetry = new PointSymmetry({
         folds: value_or_default('folds', 1),
         input_rotation: value_or_default('in-rotation', 0),
         input_mirror: value_or_default('in-reflection', 0),
@@ -225,14 +287,25 @@ function update_symmetry() {
         output_rotation: value_or_default('out-rotation', 0),
         output_mirror: value_or_default('out-reflection', 0),
     });
-    poly_shader.symmetries = [symmetry];
-    poly_shader.set_coefficients();
+    symmetries.add_symmetry(symmetry);
+}
+
+function clear_symmetries() {
+    symmetries.clear_symmetries();
 }
 
 function update_zoom(event) {
     zoom += ZOOM_DELTA * -Math.sign(event.wheelDeltaY);
     zoom = max(zoom, ZOOM_DELTA);
     poly_shader.set_zoom(zoom);
+    rosette_curve_shader.set_zoom(zoom);
+    demo_shader.set_zoom(zoom);
     
     event.preventDefault();
+}
+
+function mouseMoved() {
+    const mouse_uv = [mouseX / width, 1.0 - mouseY / height];
+    rosette_curve_shader.set_mouse_uv(mouse_uv);
+    demo_shader.set_mouse_uv(mouse_uv);
 }
