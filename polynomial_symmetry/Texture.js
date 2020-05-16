@@ -81,7 +81,7 @@ export class WebcamTexture extends Texture {
         this._camera = undefined;
     }
     
-    make_graphics(sketch) {
+    init(sketch) {
         this._sketch = sketch;
         if (this._camera !== undefined) {
             return;

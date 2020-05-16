@@ -99,13 +99,23 @@ void main() {
 `;
 
 export class RosetteCurveShader extends SymmetryShader {
+    constructor() {
+        super();
+        this._polyline_model = undefined;
+    }
+
+    preload(sketch) {
+        this._polyline_model = sketch.loadModel('assets/polyline.obj');
+    }
+
     init(sketch) {
         super.init(sketch, VERT_SHADER, FRAG_SHADER);
     }
+
     
     draw() {
         this.update_time();
-        this._sketch.model(polyline_model);
+        this._sketch.model(this._polyline_model);
         
         // Disable when done to get ready for the next shader
         this.disable();

@@ -76,16 +76,21 @@ export class DemoShader extends SymmetryShader {
     constructor(type) {
         super()
         this._vert_shader = VERT_SHADERS[type];
+        this._grid_model = undefined;
+    }
+
+    preload(sketch) {
+        this._grid_model = sketch.loadModel('assets/grid.obj');
     }
     
     init(sketch) {
         super.init(sketch, this._vert_shader, FRAG_SHADER);
     }
     
-   draw() {
+    draw() {
         this.update_time();
         this._sketch.fill(0, 0, 0, 0);
-        this._sketch.model(grid_model);
+        this._sketch.model(this._grid_model);
         
         // Disable when done to get ready for the next shader
         this.disable();

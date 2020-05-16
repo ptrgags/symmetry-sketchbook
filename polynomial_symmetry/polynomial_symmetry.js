@@ -1,5 +1,5 @@
 import { Log } from './Log.js';
-import { TextureManager, SymmetryManager } from './managers.js';
+import { TextureManager, SymmetryManager, ShaderManager } from './managers.js';
 import { PolynomialShader } from './shaders/PolynomialShader.js';
 import { DemoShader } from './shaders/DemoShader.js';
 import { RosetteCurveShader } from './shaders/RosetteCurveShader.js';
@@ -11,15 +11,17 @@ let polyline_model;
 let grid_model;
 
 const log = new Log();
-const symmetries = new SymmetryManager();
-const textures = new TextureManager([256, 256]);
-const poly_shader = new PolynomialShader('rosette');
-const demo_shader = new DemoShader('rosette');
-const rosette_curve_shader = new RosetteCurveShader();
+const shaders = new ShaderManager();
+const symmetries = new SymmetryManager(shaders);
+const textures = new TextureManager(shaders, [256, 256]);
+
+shaders.add_shader('poly-rosette', new PolynomialShader('rosette'));
+shaders.add_shader('poly-frieze', new PolynomialShader('frieze'));
+shaders.add_shader('rosette-curve', new RosetteCurveShader('rosette'), true);
+shaders.add_shader('demo-rosette', new DemoShader('rosette'));
+shaders.add_shader('demo-frieze', new DemoShader('frieze'));
 
 let image_texture;
-let show_curves = false;
-let show_demo = false;
 
 const BUILT_IN_TEXTURES = {
     checkerboard: new Checkerboard(),
@@ -54,8 +56,7 @@ let zoom = 3;
 const ZOOM_DELTA = 0.5;
 
 function preload(sketch) {
-    polyline_model = sketch.loadModel('assets/polyline.obj');
-    grid_model = sketch.loadModel('assets/grid.obj');
+    shaders.preload(sketch);
 }
 
 function setup(sketch) {
@@ -66,30 +67,17 @@ function setup(sketch) {
     sketch.textureMode(sketch.NORMAL);
     
     log.connect();
+
+    shaders.init(sketch);
+    shaders.set_uniform('zoom', zoom);
+    shaders.set_coefficients(DEFAULT_COEFFICIENTS);
+    shaders.set_animation(DEFAULT_ANIMATION);
+    shaders.disable_all();
+    shaders.set_show('poly-rosette', true);
     
-    // Setup the shader
-    poly_shader.init(sketch);
-    poly_shader.set_uniform('zoom', zoom);
-    poly_shader.set_coefficients(DEFAULT_COEFFICIENTS);
-    poly_shader.set_animation(DEFAULT_ANIMATION);
-    poly_shader.disable();
-    
-    demo_shader.init(sketch);
-    demo_shader.set_uniform('zoom', zoom);
-    demo_shader.set_coefficients(DEFAULT_COEFFICIENTS);
-    demo_shader.disable();
-    
-    rosette_curve_shader.init(sketch);
-    rosette_curve_shader.set_uniform('zoom', zoom);
-    rosette_curve_shader.set_coefficients(DEFAULT_COEFFICIENTS);
-    rosette_curve_shader.set_animation(DEFAULT_ANIMATION);
-    rosette_curve_shader.disable();
-    
-    symmetries.shaders = [demo_shader, poly_shader, rosette_curve_shader];
     symmetries.add_symmetry(DEFAULT_SYMMETRY);
     symmetries.update_panel();
     
-    textures.shaders = [demo_shader, poly_shader, rosette_curve_shader];
     textures.texture = BUILT_IN_TEXTURES.checkerboard;
     
     attach_handlers();
@@ -151,30 +139,21 @@ function use_webcam() {
 }
 
 function update_ref_geometry(e) {
-    const show_ref_geometry = e.target.checked;
-    poly_shader.set_show_ref_geometry(show_ref_geometry);
+    shaders.set_uniform('show_ref_geometry', e.target.checked);
 }
 
 function update_demo_mode(e) {
-    show_demo = e.target.checked;
+    shaders.set_show('demo-rosette', e.target.checked);
+    shaders.set_show('poly-rosette', !e.target.checked);
 }
 
 function update_display_curves(e) {
-    show_curves = e.target.checked;
+    shaders.set_show('rosette-curve', e.target.checked);
 }
 
 function draw(sketch) {
     sketch.background(0, 40, 45);
-    
-    if (show_demo) {
-        demo_shader.draw();
-    } else {
-        poly_shader.draw();
-    }
-    
-    if (show_curves) {
-        rosette_curve_shader.draw();
-    }
+    shaders.draw();
 }
 
 function upload_image(e) {
@@ -205,18 +184,13 @@ function set_random_coefficients() {
     }
     
     const coeffs = new Coefficients(terms);
-    poly_shader.set_coefficients(coeffs);
-    demo_shader.set_coefficients(coeffs);
-    rosette_curve_shader.set_coefficients(coeffs);
-    
+    shader.set_coefficients(coeffs);
 }
 
 function update_coefficients() {
     const coeff_input = document.getElementById('coeffs');
     const coefficients = parse_coefficients(coeff_input.value);
-    poly_shader.set_coefficients(coefficients);
-    demo_shader.set_coefficients(coefficients);
-    rosette_curve_shader.set_coefficients(coefficients);
+    shader.set_coefficients(coefficients);
     
     /*
     const animation_input = document.getElementById('animation');
@@ -306,17 +280,14 @@ function clear_symmetries() {
 function update_zoom(event) {
     zoom += ZOOM_DELTA * -Math.sign(event.wheelDeltaY);
     zoom = Math.max(zoom, ZOOM_DELTA);
-    poly_shader.set_uniform('zoom', zoom);
-    rosette_curve_shader.set_uniform('zoom', zoom);
-    demo_shader.set_uniform('zoom', zoom);
+    shaders.set_uniform('zoom', zoom);
     
     event.preventDefault();
 }
 
 function mouseMoved(sketch) {
     const mouse_uv = [sketch.mouseX / sketch.width, 1.0 - sketch.mouseY / sketch.height];
-    rosette_curve_shader.set_mouse_uv(mouse_uv);
-    demo_shader.set_mouse_uv(mouse_uv);
+    shaders.set_mouse_uv(mouse_uv);
 }
 
 function main() {

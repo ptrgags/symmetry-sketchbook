@@ -1,21 +1,13 @@
 export class TextureManager {
-    constructor(dims) {
+    constructor(shaders, dims) {
         this._dims = dims;
         this._texture = undefined;
-        this._shaders = [];
+        this._shaders = shaders;
         this._sketch = undefined;
     }
 
     init(sketch) {
         this._sketch = sketch;
-    }
-    
-    get shaders() {
-        return this._shaders;
-    }
-    
-    set shaders(shaders) {
-        this._shaders = shaders;
     }
     
     get texture() {
@@ -26,20 +18,14 @@ export class TextureManager {
         const [w, h] = this._dims;
         tex.init(sketch, w, h);
         this._texture = tex;
-        this._update_shaders();
-    }
-    
-    _update_shaders() {
-        for (const shader of this._shaders) {
-            shader.set_texture(this._texture);
-        }
+        this._shaders.set_texture(this._texture);
     }
 }
 
 export class SymmetryManager {
-    constructor() {
+    constructor(shaders) {
+        this._shaders = shaders;
         this._symmetries = [];
-        this._shaders = [];
     }
     
     get symmetries() {
@@ -58,24 +44,117 @@ export class SymmetryManager {
         this.update_panel();
     }
     
-    get shaders() {
-        return this._shaders;
-    }
-    
-    set shaders(shaders) {
-        this._shaders = shaders;
-    }
-    
     _update_shaders() {
-        for (const shader of this._shaders) {
-            shader.symmetries = this._symmetries;
-            shader.set_coefficients();
-        }
+        this._shaders.set_symmetries(this._symmetries);
     }
     
     update_panel() {
         const panel = document.getElementById('current-symmetries');
         const lines = this._symmetries.map(x => x.to_string()).join('<br/>');
         panel.innerHTML = `Current Symmetries:<br/>${lines}`;
+    }
+}
+
+export class ShaderManager {
+    constructor() {
+        this._shaders = new Map();
+        this._sketch = undefined;
+    }
+
+    add_shader(name, shader, transparent) {
+        transparent = transparent || false;
+        this._shaders.set(name, {
+            shader: shader,
+            show: false,
+            transparent
+        });
+    }
+
+    preload(sketch) {
+        for (const shaderInfo of this._shaders.values()) {
+            shaderInfo.shader.preload(sketch);
+        }
+    }
+
+    init(sketch) {
+        this._sketch = sketch;
+        for (const shaderInfo of this._shaders.values()) {
+            shaderInfo.shader.init(sketch);
+        }
+    }
+
+    set_uniform(name, value) {
+        for (const shaderInfo of this._shaders.values()) {
+            shaderInfo.shader.set_uniform(name, value);
+        }
+    }
+
+    set_symmetries(symmetries) {
+        for (const shaderInfo of this._shaders.values()) {
+            const shader = shaderInfo.shader;
+            shader.symmetries = symmetries;
+            shader.set_coefficients();
+        }
+    }
+
+    set_coefficients(coeffs) {
+        for (const shaderInfo of this._shaders.values()) {
+            shaderInfo.shader.set_coefficients(coeffs);
+        }
+    }
+
+    set_animation(animation) {
+        for (const shaderInfo of this._shaders.values()) {
+            shaderInfo.shader.set_animation(animation);
+        }
+    }
+
+    set_texture(tex) {
+        for (const shaderInfo of this._shaders.values()) {
+            shaderInfo.shader.set_texture(tex);
+        }
+    }
+
+    set_mouse_uv(mouse_uv) {
+        for (const shaderInfo of this._shaders.values()) {
+            shaderInfo.shader.set_mouse_uv(mouse_uv);
+        }
+    }
+
+    disable_all() {
+        for (const shaderInfo of this._shaders.values()) {
+            shaderInfo.shader.disable();
+        }
+    }
+
+    hide_all() {
+        for (const shaderInfo of this._shaders.values()) {
+            shaderInfo.show = false;
+        }
+    }
+
+    set_show(name, value) {
+        this._shaders.get(name).show = value;
+    }
+
+
+    draw() {
+        const opaque = [];
+        const transparent = [];
+        for (const shaderInfo of this._shaders.values()) {
+            if (!shaderInfo.show) {
+                continue;
+            }
+
+            if (shaderInfo.transparent) {
+                transparent.push(shaderInfo.shader);
+            } else {
+                opaque.push(shaderInfo.shader);
+            }
+        }
+
+        for (const shader of opaque.concat(transparent)) {
+            shader.draw();
+        }
     }
 }

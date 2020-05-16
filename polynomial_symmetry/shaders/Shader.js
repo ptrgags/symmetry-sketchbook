@@ -7,6 +7,9 @@ export class Shader {
         this._initialized = false;
     } 
 
+    // preload(sketch). Sometimes helpful for loading 3D models
+    preload() {}
+
     init(sketch, frag, vert) {
         this._sketch = sketch
         this._shader = sketch.createShader(frag, vert); 
