@@ -6,7 +6,7 @@ import { RosetteCurveShader } from './shaders/RosetteCurveShader.js';
 import { Checkerboard, HalfPlanes, WebcamTexture } from './Texture.js';
 import { Coefficients } from './Coefficients.js';
 import { PointSymmetry } from './SymmetryRule.js';
-import { MAX_TERMS, TWO_PI } from './util.js';
+import { MAX_TERMS, TWO_PI, mod } from './util.js';
 
 window.log = new Log();
 const shaders = new ShaderManager();
@@ -148,12 +148,15 @@ function update_ref_geometry(e) {
     shaders.set_uniform('show_ref_geometry', e.target.checked);
 }
 
+// bluh these display settings should be a dropdown
 function update_demo_mode(e) {
     shaders.set_show('demo-rosette', e.target.checked);
     shaders.set_show('poly-rosette', !e.target.checked);
 }
 
 function update_display_curves(e) {
+    shaders.set_show('demo-rosette', !e.target.checked);
+    shaders.set_show('poly-rosette', !e.target.checked);
     shaders.set_show('rosette-curve', e.target.checked);
 }
 
