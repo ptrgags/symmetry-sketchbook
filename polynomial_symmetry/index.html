@@ -101,7 +101,7 @@
         <h3>Animation Settings (results may not be symmetric)</h3>
         <div id="current-animation">
         </div>
-        <label for="animation">Animation amp_freq_rad</label>
+        <label for="animation">Animation parameters (rad)</label>
         <input id="animation" type="text" />
         <br/>
         <button id="update-animation">Update Animation</button>
@@ -120,29 +120,23 @@
           <label for="in-rotation">Input Rotation (l)</label>
           <input id="in-rotation" type="text" />
           <br/>
-          <label for="inversion">Input Inversion (p)</label>
-          <input id="inversion" type="text" />
-          <label for="in-reflection">Input Reflection (q)</label>
-          <input id="in-reflection" type="text" />
+          <bricks-checkbox id="inversion">Input inversion (p)</bricks-checkbox>
+          <bricks-checkbox id="in-reflection">Input Reflection(q)</bricks-checkbox>
           <br/>
           <label for="out-rotation">Output Rotation (u)</label>
           <input id="out-rotation" type="text" />
-          <label for="out-reflection">Output Reflection (v)</label>
-          <input id="out-reflection" type="text" />
+          <bricks-checkbox id="out-reflection">Output Reflection (v)</bricks-checkbox>
           <br/>
           <button id="add-point-symmetry">Add Symmetry</button>
         </div>
       </div>
       <div id="display-settings">
        <h3>Display Settings</h3>
-       <label for="toggle-ref-geometry">Toggle Reference Geometry</label>
-       <input id="toggle-ref-geometry" type="checkbox" />
+       <bricks-checkbox id="toggle-ref-geometry">Toggle Reference Geometry</bricks-checkbox>
        <br/>
-       <label for="toggle-display-curves" type="checkbox">Display Rosette Curves</input>
-       <input id="toggle-display-curves" type="checkbox" />
+       <bricks-checkbox id="toggle-display-curves">Display Rosette Curves</bricks-checkbox>
        <br/>
-       <label for="toggle-demo-mode" type="checkbox">Enable Demo Mode</input>
-       <input id="toggle-demo-mode" type="checkbox" />
+       <bricks-checkbox id="toggle-demo-mode">Enable Demo Mode</bricks-checkbox>
       </div>
       <div id="log-panel">
         <h3>Log</h3>

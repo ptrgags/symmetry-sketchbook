@@ -8,6 +8,8 @@ import { Coefficients } from './Coefficients.js';
 import { PointSymmetry } from './SymmetryRule.js';
 import { MAX_TERMS, TWO_PI, mod } from './util.js';
 
+import './components/Checkbox.js';
+
 window.log = new Log();
 const shaders = new ShaderManager();
 const symmetries = new SymmetryManager(shaders);
@@ -98,6 +100,10 @@ function select_texture(e) {
     textures.texture = BUILT_IN_TEXTURES[e.target.value];
 }
 
+function find(query) {
+    return document.querySelector(query);
+}
+
 function attach_handlers() {
     const image_input = document.getElementById('image-input');
     image_input.addEventListener('change', upload_image);
@@ -127,15 +133,10 @@ function attach_handlers() {
     
     const clear_symmetry_button = document.getElementById('clear-symmetries');
     clear_symmetry_button.addEventListener('click', clear_symmetries);
-    
-    const toggle_ref_geometry = document.getElementById('toggle-ref-geometry');
-    toggle_ref_geometry.addEventListener('click', update_ref_geometry);
-    
-    const toggle_curve = document.getElementById('toggle-display-curves');
-    toggle_curve.addEventListener('click', update_display_curves);
-    
-    const toggle_demo = document.getElementById('toggle-demo-mode');
-    toggle_demo.addEventListener('click', update_demo_mode);
+
+    find('#toggle-ref-geometry').click(update_ref_geometry);
+    find('#toggle-display-curves').click(update_display_curves);
+    find('#toggle-demo-mode').click(update_demo_mode);
     
     setup_texture_dropdown();
 }
@@ -144,20 +145,20 @@ function use_webcam() {
     textures.texture = webcam;
 }
 
-function update_ref_geometry(e) {
-    shaders.set_uniform('show_ref_geometry', e.target.checked);
+function update_ref_geometry(checked) {
+    shaders.set_uniform('show_ref_geometry', checked);
 }
 
 // bluh these display settings should be a dropdown
-function update_demo_mode(e) {
-    shaders.set_show('demo-rosette', e.target.checked);
-    shaders.set_show('poly-rosette', !e.target.checked);
+function update_demo_mode(checked) {
+    shaders.set_show('demo-rosette', checked);
+    shaders.set_show('poly-rosette', !checked);
 }
 
-function update_display_curves(e) {
-    shaders.set_show('demo-rosette', !e.target.checked);
-    shaders.set_show('poly-rosette', !e.target.checked);
-    shaders.set_show('rosette-curve', e.target.checked);
+function update_display_curves(checked) {
+    shaders.set_show('demo-rosette', !checked);
+    shaders.set_show('poly-rosette', !checked);
+    shaders.set_show('rosette-curve', checked);
 }
 
 function draw(sketch) {
@@ -276,14 +277,19 @@ function value_or_default(id, default_val) {
     return default_val;
 }
 
+function checkbox_int(query) {
+    const checked = find(query).checked;
+    return checked ? 1 : 0
+}
+
 function add_point_symmetry() {
     const symmetry = new PointSymmetry({
         folds: value_or_default('folds', 1),
         input_rotation: value_or_default('in-rotation', 0),
-        input_mirror: value_or_default('in-reflection', 0),
-        input_inversion: value_or_default('inversion', 0),
+        input_mirror: checkbox_int('#in-reflection'),
+        input_inversion: checkbox_int('#inversion'),
         output_rotation: value_or_default('out-rotation', 0),
-        output_mirror: value_or_default('out-reflection', 0),
+        output_mirror: checkbox_int('#out-reflection'),
     });
     symmetries.add_symmetry(symmetry);
 }
