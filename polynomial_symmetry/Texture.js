@@ -1,4 +1,4 @@
-class Texture {
+export class Texture {
     constructor() {
         this._graphics = undefined;
     }
@@ -24,7 +24,7 @@ class Texture {
     }
 }
 
-class HalfPlanes extends Texture {
+export class HalfPlanes extends Texture {
     _draw_texture() {
         const gfx = this._graphics;
         gfx.background(255, 0, 0);
@@ -41,7 +41,7 @@ class HalfPlanes extends Texture {
     }
 }
 
-class Checkerboard extends Texture {
+export class Checkerboard extends Texture {
     _draw_texture() {
         const gfx = this._graphics;
         gfx.background(255, 0, 0);
@@ -52,7 +52,7 @@ class Checkerboard extends Texture {
     }
 }
 
-class ImageTexture extends Texture {
+export class ImageTexture extends Texture {
     constructor(img) {
         super();
         this._img = img;
@@ -71,7 +71,7 @@ class ImageTexture extends Texture {
     }
 }
 
-class WebcamTexture extends Texture {
+export class WebcamTexture extends Texture {
     constructor() {
         super();
         this._camera = undefined;
@@ -91,39 +91,5 @@ class WebcamTexture extends Texture {
     
     set_wrapping() {
         textureWrap(CLAMP);
-    }
-}
-
-
-class TextureManager {
-    constructor(dims) {
-        this._dims = dims;
-        this._texture = undefined;
-        this._shaders = [];
-    }
-    
-    get shaders() {
-        return this._shaders;
-    }
-    
-    set shaders(shaders) {
-        this._shaders = shaders;
-    }
-    
-    get texture() {
-        return this._texture;
-    }
-    
-    set texture(tex) {
-        const [w, h] = this._dims;
-        tex.make_graphics(w, h);
-        this._texture = tex;
-        this._update_shaders();
-    }
-    
-    _update_shaders() {
-        for (const shader of this._shaders) {
-            shader.set_texture(this._texture);
-        }
     }
 }

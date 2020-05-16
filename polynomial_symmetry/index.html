@@ -3,20 +3,9 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-  <!-- PLEASE NO CHANGES BELOW THIS LINE (UNTIL I SAY SO) -->
   <script language="javascript" type="text/javascript" src="libraries/p5.min.js"></script>
-  <script language="javascript" type="text/javascript" src="Coefficients.js"></script>
-  <script language="javascript" type="text/javascript" src="DemoShader.js"></script>
-  <script language="javascript" type="text/javascript" src="Log.js"></script>
-  <script language="javascript" type="text/javascript" src="PolynomialShader.js"></script>
-  <script language="javascript" type="text/javascript" src="RosetteCurveShader.js"></script>
-  <script language="javascript" type="text/javascript" src="SymmetryRule.js"></script>
-  <script language="javascript" type="text/javascript" src="Texture.js"></script>
-  <script language="javascript" type="text/javascript" src="polynomial_symmetry.js"></script>
-  <!-- OK, YOU CAN MAKE CHANGES BELOW THIS LINE AGAIN -->
+  <script type="module" src="polynomial_symmetry.js"></script>
 
-  <!-- This line removes any default padding and style.
-       You might only need one of these values set. -->
   <style> 
   body { 
       padding: 0; 
@@ -105,12 +94,9 @@
         <label for="coeffs">Coefficients (n, m, amp=1, phase_deg=0)</label>
         <input id="coeffs" type="text" />
         <br/>
-        <!--
-        The world is not yet ready for this
         <label for="animation">Animation (amp_freq_rad)</label>
         <input id="animation" type="text" />
         <br/>
-        -->
         <button id="update-params">Update Parameters</button>
         <button id="random-params">Random Parameters</button>
       </div>

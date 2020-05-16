@@ -152,7 +152,7 @@
  * Congrats, you survived a crash course in Applied Group Theory.
  * Reward: source code to actually implement this!
  */
-class PointSymmetry {
+export class PointSymmetry {
     constructor(options) {
         options = options || {};
         // Mirror symmetry across the x-axis.
@@ -417,49 +417,5 @@ class TermMap {
  *
  * This limits 
  */
-class FriezeSymmetry extends PointSymmetry {
-}
-
-class SymmetryManager {
-    constructor() {
-        this._symmetries = [];
-        this._shaders = [];
-    }
-    
-    get symmetries() {
-        return this._symmetries();
-    }
-    
-    add_symmetry(symmetry) {
-        this._symmetries.push(symmetry);
-        this._update_shaders();
-        this.update_panel();
-    }
-    
-    clear_symmetries() {
-        this._symmetries = [];
-        this._update_shaders();
-        this.update_panel();
-    }
-    
-    get shaders() {
-        return this._shaders;
-    }
-    
-    set shaders(shaders) {
-        this._shaders = shaders;
-    }
-    
-    _update_shaders() {
-        for (const shader of this._shaders) {
-            shader.symmetries = this._symmetries;
-            shader.set_coefficients();
-        }
-    }
-    
-    update_panel() {
-        const panel = document.getElementById('current-symmetries');
-        const lines = this._symmetries.map(x => x.to_string()).join('<br/>');
-        panel.innerHTML = `Current Symmetries:<br/>${lines}`;
-    }
+export class FriezeSymmetry extends PointSymmetry {
 }

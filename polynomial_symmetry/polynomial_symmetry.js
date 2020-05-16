@@ -1,11 +1,20 @@
+import { Log } from './Log.js';
+import { TextureManager, SymmetryManager } from './managers.js';
+import { PolynomialShader } from './shaders/PolynomialShader.js';
+import { DemoShader } from './shaders/DemoShader.js';
+import { RosetteCurveShader } from './shaders/RosetteCurveShader.js';
+import { Checkerboard, HalfPlanes, WebcamTexture } from './Texture.js';
+import { Coefficients } from './Coefficients.js';
+import { PointSymmetry } from './SymmetryRule.js';
+
 let polyline_model;
 let grid_model;
 
 const log = new Log();
 const symmetries = new SymmetryManager();
 const textures = new TextureManager([256, 256]);
-const poly_shader = new PolynomialShader(PATTERN_TYPES.ROSETTE);
-const demo_shader = new DemoShader(PATTERN_TYPES.ROSETTE);
+const poly_shader = new PolynomialShader('rosette');
+const demo_shader = new DemoShader('rosette');
 const rosette_curve_shader = new RosetteCurveShader();
 
 let image_texture;
