@@ -1,5 +1,5 @@
 import { Coefficients } from './Coefficients.js';
-const TWO_PI = 2.0 * Math.PI;
+import { TWO_PI, mod } from './util.js';
 
 /**
  * Simulate symmetry rules of functions from Complex -> Complex.
@@ -362,10 +362,6 @@ export class PointSymmetry {
         
         return true;
     }
-}
-
-function mod(x, n) {
-    return ((x % n) + n) % n;
 }
 
 class TermMap {

@@ -94,11 +94,19 @@
         <label for="coeffs">Coefficients (n, m, amp=1, phase_deg=0)</label>
         <input id="coeffs" type="text" />
         <br/>
-        <label for="animation">Animation (amp_freq_rad)</label>
-        <input id="animation" type="text" />
-        <br/>
         <button id="update-params">Update Parameters</button>
         <button id="random-params">Random Parameters</button>
+      </div>
+      <div id="animation-settings">
+        <h3>Animation Settings (results may not be symmetric)</h3>
+        <div id="current-animation">
+        </div>
+        <label for="animation">Animation amp_freq_rad</label>
+        <input id="animation" type="text" />
+        <br/>
+        <button id="update-animation">Update Animation</button>
+        <button id="random-animation">Random Animation</button>
+        <button id="no-animation">No Animation</button>
       </div>
       <div id="symmetry-settings">
         <h3>Symmetry Settings</h3>

@@ -1,4 +1,4 @@
-import { MAX_TERMS } from './common_glsl.js';
+import { MAX_TERMS } from '../util.js';
 export class Shader {
     constructor() {
         this._shader = undefined;

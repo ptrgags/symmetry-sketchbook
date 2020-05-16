@@ -6,11 +6,9 @@ import { RosetteCurveShader } from './shaders/RosetteCurveShader.js';
 import { Checkerboard, HalfPlanes, WebcamTexture } from './Texture.js';
 import { Coefficients } from './Coefficients.js';
 import { PointSymmetry } from './SymmetryRule.js';
+import { MAX_TERMS, TWO_PI } from './util.js';
 
-let polyline_model;
-let grid_model;
-
-const log = new Log();
+window.log = new Log();
 const shaders = new ShaderManager();
 const symmetries = new SymmetryManager(shaders);
 const textures = new TextureManager(shaders, [256, 256]);
@@ -43,7 +41,7 @@ const DEFAULT_COEFFICIENTS = new Coefficients([
 ]);
 const DEFAULT_ANIMATION = [
     0,
-    0,
+    1,
     0
 ];
 
@@ -78,6 +76,7 @@ function setup(sketch) {
     symmetries.add_symmetry(DEFAULT_SYMMETRY);
     symmetries.update_panel();
     
+    textures.init(sketch);
     textures.texture = BUILT_IN_TEXTURES.checkerboard;
     
     attach_handlers();
@@ -100,19 +99,26 @@ function select_texture(e) {
 }
 
 function attach_handlers() {
-    // Hook up the image input dialog
     const image_input = document.getElementById('image-input');
     image_input.addEventListener('change', upload_image);
     
-    // Update coefficients
     const update_button = document.getElementById('update-params');
     update_button.addEventListener('click', update_coefficients);
     
-    // Random 10 coefficients
     const random_button = document.getElementById('random-params');
     random_button.addEventListener('click', set_random_coefficients);
+
+    const update_anim_button = document.getElementById('update-animation');
+    update_anim_button.addEventListener('click', update_animation);
     
-    // Update Symmetry Rule
+    // Ideally
+    // find('random-animation').click((checked) => ...);
+    const random_anim_button = document.getElementById('random-animation');
+    random_anim_button.addEventListener('click', random_animation);
+
+    const no_anim_button = document.getElementById('no-animation');
+    no_anim_button.addEventListener('click', no_animation);
+    
     const symmetry_button = document.getElementById('add-point-symmetry');
     symmetry_button.addEventListener('click', add_point_symmetry);
     
@@ -161,45 +167,51 @@ function upload_image(e) {
     const reader = new FileReader();
     reader.addEventListener('load', (e) => {
         const url = e.target.result;
-        update_texture(url);
+        textures.load_image(url);
     });
     reader.readAsDataURL(file);
 }
 
-function update_texture(url) {
-    loadImage(url, img => {
-        const tex = new ImageTexture(img);
-        textures.texture = tex;
-    });
-}
-
 function set_random_coefficients() {
-    terms = [];
+    const terms = [];
     for (let i = 0; i < 10; i++) {
-        const n = floor(random(-10, 10 + 1));
-        const m = floor(random(-10, 10 + 1));
+        const n = sketch.floor(sketch.random(-10, 10 + 1));
+        const m = sketch.floor(sketch.random(-10, 10 + 1));
         const amp = 1.0 / (n - m + 1);
-        const phase = random(TWO_PI);
+        const phase = sketch.random(TWO_PI);
         terms.push([n, m, amp, phase]);
     }
     
     const coeffs = new Coefficients(terms);
-    shader.set_coefficients(coeffs);
+    shaders.set_coefficients(coeffs);
 }
 
 function update_coefficients() {
     const coeff_input = document.getElementById('coeffs');
     const coefficients = parse_coefficients(coeff_input.value);
-    shader.set_coefficients(coefficients);
-    
-    /*
+    shaders.set_coefficients(coefficients); 
+}
+
+function update_animation() {
     const animation_input = document.getElementById('animation');
     const anim_params = parse_animation_params(animation_input.value);
     
     if (anim_params.length > 0) {
-        poly_shader.set_animation(anim_params);
+        shaders.set_animation(anim_params);
     }
-    */
+}
+
+function random_animation() {
+    const anim_params = [];
+    for (let i = 0; i < MAX_TERMS; i++) {
+        anim_params.push(TWO_PI * sketch.random());
+    }
+    shaders.set_animation(anim_params);
+}
+
+function no_animation() {
+    const anim_params = new Array(MAX_TERMS).fill(0);
+    shaders.set_animation(anim_params);
 }
 
 function * parse_tuples(text) {
@@ -239,7 +251,7 @@ function parse_coefficients(text) {
 }
 
 function parse_animation_params(text) {
-    params = [];
+    const params = [];
     for (const token of text.split(/,\s*/)) {
         if (token === '') {
             continue;

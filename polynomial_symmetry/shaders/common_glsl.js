@@ -1,3 +1,5 @@
+import {MAX_TERMS} from '../util.js';
+
 export const common = {};
 common.defines = `
 #define PI ${Math.PI}
@@ -39,7 +41,6 @@ vec2 to_rect(vec2 polar) {
 }
 `;
 
-export const MAX_TERMS = 64;
 common.uniforms_polynomial = `
 #define MAX_TERMS ${MAX_TERMS}
 

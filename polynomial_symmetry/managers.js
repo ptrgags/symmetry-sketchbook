@@ -1,3 +1,4 @@
+import { ImageTexture } from './Texture.js';
 export class TextureManager {
     constructor(shaders, dims) {
         this._dims = dims;
@@ -9,11 +10,18 @@ export class TextureManager {
     init(sketch) {
         this._sketch = sketch;
     }
+
+    load_image(url) {
+        this._sketch.loadImage(url, img => {
+            const tex = new ImageTexture(img);
+            this.texture = tex;
+        });
+    }
     
     get texture() {
         return this._texture;
     }
-    
+
     set texture(tex) {
         const [w, h] = this._dims;
         tex.init(sketch, w, h);
