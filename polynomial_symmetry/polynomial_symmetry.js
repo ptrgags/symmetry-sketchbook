@@ -53,34 +53,34 @@ const DEFAULT_SYMMETRY = new PointSymmetry({
 let zoom = 3;
 const ZOOM_DELTA = 0.5;
 
-function preload() {
-    polyline_model = loadModel('assets/polyline.obj');
-    grid_model = loadModel('assets/grid.obj');
+function preload(sketch) {
+    polyline_model = sketch.loadModel('assets/polyline.obj');
+    grid_model = sketch.loadModel('assets/grid.obj');
 }
 
-function setup() {
+function setup(sketch) {
     //const canvas = createCanvas(800, 400, WEBGL);
-    const canvas = createCanvas(400, 400, WEBGL);
+    const canvas = sketch.createCanvas(400, 400, sketch.WEBGL);
     canvas.parent('p5-canvas');
     canvas.canvas.addEventListener('wheel', update_zoom);
-    textureMode(NORMAL);
+    sketch.textureMode(sketch.NORMAL);
     
     log.connect();
     
     // Setup the shader
-    poly_shader.init_shader();
-    poly_shader.set_zoom(zoom);
+    poly_shader.init(sketch);
+    poly_shader.set_uniform('zoom', zoom);
     poly_shader.set_coefficients(DEFAULT_COEFFICIENTS);
     poly_shader.set_animation(DEFAULT_ANIMATION);
     poly_shader.disable();
     
-    demo_shader.init_shader();
-    demo_shader.set_zoom(zoom);
+    demo_shader.init(sketch);
+    demo_shader.set_uniform('zoom', zoom);
     demo_shader.set_coefficients(DEFAULT_COEFFICIENTS);
     demo_shader.disable();
     
-    rosette_curve_shader.init_shader();
-    rosette_curve_shader.set_zoom(zoom);
+    rosette_curve_shader.init(sketch);
+    rosette_curve_shader.set_uniform('zoom', zoom);
     rosette_curve_shader.set_coefficients(DEFAULT_COEFFICIENTS);
     rosette_curve_shader.set_animation(DEFAULT_ANIMATION);
     rosette_curve_shader.disable();
@@ -163,8 +163,8 @@ function update_display_curves(e) {
     show_curves = e.target.checked;
 }
 
-function draw() {
-    background(0, 40, 45);
+function draw(sketch) {
+    sketch.background(0, 40, 45);
     
     if (show_demo) {
         demo_shader.draw();
@@ -243,7 +243,7 @@ function * parse_tuples(text) {
 }
 
 function parse_coefficients(text) {
-    tuples = [];
+    const tuples = [];
     for (const tuple of parse_tuples(text)) {
         if (tuple.length < 2 || 4 < tuple.length) {
             console.warn(`Coefficients should have 2-4 components, got ${tuple} instead`);
@@ -305,16 +305,29 @@ function clear_symmetries() {
 
 function update_zoom(event) {
     zoom += ZOOM_DELTA * -Math.sign(event.wheelDeltaY);
-    zoom = max(zoom, ZOOM_DELTA);
-    poly_shader.set_zoom(zoom);
-    rosette_curve_shader.set_zoom(zoom);
-    demo_shader.set_zoom(zoom);
+    zoom = Math.max(zoom, ZOOM_DELTA);
+    poly_shader.set_uniform('zoom', zoom);
+    rosette_curve_shader.set_uniform('zoom', zoom);
+    demo_shader.set_uniform('zoom', zoom);
     
     event.preventDefault();
 }
 
-function mouseMoved() {
-    const mouse_uv = [mouseX / width, 1.0 - mouseY / height];
+function mouseMoved(sketch) {
+    const mouse_uv = [sketch.mouseX / sketch.width, 1.0 - sketch.mouseY / sketch.height];
     rosette_curve_shader.set_mouse_uv(mouse_uv);
     demo_shader.set_mouse_uv(mouse_uv);
 }
+
+function main() {
+    const closure = (sketch) => {
+        sketch.preload = () => preload(sketch);
+        sketch.setup = () => setup(sketch);
+        sketch.draw = () => draw(sketch);
+        sketch.mouseMoved = () => mouseMoved(sketch);
+    }
+    window.sketch = new p5(closure);
+}
+
+
+main();

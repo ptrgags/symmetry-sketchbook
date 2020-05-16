@@ -1,3 +1,6 @@
+import { Coefficients } from './Coefficients.js';
+const TWO_PI = 2.0 * Math.PI;
+
 /**
  * Simulate symmetry rules of functions from Complex -> Complex.
  * These rules are of the form:

@@ -1,13 +1,15 @@
 export class Texture {
     constructor() {
         this._graphics = undefined;
+        this._sketch = undefined;
     }
     
-    make_graphics(width, height) {
+    init(sketch, width, height) {
+        this._sketch = sketch;
         if (this._graphics !== undefined) {
             return;
         }
-        this._graphics = createGraphics(width, height);
+        this._graphics = sketch.createGraphics(width, height);
         this._draw_texture();
     }
     
@@ -16,7 +18,7 @@ export class Texture {
     }
     
     set_wrapping() {
-        textureWrap(REPEAT);
+        this._sketch.textureWrap(this._sketch.REPEAT);
     }
     
     _draw_texture() {
@@ -34,10 +36,11 @@ export class HalfPlanes extends Texture {
     }
     
     set_wrapping() {
+        const sketch = this._sketch;
         // If we wrap in the y-direction, you'll get
         // alternating colors even when the y-value is
         // positive
-        textureWrap(REPEAT, CLAMP);
+        sketch.textureWrap(sketch.REPEAT, sketch.CLAMP);
     }
 }
 
@@ -58,7 +61,8 @@ export class ImageTexture extends Texture {
         this._img = img;
     }
     
-    make_graphics() {
+    init(sketch) {
+        this._sketch = sketch;
         // Nothing to be done here
     }
     
@@ -67,7 +71,7 @@ export class ImageTexture extends Texture {
     }
     
     set_wrapping() { 
-        textureWrap(CLAMP);
+        this._sketch.textureWrap(this._sketch.CLAMP);
     }
 }
 
@@ -77,11 +81,12 @@ export class WebcamTexture extends Texture {
         this._camera = undefined;
     }
     
-    make_graphics() {
+    make_graphics(sketch) {
+        this._sketch = sketch;
         if (this._camera !== undefined) {
             return;
         }
-        this._camera = createCapture(VIDEO);
+        this._camera = sketch.createCapture(this._sketch.VIDEO);
         this._camera.hide();
     }
     
@@ -90,6 +95,6 @@ export class WebcamTexture extends Texture {
     }
     
     set_wrapping() {
-        textureWrap(CLAMP);
+        this._sketch.textureWrap(this._sketch.CLAMP);
     }
 }

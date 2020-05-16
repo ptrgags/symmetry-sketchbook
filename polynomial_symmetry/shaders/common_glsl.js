@@ -69,7 +69,7 @@ common.uniforms_texture = `
 uniform sampler2D texture0;
 `;
 
-export const uniforms_mouse = `
+common.uniforms_mouse = `
 // Mouse position across the canvas. Might be outside
 // [0, 1] if the mouse is outside the canvas.
 uniform vec2 mouse_uv;

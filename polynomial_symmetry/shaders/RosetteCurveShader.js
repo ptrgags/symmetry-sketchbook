@@ -7,15 +7,15 @@ ${common.defines}
 
 attribute vec3 aPosition;
 
-${common.uniforms_animation}
 ${common.uniforms_polynomial}
+${common.uniforms_animation}
 ${common.uniforms_view}
 ${common.uniforms_mouse}
 
 varying vec2 uv;
 varying vec2 curve;
 
-${common.funcs_polar};
+${common.funcs_polar}
 ${common.funcs_view}
 
 vec2 compute_rosette(vec2 z, float t) {
@@ -67,7 +67,7 @@ void main() {
 }
 `;
 
-const ROSETTE_CURVE_FRAG_SHADER = `
+const FRAG_SHADER = `
 ${common.defines}
 precision highp float;
 
@@ -99,13 +99,13 @@ void main() {
 `;
 
 export class RosetteCurveShader extends SymmetryShader {
-    init_shader(sketch) {
-        super.init_shader(sketch, VERT_SHADER, FRAG_SHADER);
+    init(sketch) {
+        super.init(sketch, VERT_SHADER, FRAG_SHADER);
     }
     
     draw() {
         this.update_time();
-        model(polyline_model);
+        this._sketch.model(polyline_model);
         
         // Disable when done to get ready for the next shader
         this.disable();

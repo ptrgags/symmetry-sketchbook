@@ -7,10 +7,10 @@ ${common.defines}
 attribute vec3 aPosition;
 attribute vec2 aTexCoord;
 
-${common.uniforms_polynomial}
 ${common.uniforms_view}
-${common.uniforms_animation}
 ${common.uniforms_mouse}
+${common.uniforms_polynomial}
+${common.uniforms_animation}
 
 varying vec2 uv;
 varying vec2 warped_pos;
@@ -48,6 +48,7 @@ varying vec2 uv;
 varying vec2 warped_pos;
 
 ${common.uniforms_texture}
+${common.uniforms_polynomial}
 ${common.uniforms_animation}
 ${common.uniforms_view}
 ${common.uniforms_mouse}
@@ -77,14 +78,14 @@ export class DemoShader extends SymmetryShader {
         this._vert_shader = VERT_SHADERS[type];
     }
     
-    init_shader(sketch) {
-        super.init_shader(sketch, this._vert_shader, FRAG_SHADER);
+    init(sketch) {
+        super.init(sketch, this._vert_shader, FRAG_SHADER);
     }
     
    draw() {
         this.update_time();
-        fill(0, 0, 0, 0);
-        model(grid_model);
+        this._sketch.fill(0, 0, 0, 0);
+        this._sketch.model(grid_model);
         
         // Disable when done to get ready for the next shader
         this.disable();

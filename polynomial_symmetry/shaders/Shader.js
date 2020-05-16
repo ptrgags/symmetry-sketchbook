@@ -1,3 +1,4 @@
+import { MAX_TERMS } from './common_glsl.js';
 export class Shader {
     constructor() {
         this._shader = undefined;
@@ -35,12 +36,12 @@ export class Shader {
 
     set_uniform(name, value) {
         this.enable();
-        this._sketch.setUniform(name, value);
+        this._shader.setUniform(name, value);
     }
 
     update_time() {
         this.enable();
-        this._shader.setUniform('time', millis() / 1000.0);
+        this._shader.setUniform('time', this._sketch.millis() / 1000.0);
     }
 
     set_texture(texture) {
@@ -81,8 +82,8 @@ export class SymmetryShader extends Shader {
         this._symmetries = [];
     }
 
-    init_shader(sketch, frag, vert) {
-        super.init_shader(sketch, frag, vert);
+    init(sketch, frag, vert) {
+        super.init(sketch, frag, vert);
         this.set_uniform('show_ref_geometry', 0.0); 
     }
 
@@ -116,8 +117,8 @@ export class SymmetryShader extends Shader {
         // Since we always need to exactly fill the buffer,
         // add on some terms that are all equal to 0 to make sure
         // the calculation is performed correctly
-        const powers_buffer = this._pad_zeros(powers, MAX_TERMS * 2);
-        const coeffs_buffer = this._pad_zeros(coeffs, MAX_TERMS * 2); 
+        const powers_buffer = pad_zeros(powers, MAX_TERMS * 2);
+        const coeffs_buffer = pad_zeros(coeffs, MAX_TERMS * 2); 
         
         program.setUniform('powers', powers_buffer);
         program.setUniform('coeffs', coeffs_buffer);
@@ -125,7 +126,7 @@ export class SymmetryShader extends Shader {
     
     set_animation(animation_params) {
         this.enable();
-        const animation_buffer = this._pad_zeros(animation_params, MAX_TERMS);
+        const animation_buffer = pad_zeros(animation_params, MAX_TERMS);
         this._shader.setUniform('animation', animation_buffer);
     }
 }

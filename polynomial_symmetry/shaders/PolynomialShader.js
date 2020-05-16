@@ -130,23 +130,24 @@ export class PolynomialShader extends SymmetryShader {
         this._frag_shader = FRAG_SHADERS[type];
     }
     
-    init_shader(sketch) {
-        super.init_shader(sketch, VERT_SHADER, this._frag_shader);
+    init(sketch) {
+        super.init(sketch, VERT_SHADER, this._frag_shader);
     }
     
-   draw() {
+    draw() {
+        const sketch = this._sketch;
         this.update_time();
-        noStroke();
+        sketch.noStroke();
         
         // This makes sure the alpha channel is enabled for
         // transparent images.
-        fill(0, 0, 0, 0);
+        sketch.fill(0, 0, 0, 0);
         
         // Draw a quad that spans the canvas. Since the vertex shader
         // ignores the model matrix, use clip coordinates
         const hw = 1;
         const hh = 1;
-        quad(-hw, -hh, hw, -hh, hw, hh, -hw, hh);
+        sketch.quad(-hw, -hh, hw, -hh, hw, hh, -hw, hh);
         
         // Disable when done to get ready for the next shader
         this.disable();

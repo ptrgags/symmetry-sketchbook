@@ -3,6 +3,11 @@ export class TextureManager {
         this._dims = dims;
         this._texture = undefined;
         this._shaders = [];
+        this._sketch = undefined;
+    }
+
+    init(sketch) {
+        this._sketch = sketch;
     }
     
     get shaders() {
@@ -19,7 +24,7 @@ export class TextureManager {
     
     set texture(tex) {
         const [w, h] = this._dims;
-        tex.make_graphics(w, h);
+        tex.init(sketch, w, h);
         this._texture = tex;
         this._update_shaders();
     }
