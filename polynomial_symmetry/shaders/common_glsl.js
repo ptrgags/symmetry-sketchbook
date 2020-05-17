@@ -111,3 +111,10 @@ common.uniforms_mouse = `
 // [0, 1] if the mouse is outside the canvas.
 uniform vec2 mouse_uv;
 `;
+
+common.uniforms_wallpaper = `
+// inverse of the basis matrix for the wallpaper lattice
+// This is used to convert to lattice coordinates
+// p5.js seems to ignore mat2 matrices so I'll use a mat3 instead.
+uniform mat3 inv_lattice;
+`;

@@ -3,6 +3,7 @@ import { TextureManager, SymmetryManager, ShaderManager } from './managers.js';
 import { PolynomialShader } from './shaders/PolynomialShader.js';
 import { DemoShader } from './shaders/DemoShader.js';
 import { RosetteCurveShader } from './shaders/RosetteCurveShader.js';
+import { WallpaperShader } from './shaders/WallpaperShader.js';
 import { Checkerboard, HalfPlanes, WebcamTexture } from './Texture.js';
 import { Coefficients } from './Coefficients.js';
 import { PointSymmetry } from './SymmetryRule.js';
@@ -36,11 +37,69 @@ const SHADER_OPTIONS = [{
     label: '"Tie-dye" Friezes',
     value: 'tie-dye-frieze',
     shader: new DemoShader('frieze')
+}, {
+    label: 'Wallpaper',
+    value: 'wallpaper',
+    shader: new WallpaperShader()
 }];
 
 for (const {value, shader} of SHADER_OPTIONS) {
     shaders.add_shader(value, shader);
 }
+
+const LATTICE_OPTIONS = [{
+    label: 'Square',
+    value: 'square'
+}, {
+    label: 'Rectangle',
+    value: 'rectangle'
+}, {
+    label: 'Rhombus',
+    value: 'rhombus'
+}, {
+    label: 'Hexagon',
+    value: 'hexagon',
+}, {
+    label: 'Parallelogram',
+    value: 'parallelogram',
+}, {
+    label: 'Random',
+    value: 'random'
+}];
+
+function random_vec() {
+    const x = 2.0 * Math.random() - 1.0;
+    const y = 2.0 * Math.random() - 1.0;
+    return [x, y]
+}
+
+const THIRD_TURN = 2.0 * Math.PI / 3.0;
+const LATTICE_BASIS_VECTORS = {
+    'square': [
+        [1, 0],
+        [0, 1],
+    ], 
+    'rectangle': [
+        [2, 0],
+        [0, 1]
+    ],
+    'rhombus': [
+        [1, 2],
+        [1, -2]
+    ],
+    'hexagon': [
+        [1, 0],
+        [Math.cos(THIRD_TURN), Math.sin(THIRD_TURN)]
+    ],
+    'parallelogram': [
+        [1, 0],
+        [1, 2]
+    ],
+    'random': [
+        random_vec(),
+        random_vec()
+    ],
+};
 
 let image_texture;
 
@@ -108,7 +167,7 @@ function setup(sketch) {
     shaders.set_coefficients(DEFAULT_COEFFICIENTS);
     shaders.set_animation(DEFAULT_ANIMATION);
     shaders.disable_all();
-    shaders.set_show('poly-rosette', true);
+    shaders.set_show('wallpaper', true);
     
     symmetries.add_symmetry(DEFAULT_SYMMETRY);
     symmetries.update_panel();
@@ -148,6 +207,10 @@ function attach_handlers() {
     find('#shader-select')
         .set_options(SHADER_OPTIONS)
         .change(select_shader);
+
+    find('#lattice-select')
+        .set_options(LATTICE_OPTIONS)
+        .change(select_lattice);
 }
 
 function use_webcam() {
@@ -161,6 +224,11 @@ function update_ref_geometry(checked) {
 function select_shader(shader_id) {
     shaders.hide_all();
     shaders.set_show(shader_id, true);
+}
+
+function select_lattice(lattice_type) {
+    const [e1, e2] = LATTICE_BASIS_VECTORS[lattice_type];
+    shaders.set_lattice(e1, e2);
 }
 
 function draw(sketch) {
