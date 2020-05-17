@@ -14,11 +14,13 @@ uniform float zoom;
 
 common.funcs_view = `
 vec2 to_complex(vec2 uv) {
-    return (uv - 0.5) * aspect * zoom;
+    vec2 centered_uv = (uv - 0.5) * vec2(aspect, 1.0);
+    return zoom * centered_uv;
 }
 
 vec2 to_uv(vec2 complex) {
-    return complex / zoom / aspect + 0.5;
+    vec2 centered_uv = complex / zoom;
+    return centered_uv / vec2(aspect, 1.0) + 0.5;
 }
 
 vec2 complex_to_clip(vec2 complex) {

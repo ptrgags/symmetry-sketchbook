@@ -138,6 +138,9 @@ function attach_handlers() {
     find('#use-webcam').addEventListener('click', use_webcam); 
     find('#clear-symmetries').addEventListener('click', clear_symmetries);
 
+    find('#toggle-ref-geometry')
+        .click(update_ref_geometry);
+
     find('#builtin-textures')
         .set_options(BUILT_IN_TEXTURE_OPTIONS)
         .change(select_texture);
