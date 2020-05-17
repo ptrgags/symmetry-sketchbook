@@ -21,7 +21,7 @@
       color: #BBBBBB;
   }
   
-  input[type=text], select {
+  input[type=text] {
       background-color: #000000;
       color: #BBBBBB;
       border: 2px solid #888888;
@@ -43,10 +43,15 @@
   .container {
       display: flex;
       flex-wrap: wrap;
+      height: 100%;
   }
   
   .half-page {
       width: 50%;
+  }
+
+  #canvas-pane {
+      height: 80%;
   }
   
   h3, h4 {
@@ -59,26 +64,23 @@
   
   .hidden {
       display: none
-  }
-  
+  } 
+
   #p5-canvas {
       margin: 16px;
   }
-  
   </style>
 </head>
 <body>
   <div class="container">
-    <div class="half-page">
+    <div class="half-page" id='canvas-pane'>
       <div id="p5-canvas">
       </div>
     </div>
     <div class="half-page">
       <div id="texture-settings">
         <h3>Texture Settings</h3>
-        <label for="builtin-select">Choose a built-in texture:</label>
-        <select id="builtin-select">
-        </select>
+        <bricks-dropdown id="builtin-textures" label="Choose a built-in texture"></bricks-dropdown>
         <br/>
         <span class="or">OR</span>
         <label for="image-input">Choose a PNG or JPEG image texture:</label>
@@ -132,11 +134,7 @@
       </div>
       <div id="display-settings">
        <h3>Display Settings</h3>
-       <bricks-checkbox id="toggle-ref-geometry">Toggle Reference Geometry</bricks-checkbox>
-       <br/>
-       <bricks-checkbox id="toggle-display-curves">Display Rosette Curves</bricks-checkbox>
-       <br/>
-       <bricks-checkbox id="toggle-demo-mode">Enable Demo Mode</bricks-checkbox>
+       <bricks-dropdown id="shader-select" label="Select Shader"></bricks-dropdown>
       </div>
       <div id="log-panel">
         <h3>Log</h3>

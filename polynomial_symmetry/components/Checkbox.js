@@ -1,8 +1,4 @@
 class Checkbox extends HTMLElement {
-    static get observedAttributes() {
-        return ['label'];
-    }
-
     constructor() {
         super();
         this._checked = false;
@@ -22,7 +18,7 @@ class Checkbox extends HTMLElement {
         this.attach_handlers();
     }
 
-    attach_handlers(shadow) {
+    attach_handlers() {
         this.shadowRoot.querySelector('#checkbox').addEventListener('click', (e) => {
             this._checked = e.target.checked;
             if (this._on_click) {

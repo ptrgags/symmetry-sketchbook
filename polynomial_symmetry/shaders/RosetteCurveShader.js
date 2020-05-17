@@ -115,6 +115,7 @@ export class RosetteCurveShader extends SymmetryShader {
     
     draw() {
         this.update_time();
+        this._sketch.fill(0, 0, 0, 0);
         this._sketch.model(this._polyline_model);
         
         // Disable when done to get ready for the next shader

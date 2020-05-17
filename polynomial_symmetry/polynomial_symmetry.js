@@ -9,17 +9,38 @@ import { PointSymmetry } from './SymmetryRule.js';
 import { MAX_TERMS, TWO_PI, mod } from './util.js';
 
 import './components/Checkbox.js';
+import './components/Dropdown.js';
 
 window.log = new Log();
 const shaders = new ShaderManager();
 const symmetries = new SymmetryManager(shaders);
 const textures = new TextureManager(shaders, [256, 256]);
 
-shaders.add_shader('poly-rosette', new PolynomialShader('rosette'));
-shaders.add_shader('poly-frieze', new PolynomialShader('frieze'));
-shaders.add_shader('rosette-curve', new RosetteCurveShader('rosette'), true);
-shaders.add_shader('demo-rosette', new DemoShader('rosette'));
-shaders.add_shader('demo-frieze', new DemoShader('frieze'));
+const SHADER_OPTIONS = [{
+    label: 'Polynomial Rosettes',
+    value: 'poly-rosette',
+    shader: new PolynomialShader('rosette')
+}, {
+    label: 'Polynomial Friezes',
+    value: 'poly-frieze',
+    shader: new PolynomialShader('frieze')
+}, {
+    label: 'Parametric Rosette Curves',
+    value: 'rosette-curve',
+    shader: new RosetteCurveShader()
+}, {
+    label: '"Tie-dye" Rosettes',
+    value: 'tie-dye-rosette',
+    shader: new DemoShader('rosette')
+}, {
+    label: '"Tie-dye" Friezes',
+    value: 'tie-dye-frieze',
+    shader: new DemoShader('frieze')
+}];
+
+for (const {value, shader} of SHADER_OPTIONS) {
+    shaders.add_shader(value, shader);
+}
 
 let image_texture;
 
@@ -27,6 +48,9 @@ const BUILT_IN_TEXTURES = {
     checkerboard: new Checkerboard(),
     half_planes: new HalfPlanes()
 };
+const BUILT_IN_TEXTURE_OPTIONS = Object.keys(BUILT_IN_TEXTURES).map(key => {
+    return {label: key, value: key};
+});
 
 const webcam = new WebcamTexture();
 
@@ -59,9 +83,19 @@ function preload(sketch) {
     shaders.preload(sketch);
 }
 
+function pick_size() {
+    const container = find("#canvas-pane");
+    const style = getComputedStyle(container);
+    const margin = 2 * 16;
+    return [
+        parseFloat(style.width) - margin,
+        parseFloat(style.height) - margin
+    ];
+}
+
 function setup(sketch) {
-    //const canvas = createCanvas(800, 400, WEBGL);
-    const canvas = sketch.createCanvas(400, 400, sketch.WEBGL);
+    const [w, h] = pick_size();
+    const canvas = sketch.createCanvas(w, h, sketch.WEBGL);
     canvas.parent('p5-canvas');
     canvas.canvas.addEventListener('wheel', update_zoom);
     sketch.textureMode(sketch.NORMAL);
@@ -70,6 +104,7 @@ function setup(sketch) {
 
     shaders.init(sketch);
     shaders.set_uniform('zoom', zoom);
+    shaders.set_uniform('aspect', w / h);
     shaders.set_coefficients(DEFAULT_COEFFICIENTS);
     shaders.set_animation(DEFAULT_ANIMATION);
     shaders.disable_all();
@@ -84,20 +119,8 @@ function setup(sketch) {
     attach_handlers();
 }
 
-function setup_texture_dropdown() {
-    const dropdown = document.getElementById('builtin-select');
-    for (const key of Object.keys(BUILT_IN_TEXTURES)) {
-        const option = document.createElement('option');
-        option.value = key;
-        option.innerHTML = key;
-        dropdown.appendChild(option);
-    }
-    
-    dropdown.addEventListener('change', select_texture);
-}
-
-function select_texture(e) {
-    textures.texture = BUILT_IN_TEXTURES[e.target.value];
+function select_texture(name) {
+    textures.texture = BUILT_IN_TEXTURES[name];
 }
 
 function find(query) {
@@ -105,40 +128,23 @@ function find(query) {
 }
 
 function attach_handlers() {
-    const image_input = document.getElementById('image-input');
-    image_input.addEventListener('change', upload_image);
-    
-    const update_button = document.getElementById('update-params');
-    update_button.addEventListener('click', update_coefficients);
-    
-    const random_button = document.getElementById('random-params');
-    random_button.addEventListener('click', set_random_coefficients);
+    find('#image-input').addEventListener('change', upload_image); 
+    find('#update-params').addEventListener('click', update_coefficients); 
+    find('#random-params').addEventListener('click', set_random_coefficients);
+    find('#update-animation').addEventListener('click', update_animation); 
+    find('#random-animation').addEventListener('click', random_animation);
+    find('#no-animation').addEventListener('click', no_animation); 
+    find('#add-point-symmetry').addEventListener('click', add_point_symmetry); 
+    find('#use-webcam').addEventListener('click', use_webcam); 
+    find('#clear-symmetries').addEventListener('click', clear_symmetries);
 
-    const update_anim_button = document.getElementById('update-animation');
-    update_anim_button.addEventListener('click', update_animation);
-    
-    // Ideally
-    // find('random-animation').click((checked) => ...);
-    const random_anim_button = document.getElementById('random-animation');
-    random_anim_button.addEventListener('click', random_animation);
+    find('#builtin-textures')
+        .set_options(BUILT_IN_TEXTURE_OPTIONS)
+        .change(select_texture);
 
-    const no_anim_button = document.getElementById('no-animation');
-    no_anim_button.addEventListener('click', no_animation);
-    
-    const symmetry_button = document.getElementById('add-point-symmetry');
-    symmetry_button.addEventListener('click', add_point_symmetry);
-    
-    const webcam_button = document.getElementById('use-webcam');
-    webcam_button.addEventListener('click', use_webcam);
-    
-    const clear_symmetry_button = document.getElementById('clear-symmetries');
-    clear_symmetry_button.addEventListener('click', clear_symmetries);
-
-    find('#toggle-ref-geometry').click(update_ref_geometry);
-    find('#toggle-display-curves').click(update_display_curves);
-    find('#toggle-demo-mode').click(update_demo_mode);
-    
-    setup_texture_dropdown();
+    find('#shader-select')
+        .set_options(SHADER_OPTIONS)
+        .change(select_shader);
 }
 
 function use_webcam() {
@@ -149,16 +155,9 @@ function update_ref_geometry(checked) {
     shaders.set_uniform('show_ref_geometry', checked);
 }
 
-// bluh these display settings should be a dropdown
-function update_demo_mode(checked) {
-    shaders.set_show('demo-rosette', checked);
-    shaders.set_show('poly-rosette', !checked);
-}
-
-function update_display_curves(checked) {
-    shaders.set_show('demo-rosette', !checked);
-    shaders.set_show('poly-rosette', !checked);
-    shaders.set_show('rosette-curve', checked);
+function select_shader(shader_id) {
+    shaders.hide_all();
+    shaders.set_show(shader_id, true);
 }
 
 function draw(sketch) {
@@ -246,7 +245,7 @@ function parse_coefficients(text) {
         }
         
         const [n, m, amp, phase] = coeffs;
-        const adjusted_phase = mod(radians(phase), TWO_PI);
+        const adjusted_phase = mod(sketch.radians(phase), TWO_PI);
         
         tuples.push([n, m, amp, adjusted_phase]);
     }
@@ -306,9 +305,15 @@ function update_zoom(event) {
     event.preventDefault();
 }
 
-function mouseMoved(sketch) {
+function mouse_moved(sketch) {
     const mouse_uv = [sketch.mouseX / sketch.width, 1.0 - sketch.mouseY / sketch.height];
     shaders.set_mouse_uv(mouse_uv);
+}
+
+function resize(sketch) {
+    const [w, h] = pick_size();
+    sketch.resizeCanvas(w, h);
+    shaders.set_uniform('aspect', w / h);
 }
 
 function main() {
@@ -316,10 +321,10 @@ function main() {
         sketch.preload = () => preload(sketch);
         sketch.setup = () => setup(sketch);
         sketch.draw = () => draw(sketch);
-        sketch.mouseMoved = () => mouseMoved(sketch);
+        sketch.mouseMoved = () => mouse_moved(sketch);
+        sketch.windowResized = () => resize(sketch);
     }
     window.sketch = new p5(closure);
 }
-
 
 main();
