@@ -21,6 +21,7 @@ ${symmetry_func}
 
 void main() {
     uv = aTexCoord;
+    uv.y = 1.0 - uv.y;
     
     vec2 grid_position = aPosition.xy;
     vec2 complex = to_complex(uv);
@@ -56,9 +57,7 @@ ${common.uniforms_mouse}
 ${common.funcs_view}
 
 void main() {
-    vec2 z_uv = to_uv(warped_pos);
-    z_uv.y = 1.0 - z_uv.y;
-    vec4 tex_color = texture2D(texture0, fract(z_uv));
+    vec4 tex_color = texture2D(texture0, to_texture(warped_pos));
     vec4 grid_lines = vec4(1.0);
     float t = clamp(mouse_uv.y, 0.0, 1.0);
     vec4 color = mix(grid_lines, tex_color, t); 

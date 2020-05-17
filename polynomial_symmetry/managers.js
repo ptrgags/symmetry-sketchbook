@@ -129,6 +129,12 @@ export class ShaderManager {
         }
     }
 
+    set_pan_uv(mouse_uv) {
+        for (const shaderInfo of this._shaders.values()) {
+            shaderInfo.shader.set_pan_uv(mouse_uv);
+        }
+    }
+
     disable_all() {
         for (const shaderInfo of this._shaders.values()) {
             shaderInfo.shader.disable();

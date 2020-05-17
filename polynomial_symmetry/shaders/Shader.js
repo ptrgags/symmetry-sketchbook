@@ -61,6 +61,15 @@ export class Shader {
         this.enable();
         this._shader.setUniform('mouse_uv', mouse_uv);
     }
+
+    set_pan_uv(pan_uv) {
+        // Sometimes mouse events are triggered too early
+        if (!this._initialized) {
+            return;
+        }
+        this.enable();
+        this._shader.setUniform('pan_uv', pan_uv);
+    }
 }
 
 function pad_zeros(values, desired_length) {

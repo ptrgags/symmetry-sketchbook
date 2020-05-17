@@ -10,17 +10,51 @@ common.uniforms_view = `
 uniform float aspect;
 // Scale factor for zooming
 uniform float zoom;
+// current pan in uv coordinates
+uniform vec2 pan_uv;
 `;
 
 common.funcs_view = `
-vec2 to_complex(vec2 uv) {
-    vec2 centered_uv = (uv - 0.5) * vec2(aspect, 1.0);
-    return zoom * centered_uv;
+vec2 apply_aspect_fix(vec2 uv) {
+    return uv * vec2(aspect, 1.0);
 }
 
+vec2 unapply_aspect_fix(vec2 uv) {
+    return uv / vec2(aspect, 1.0);
+}
+
+vec2 to_centered(vec2 uv) {
+    return uv - 0.5;
+}
+
+vec2 to_corner(vec2 uv) {
+    return uv + 0.5;
+}
+
+vec2 apply_zoom(vec2 uv) {
+    return zoom * uv;
+}
+
+vec2 unapply_zoom(vec2 uv) {
+    return uv / zoom;
+}
+
+vec2 to_complex(vec2 uv) {
+    vec2 position_uv = to_centered(uv) - pan_uv;
+    return apply_zoom(apply_aspect_fix(position_uv));
+}
+
+// Convert back to uv space for use in vertex shaders like the demo shader
 vec2 to_uv(vec2 complex) {
-    vec2 centered_uv = complex / zoom;
-    return centered_uv / vec2(aspect, 1.0) + 0.5;
+    vec2 position_uv = unapply_zoom(complex);
+    return to_corner(position_uv);
+}
+
+// Convert to texture space. This wraps the texture coordinates and flips y
+vec2 to_texture(vec2 complex) {
+    vec2 uv = fract(to_corner(complex));
+    uv.y = 1.0 - uv.y;
+    return uv;
 }
 
 vec2 complex_to_clip(vec2 complex) {

@@ -10,10 +10,8 @@ varying vec2 uv;
 void main() {
     vec4 position = vec4(aPosition, 1.0);
     gl_Position = position;
+
     uv = aTexCoord;
-    
-    // Flip y.
-    uv.y = 1.0 - uv.y;
 }
 `;
 
@@ -96,15 +94,14 @@ ${common.funcs_view}
 void main() {
     vec2 complex = to_complex(uv);
     vec2 z = compute_polynomial(complex);
-    vec2 z_uv = to_uv(z);
-    vec4 output_color = texture2D(texture0, fract(z_uv));
+    vec4 output_color = texture2D(texture0, to_texture(z));
     
     float unit_circle_dist = abs(length(z) - 1.0);
     float unit_circle_mask = smoothstep(0.02, 0.01, unit_circle_dist);
     
     float modulus = length(z);
-    float far_away = smoothstep(10.0, 50.0, modulus);
-    float near_zero = smoothstep(0.0011, 0.001, modulus);
+    float far_away = smoothstep(100.0, 200.0, modulus);
+    float near_zero = smoothstep(0.011, 0.01, modulus);
     
     const vec4 CYAN = vec4(0.0, 1.0, 1.0, 1.0);
     const vec4 YELLOW = vec4(1.0, 1.0, 0.0, 1.0);

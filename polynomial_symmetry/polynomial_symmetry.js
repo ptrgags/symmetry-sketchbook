@@ -313,6 +313,15 @@ function mouse_moved(sketch) {
     shaders.set_mouse_uv(mouse_uv);
 }
 
+let pan = {x: 0, y: 0};
+function mouse_dragged(sketch, event) {
+    pan.x += event.movementX;
+    pan.y += event.movementY;
+
+    const pan_uv = [pan.x / sketch.width, -pan.y / sketch.height];
+    shaders.set_pan_uv(pan_uv);
+}
+
 function resize(sketch) {
     const [w, h] = pick_size();
     sketch.resizeCanvas(w, h);
@@ -326,6 +335,7 @@ function main() {
         sketch.draw = () => draw(sketch);
         sketch.mouseMoved = () => mouse_moved(sketch);
         sketch.windowResized = () => resize(sketch);
+        sketch.mouseDragged = (event) => mouse_dragged(sketch, event);
     }
     window.sketch = new p5(closure);
 }

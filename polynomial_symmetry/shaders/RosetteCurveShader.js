@@ -64,6 +64,7 @@ void main() {
     
     gl_Position = vec4(clip_position, 0.0, 1.0);
     uv = aPosition.xy;
+    uv.y = 1.0 - uv.y;
 }
 `;
 
@@ -85,10 +86,7 @@ void main() {
     float outer_strip = 1.0 - step(0.15, center_dist);
     float inner_strip = 1.0 - step(0.1, center_dist);
     
-    vec2 z_uv = to_uv(curve);
-    z_uv.y = 1.0 - z_uv.y;
-    
-    vec4 value_color = texture2D(texture0, z_uv);
+    vec4 value_color = texture2D(texture0, to_texture(curve));
     vec4 direction_color = vec4(t);
     
     vec4 image = vec4(0.0);
