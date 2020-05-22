@@ -1,13 +1,15 @@
-class Texture {
+export class Texture {
     constructor() {
         this._graphics = undefined;
+        this._sketch = undefined;
     }
     
-    make_graphics(width, height) {
+    init(sketch, width, height) {
+        this._sketch = sketch;
         if (this._graphics !== undefined) {
             return;
         }
-        this._graphics = createGraphics(width, height);
+        this._graphics = sketch.createGraphics(width, height);
         this._draw_texture();
     }
     
@@ -16,7 +18,7 @@ class Texture {
     }
     
     set_wrapping() {
-        textureWrap(REPEAT);
+        this._sketch.textureWrap(this._sketch.REPEAT);
     }
     
     _draw_texture() {
@@ -24,7 +26,7 @@ class Texture {
     }
 }
 
-class HalfPlanes extends Texture {
+export class HalfPlanes extends Texture {
     _draw_texture() {
         const gfx = this._graphics;
         gfx.background(255, 0, 0);
@@ -34,14 +36,15 @@ class HalfPlanes extends Texture {
     }
     
     set_wrapping() {
+        const sketch = this._sketch;
         // If we wrap in the y-direction, you'll get
         // alternating colors even when the y-value is
         // positive
-        textureWrap(REPEAT, CLAMP);
+        sketch.textureWrap(sketch.REPEAT, sketch.CLAMP);
     }
 }
 
-class Checkerboard extends Texture {
+export class Checkerboard extends Texture {
     _draw_texture() {
         const gfx = this._graphics;
         gfx.background(255, 0, 0);
@@ -52,13 +55,14 @@ class Checkerboard extends Texture {
     }
 }
 
-class ImageTexture extends Texture {
+export class ImageTexture extends Texture {
     constructor(img) {
         super();
         this._img = img;
     }
     
-    make_graphics() {
+    init(sketch) {
+        this._sketch = sketch;
         // Nothing to be done here
     }
     
@@ -67,21 +71,22 @@ class ImageTexture extends Texture {
     }
     
     set_wrapping() { 
-        textureWrap(CLAMP);
+        this._sketch.textureWrap(this._sketch.CLAMP);
     }
 }
 
-class WebcamTexture extends Texture {
+export class WebcamTexture extends Texture {
     constructor() {
         super();
         this._camera = undefined;
     }
     
-    make_graphics() {
+    init(sketch) {
+        this._sketch = sketch;
         if (this._camera !== undefined) {
             return;
         }
-        this._camera = createCapture(VIDEO);
+        this._camera = sketch.createCapture(this._sketch.VIDEO);
         this._camera.hide();
     }
     
@@ -90,40 +95,6 @@ class WebcamTexture extends Texture {
     }
     
     set_wrapping() {
-        textureWrap(CLAMP);
-    }
-}
-
-
-class TextureManager {
-    constructor(dims) {
-        this._dims = dims;
-        this._texture = undefined;
-        this._shaders = [];
-    }
-    
-    get shaders() {
-        return this._shaders;
-    }
-    
-    set shaders(shaders) {
-        this._shaders = shaders;
-    }
-    
-    get texture() {
-        return this._texture;
-    }
-    
-    set texture(tex) {
-        const [w, h] = this._dims;
-        tex.make_graphics(w, h);
-        this._texture = tex;
-        this._update_shaders();
-    }
-    
-    _update_shaders() {
-        for (const shader of this._shaders) {
-            shader.set_texture(this._texture);
-        }
+        this._sketch.textureWrap(this._sketch.CLAMP);
     }
 }

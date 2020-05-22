@@ -3,20 +3,9 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-  <!-- PLEASE NO CHANGES BELOW THIS LINE (UNTIL I SAY SO) -->
   <script language="javascript" type="text/javascript" src="libraries/p5.min.js"></script>
-  <script language="javascript" type="text/javascript" src="Coefficients.js"></script>
-  <script language="javascript" type="text/javascript" src="DemoShader.js"></script>
-  <script language="javascript" type="text/javascript" src="Log.js"></script>
-  <script language="javascript" type="text/javascript" src="PolynomialShader.js"></script>
-  <script language="javascript" type="text/javascript" src="RosetteCurveShader.js"></script>
-  <script language="javascript" type="text/javascript" src="SymmetryRule.js"></script>
-  <script language="javascript" type="text/javascript" src="Texture.js"></script>
-  <script language="javascript" type="text/javascript" src="polynomial_symmetry.js"></script>
-  <!-- OK, YOU CAN MAKE CHANGES BELOW THIS LINE AGAIN -->
+  <script type="module" src="polynomial_symmetry.js"></script>
 
-  <!-- This line removes any default padding and style.
-       You might only need one of these values set. -->
   <style> 
   body { 
       padding: 0; 
@@ -32,7 +21,7 @@
       color: #BBBBBB;
   }
   
-  input[type=text], select {
+  input[type=text] {
       background-color: #000000;
       color: #BBBBBB;
       border: 2px solid #888888;
@@ -54,10 +43,15 @@
   .container {
       display: flex;
       flex-wrap: wrap;
+      height: 100%;
   }
   
   .half-page {
       width: 50%;
+  }
+
+  #canvas-pane {
+      height: 80%;
   }
   
   h3, h4 {
@@ -70,33 +64,30 @@
   
   .hidden {
       display: none
-  }
-  
+  } 
+
   #p5-canvas {
       margin: 16px;
   }
-  
   </style>
 </head>
 <body>
   <div class="container">
-    <div class="half-page">
+    <div class="half-page" id='canvas-pane'>
       <div id="p5-canvas">
       </div>
     </div>
     <div class="half-page">
       <div id="texture-settings">
         <h3>Texture Settings</h3>
-        <label for="builtin-select">Choose a built-in texture:</label>
-        <select id="builtin-select">
-        </select>
+        <bricks-dropdown id="builtin-textures" label="Choose a built-in texture"></bricks-dropdown>
         <br/>
         <span class="or">OR</span>
         <label for="image-input">Choose a PNG or JPEG image texture:</label>
         <input id="image-input" type="file" accept="image/png, image/jpeg" />
         <br/>
-        <span class="or hidden">OR</span>
-        <button id="use-webcam" class="hidden">Use Webcam</button>
+        <span class="or">OR</span>
+        <button id="use-webcam">Use Webcam</button>
       </div>
       <div id="coefficient-settings">
         <h3>Coefficient Settings</h3>
@@ -105,14 +96,19 @@
         <label for="coeffs">Coefficients (n, m, amp=1, phase_deg=0)</label>
         <input id="coeffs" type="text" />
         <br/>
-        <!--
-        The world is not yet ready for this
-        <label for="animation">Animation (amp_freq_rad)</label>
-        <input id="animation" type="text" />
-        <br/>
-        -->
         <button id="update-params">Update Parameters</button>
         <button id="random-params">Random Parameters</button>
+      </div>
+      <div id="animation-settings">
+        <h3>Animation Settings (results may not be symmetric)</h3>
+        <div id="current-animation">
+        </div>
+        <label for="animation">Animation parameters (rad)</label>
+        <input id="animation" type="text" />
+        <br/>
+        <button id="update-animation">Update Animation</button>
+        <button id="random-animation">Random Animation</button>
+        <button id="no-animation">No Animation</button>
       </div>
       <div id="symmetry-settings">
         <h3>Symmetry Settings</h3>
@@ -126,29 +122,21 @@
           <label for="in-rotation">Input Rotation (l)</label>
           <input id="in-rotation" type="text" />
           <br/>
-          <label for="inversion">Input Inversion (p)</label>
-          <input id="inversion" type="text" />
-          <label for="in-reflection">Input Reflection (q)</label>
-          <input id="in-reflection" type="text" />
+          <bricks-checkbox id="inversion">Input inversion (p)</bricks-checkbox>
+          <bricks-checkbox id="in-reflection">Input Reflection(q)</bricks-checkbox>
           <br/>
           <label for="out-rotation">Output Rotation (u)</label>
           <input id="out-rotation" type="text" />
-          <label for="out-reflection">Output Reflection (v)</label>
-          <input id="out-reflection" type="text" />
+          <bricks-checkbox id="out-reflection">Output Reflection (v)</bricks-checkbox>
           <br/>
           <button id="add-point-symmetry">Add Symmetry</button>
         </div>
       </div>
       <div id="display-settings">
        <h3>Display Settings</h3>
-       <label for="toggle-ref-geometry">Toggle Reference Geometry</label>
-       <input id="toggle-ref-geometry" type="checkbox" />
+       <bricks-dropdown id="shader-select" label="Select Shader"></bricks-dropdown>
        <br/>
-       <label for="toggle-display-curves" type="checkbox">Display Rosette Curves</input>
-       <input id="toggle-display-curves" type="checkbox" />
-       <br/>
-       <label for="toggle-demo-mode" type="checkbox">Enable Demo Mode</input>
-       <input id="toggle-demo-mode" type="checkbox" />
+       <bricks-checkbox id="toggle-ref-geometry">Show Reference Geometry</bricks-checkbox>
       </div>
       <div id="log-panel">
         <h3>Log</h3>

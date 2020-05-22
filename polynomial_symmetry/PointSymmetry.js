@@ -1,3 +1,6 @@
+import { Coefficients } from './Coefficients.js';
+import { TWO_PI, mod } from './math_util.js';
+
 /**
  * Simulate symmetry rules of functions from Complex -> Complex.
  * These rules are of the form:
@@ -143,16 +146,20 @@
  * for every coefficient a_nm:
  *   locate the partner indices (i, j) = swap^(v + q) negate^p(n, m)
  *   if (i, j) === (n, m):
- *     ...This case needs special care. I'll return to this soon.
+ *     Compute B_nm = rotate_k^P conj^v a_nm
+ *     if B_nm is approximately equal to a_nm:
+ *       set a_ij = a_nm
+ *     otherwise:
+ *       set a_ij = 0
  *   otherwise:
- *     set a_pq = conj^v rotate_k^(-P) a_nm
+ *     set a_ij = conj^v rotate_k^(-P) a_nm
  *
  * WOW YOU'RE STILL HERE? =================================================
  *
  * Congrats, you survived a crash course in Applied Group Theory.
  * Reward: source code to actually implement this!
  */
-class PointSymmetry {
+export class PointSymmetry {
     constructor(options) {
         options = options || {};
         // Mirror symmetry across the x-axis.
@@ -210,15 +217,6 @@ class PointSymmetry {
     /**
      * Algorithm explained in the long derivation at the top of the file.
      * 
-     * TODO: Rewrite this doc!
-     * 
-     * for every coefficient a_nm:
-     *   locate the partner indices (i, j) = swap^(v + q) negate^p(n, m)
-     *   if (i, j) === (n, m):
-     *     ...This case needs special care. I'll return to this soon.
-     *   otherwise:
-     *     set a_ij = conj^v rotate_k^(-P) a_nm
-     *
      * Note that this may clobber some coefficients. A warning will be logged
      * but the most recent coefficient will be used.
      */
@@ -361,10 +359,6 @@ class PointSymmetry {
     }
 }
 
-function mod(x, n) {
-    return ((x % n) + n) % n;
-}
-
 class TermMap {
     constructor(coefficients) {
         this._terms = new Map();
@@ -408,58 +402,5 @@ class TermMap {
             terms.push([n, m, amp, phase]);
         }
         return new Coefficients(terms);
-    }
-}
-
-/**
- * Frieze symmetry is created by plugging Phi(z) = e^iz
- * into the same polynomial f(z) = sum_nm a_nm z^n conj(z)^m
- *
- * This limits 
- */
-class FriezeSymmetry extends PointSymmetry {
-}
-
-class SymmetryManager {
-    constructor() {
-        this._symmetries = [];
-        this._shaders = [];
-    }
-    
-    get symmetries() {
-        return this._symmetries();
-    }
-    
-    add_symmetry(symmetry) {
-        this._symmetries.push(symmetry);
-        this._update_shaders();
-        this.update_panel();
-    }
-    
-    clear_symmetries() {
-        this._symmetries = [];
-        this._update_shaders();
-        this.update_panel();
-    }
-    
-    get shaders() {
-        return this._shaders;
-    }
-    
-    set shaders(shaders) {
-        this._shaders = shaders;
-    }
-    
-    _update_shaders() {
-        for (const shader of this._shaders) {
-            shader.symmetries = this._symmetries;
-            shader.set_coefficients();
-        }
-    }
-    
-    update_panel() {
-        const panel = document.getElementById('current-symmetries');
-        const lines = this._symmetries.map(x => x.to_string()).join('<br/>');
-        panel.innerHTML = `Current Symmetries:<br/>${lines}`;
     }
 }

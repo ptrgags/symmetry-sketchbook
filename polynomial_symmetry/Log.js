@@ -1,4 +1,4 @@
-class Log {
+export class Log {
     constructor() {
         this._lines = [];
         this._max_lines = 100;
