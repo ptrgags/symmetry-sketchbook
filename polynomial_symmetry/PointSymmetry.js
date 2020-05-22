@@ -1,5 +1,5 @@
 import { Coefficients } from './Coefficients.js';
-import { TWO_PI, mod } from './util.js';
+import { TWO_PI, mod } from './math_util.js';
 
 /**
  * Simulate symmetry rules of functions from Complex -> Complex.
