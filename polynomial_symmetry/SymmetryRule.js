@@ -146,7 +146,7 @@ import { TWO_PI, mod } from './util.js';
  * for every coefficient a_nm:
  *   locate the partner indices (i, j) = swap^(v + q) negate^p(n, m)
  *   if (i, j) === (n, m):
- *     ...This case needs special care. I'll return to this soon.
+ *     TODO: update this section based on the code
  *   otherwise:
  *     set a_pq = conj^v rotate_k^(-P) a_nm
  *
