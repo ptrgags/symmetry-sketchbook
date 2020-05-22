@@ -146,9 +146,13 @@ import { TWO_PI, mod } from './math_util.js';
  * for every coefficient a_nm:
  *   locate the partner indices (i, j) = swap^(v + q) negate^p(n, m)
  *   if (i, j) === (n, m):
- *     TODO: update this section based on the code
+ *     Compute B_nm = rotate_k^P conj^v a_nm
+ *     if B_nm is approximately equal to a_nm:
+ *       set a_ij = a_nm
+ *     otherwise:
+ *       set a_ij = 0
  *   otherwise:
- *     set a_pq = conj^v rotate_k^(-P) a_nm
+ *     set a_ij = conj^v rotate_k^(-P) a_nm
  *
  * WOW YOU'RE STILL HERE? =================================================
  *
@@ -213,15 +217,6 @@ export class PointSymmetry {
     /**
      * Algorithm explained in the long derivation at the top of the file.
      * 
-     * TODO: Rewrite this doc!
-     * 
-     * for every coefficient a_nm:
-     *   locate the partner indices (i, j) = swap^(v + q) negate^p(n, m)
-     *   if (i, j) === (n, m):
-     *     ...This case needs special care. I'll return to this soon.
-     *   otherwise:
-     *     set a_ij = conj^v rotate_k^(-P) a_nm
-     *
      * Note that this may clobber some coefficients. A warning will be logged
      * but the most recent coefficient will be used.
      */
@@ -408,13 +403,4 @@ class TermMap {
         }
         return new Coefficients(terms);
     }
-}
-
-/**
- * Frieze symmetry is created by plugging Phi(z) = e^iz
- * into the same polynomial f(z) = sum_nm a_nm z^n conj(z)^m
- *
- * This limits 
- */
-export class FriezeSymmetry extends PointSymmetry {
 }
