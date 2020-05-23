@@ -6,8 +6,8 @@ import { RosetteCurveShader } from './shaders/RosetteCurveShader.js';
 import { WallpaperShader } from './shaders/WallpaperShader.js';
 import { Checkerboard, HalfPlanes, WebcamTexture } from './Texture.js';
 import { Coefficients } from './Coefficients.js';
-import { PointSymmetry } from './SymmetryRule.js';
-import { MAX_TERMS, TWO_PI, mod } from './util.js';
+import { PointSymmetry } from './PointSymmetry.js';
+import { MAX_TERMS, TWO_PI, mod } from './math_util.js';
 
 import './components/Checkbox.js';
 import './components/Dropdown.js';

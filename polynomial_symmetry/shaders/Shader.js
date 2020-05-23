@@ -1,4 +1,4 @@
-import { MAX_TERMS } from '../util.js';
+import { MAX_TERMS } from '../math_util.js';
 export class Shader {
     constructor() {
         this._shader = undefined;
