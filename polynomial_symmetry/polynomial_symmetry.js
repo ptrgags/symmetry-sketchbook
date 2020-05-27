@@ -7,6 +7,7 @@ import { WallpaperShader } from './shaders/WallpaperShader.js';
 import { Checkerboard, HalfPlanes, WebcamTexture } from './Texture.js';
 import { Coefficients } from './Coefficients.js';
 import { PointSymmetry } from './PointSymmetry.js';
+import { WallpaperSymmetry } from './WallpaperSymmetry.js';
 import { MAX_TERMS, TWO_PI, mod } from './math_util.js';
 
 import './components/Checkbox.js';
@@ -194,6 +195,7 @@ function attach_handlers() {
     find('#random-animation').addEventListener('click', random_animation);
     find('#no-animation').addEventListener('click', no_animation); 
     find('#add-point-symmetry').addEventListener('click', add_point_symmetry); 
+    find('#add-wallpaper-symmetry').addEventListener('click', add_wallpaper_symmetry); 
     find('#use-webcam').addEventListener('click', use_webcam); 
     find('#clear-symmetries').addEventListener('click', clear_symmetries);
 
@@ -360,6 +362,19 @@ function add_point_symmetry() {
         input_inversion: checkbox_int('#inversion'),
         output_rotation: value_or_default('out-rotation', 0),
         output_mirror: checkbox_int('#out-reflection'),
+    });
+    symmetries.add_symmetry(symmetry);
+}
+
+function add_wallpaper_symmetry() {
+    const symmetry = new WallpaperSymmetry({
+        negate: checkbox_int('#rule-negate-nm'),
+        negate_n: checkbox_int('#rule-negate-n'),
+        negate_m: checkbox_int('#rule-negate-m'),
+        swap: checkbox_int('#rule-swap-nm'),
+        rotate_n: checkbox_int('#rule-rot-n'),
+        rotate_nm: checkbox_int('#rule-rot-nm'),
+        hex: checkbox_int('#rule-hex'),
     });
     symmetries.add_symmetry(symmetry);
 }
