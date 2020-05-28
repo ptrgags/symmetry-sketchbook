@@ -190,6 +190,9 @@ function attach_handlers() {
     find('#image-input').addEventListener('change', upload_image); 
     find('#update-params').addEventListener('click', update_coefficients); 
     find('#random-params').addEventListener('click', set_random_coefficients);
+    find('#quasi-params-5').addEventListener('click', set_quasi_coefficients(5));
+    find('#quasi-params-7').addEventListener('click', set_quasi_coefficients(7));
+
     find('#update-animation').addEventListener('click', update_animation); 
     find('#random-animation').addEventListener('click', random_animation);
     find('#no-animation').addEventListener('click', no_animation); 
@@ -266,6 +269,24 @@ function set_random_coefficients() {
     
     const coeffs = new Coefficients(terms);
     shaders.set_coefficients(coeffs);
+}
+
+function set_quasi_coefficients(k) {
+    return () => {
+        const terms = [];
+        for (let i = 0; i < k; i++) {
+            const angle = i * TWO_PI / k;
+            const n = sketch.cos(angle);
+            const m = sketch.sin(angle);
+            const amp = 1.0;
+            const phase = 0.0;
+            terms.push([n, m, amp, phase]);
+        }
+
+        const coeffs = new Coefficients(terms);
+        shaders.set_coefficients(coeffs);
+
+    };
 }
 
 function update_coefficients() {
