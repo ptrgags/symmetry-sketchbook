@@ -16,7 +16,7 @@ void main() {
 `;
 
 export const ROSETTE_FUNC = `
-vec2 compute_polynomial(vec2 z) {
+vec2 compute_polynomial(vec2 z, float animation_direction) {
     vec2 z_polar = to_polar(z);
     vec2 sum = vec2(0.0);
     for (int i = 0; i < MAX_TERMS; i++) {
@@ -34,7 +34,7 @@ vec2 compute_polynomial(vec2 z) {
         
         // Animate the coefficients for a fun twist.
         // (sometimes literally)
-        coeff.y += animation[i] * time;
+        coeff.y += animation_direction * animation[i] * time;
         
         float r = coeff.x * pow(z_polar.x, n + m);
         float theta = z_polar.y * (n - m) + coeff.y;
@@ -47,7 +47,7 @@ vec2 compute_polynomial(vec2 z) {
 `;
 
 export const FRIEZE_FUNC = `
-vec2 compute_polynomial(vec2 z) {    
+vec2 compute_polynomial(vec2 z, float animation_direction) {    
     vec2 sum = vec2(0.0);
     for (int i = 0; i < MAX_TERMS; i++) {
         // Frieze symmetry is taken by composing the
@@ -62,7 +62,7 @@ vec2 compute_polynomial(vec2 z) {
         // amplitude, phase
         vec2 a_nm = coeffs[i];
         // Animate the phase
-        a_nm.y += animation[i] * time;
+        a_nm.y += animation_direction * animation[i] * time;
         
         float r =  a_nm.x * exp(-z.y * (n + m));
         float theta = z.x * (n - m) + a_nm.y;
@@ -93,7 +93,11 @@ ${common.funcs_view}
 
 void main() {
     vec2 complex = to_complex(uv);
-    vec2 z = compute_polynomial(complex);
+    vec2 z = compute_polynomial(complex, -1.0);
+    if (enable_standing_waves) {
+        z += compute_polynomial(complex, 1.0);
+    }
+
     vec4 output_color = texture2D(texture0, to_texture(z));
     
     float unit_circle_dist = abs(length(z) - 1.0);

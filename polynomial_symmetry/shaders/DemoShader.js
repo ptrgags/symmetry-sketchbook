@@ -25,7 +25,11 @@ void main() {
     
     vec2 grid_position = aPosition.xy;
     vec2 complex = to_complex(uv);
-    vec2 z = compute_polynomial(complex);
+    vec2 z = compute_polynomial(complex, -1.0);
+
+    if (enable_standing_waves) {
+        z += compute_polynomial(complex, 1.0);
+    }
     
     warped_pos = complex_to_clip(z);
     

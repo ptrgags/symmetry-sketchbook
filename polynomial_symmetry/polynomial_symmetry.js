@@ -102,8 +102,6 @@ const LATTICE_BASIS_VECTORS = {
     ],
 };
 
-let image_texture;
-
 const BUILT_IN_TEXTURES = {
     checkerboard: new Checkerboard(),
     half_planes: new HalfPlanes()
@@ -136,6 +134,7 @@ const DEFAULT_SYMMETRY = new PointSymmetry({
     input_rotation: 1
 });
 
+let enable_standing_waves = false;
 let zoom = 3;
 const ZOOM_DELTA = 0.5;
 
@@ -168,7 +167,7 @@ function setup(sketch) {
     shaders.set_coefficients(DEFAULT_COEFFICIENTS);
     shaders.set_animation(DEFAULT_ANIMATION);
     shaders.disable_all();
-    shaders.set_show('wallpaper', true);
+    shaders.set_show('poly-rosette', true);
     
     symmetries.add_symmetry(DEFAULT_SYMMETRY);
     symmetries.update_panel();
@@ -199,6 +198,9 @@ function attach_handlers() {
     find('#use-webcam').addEventListener('click', use_webcam); 
     find('#clear-symmetries').addEventListener('click', clear_symmetries);
 
+    find('#toggle-standing-waves')
+        .click(toggle_standing_waves);
+
     find('#toggle-ref-geometry')
         .click(update_ref_geometry);
 
@@ -217,6 +219,10 @@ function attach_handlers() {
 
 function use_webcam() {
     textures.texture = webcam;
+}
+
+function toggle_standing_waves(checked) {
+    shaders.set_uniform('enable_standing_waves', checked);
 }
 
 function update_ref_geometry(checked) {

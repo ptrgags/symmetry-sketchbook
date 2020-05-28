@@ -99,6 +99,10 @@ common.uniforms_animation = `
 uniform float animation[MAX_TERMS];
 // Elapsed time since the page load in seconds.
 uniform float time;
+// If true, the polynomial will be run a second time with the
+// animation direction reversed. For waves, this produces
+// a standing wave effect.
+uniform bool enable_standing_waves;
 `;
 
 common.uniforms_texture = `

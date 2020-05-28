@@ -29,14 +29,14 @@ ${common.uniforms_view}
 ${common.funcs_view}
 ${common.funcs_polar}
 
-vec2 compute_wallpaper(vec2 z) {
+vec2 compute_wallpaper(vec2 z, float animation_direction) {
     vec2 sum = vec2(0.0);
     vec2 lattice_coords = mat2(inv_lattice) * z;
     for (int i = 0; i < MAX_TERMS; i++) {
         // a_nm expi(2pi * i * dot(nm, A^(-1) z))
         vec2 nm = powers[i];
         vec2 a_nm = coeffs[i];
-        a_nm.y += animation[i] * time;
+        a_nm.y += animation_direction * animation[i] * time;
         float angle = 2.0 * PI * dot(nm, lattice_coords) + a_nm.y;
         sum += to_rect(vec2(a_nm.x, angle));
     }
@@ -45,7 +45,10 @@ vec2 compute_wallpaper(vec2 z) {
 
 void main() {
     vec2 complex = to_complex(uv);
-    vec2 z = compute_wallpaper(complex);
+    vec2 z = compute_wallpaper(complex, -1.0);
+    if (enable_standing_waves) {
+        z += compute_wallpaper(complex, 1.0);
+    }
     vec4 output_color = texture2D(texture0, to_texture(z));
     
     float unit_circle_dist = abs(length(z) - 1.0);
