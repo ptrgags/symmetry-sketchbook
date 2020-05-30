@@ -285,7 +285,7 @@ function set_quasi_coefficients(k) {
             const angle = i * TWO_PI / k;
             const n = sketch.cos(angle);
             const m = sketch.sin(angle);
-            const amp = 1.0;
+            const amp = 1.0 / k;
             const phase = 0.0;
             terms.push([n, m, amp, phase]);
         }
