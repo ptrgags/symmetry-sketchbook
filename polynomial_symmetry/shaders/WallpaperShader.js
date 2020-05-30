@@ -37,7 +37,9 @@ vec2 compute_wallpaper(vec2 z, float animation_direction) {
         // a_nm expi(2pi * i * dot(nm, A^(-1) z))
         vec2 nm = powers[i];
         vec2 a_nm = coeffs[i];
-        a_nm.y += animation_direction * animation[i] * time;
+
+        float omega = animation[0] * length(nm);
+        a_nm.y += animation_direction * omega * time;
         float angle = 2.0 * PI * dot(nm, lattice_coords) + a_nm.y;
         sum += blend_pairwise(float(i)) * to_rect(vec2(a_nm.x, angle));
     }
