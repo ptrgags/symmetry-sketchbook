@@ -15,6 +15,22 @@ void main() {
 }
 `;
 
+export const WALLPAPER_FUNC = `
+vec2 compute_wallpaper(vec2 z, float animation_direction) {
+    vec2 sum = vec2(0.0);
+    vec2 lattice_coords = mat2(inv_lattice) * z;
+    for (int i = 0; i < MAX_TERMS; i++) {
+        // a_nm expi(2pi * i * dot(nm, A^(-1) z))
+        vec2 nm = powers[i];
+        vec2 a_nm = coeffs[i];
+        a_nm.y += animation_direction * animation[i] * time;
+        float angle = 2.0 * PI * dot(nm, lattice_coords) + a_nm.y;
+        sum += blend_pairwise(float(i)) * to_rect(vec2(a_nm.x, angle));
+    }
+    return sum;
+}
+`;
+
 const FRAG_SHADER = `
 ${common.defines}
 precision highp float;
@@ -30,19 +46,7 @@ ${common.funcs_view}
 ${common.funcs_polar}
 ${common.funcs_animation}
 
-vec2 compute_wallpaper(vec2 z, float animation_direction) {
-    vec2 sum = vec2(0.0);
-    vec2 lattice_coords = mat2(inv_lattice) * z;
-    for (int i = 0; i < MAX_TERMS; i++) {
-        // a_nm expi(2pi * i * dot(nm, A^(-1) z))
-        vec2 nm = powers[i];
-        vec2 a_nm = coeffs[i];
-        a_nm.y += animation_direction * animation[i] * time;
-        float angle = 2.0 * PI * dot(nm, lattice_coords) + a_nm.y;
-        sum += blend_pairwise(float(i)) * to_rect(vec2(a_nm.x, angle));
-    }
-    return sum;
-}
+${WALLPAPER_FUNC}
 
 void main() {
     vec2 complex = to_complex(uv);
