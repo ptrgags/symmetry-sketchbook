@@ -42,7 +42,7 @@ void main() {
 
     float height_bound = 0.0;
     for (int i = 0; i < MAX_TERMS; i++) {
-        height_bound += coeffs[i].x;
+        height_bound += abs(coeffs[i].x);
     }
 
     vec3 computed_pos = vec3(aPosition.xy, z.x / height_bound);
