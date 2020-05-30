@@ -4,6 +4,7 @@ import { PolynomialShader } from './shaders/PolynomialShader.js';
 import { DemoShader } from './shaders/DemoShader.js';
 import { RosetteCurveShader } from './shaders/RosetteCurveShader.js';
 import { WallpaperShader } from './shaders/WallpaperShader.js';
+import { RubberSheetShader } from './shaders/RubberSheetShader.js';
 import { Checkerboard, HalfPlanes, WebcamTexture } from './Texture.js';
 import { Coefficients } from './Coefficients.js';
 import { PointSymmetry } from './PointSymmetry.js';
@@ -42,6 +43,10 @@ const SHADER_OPTIONS = [{
     label: 'Wallpaper',
     value: 'wallpaper',
     shader: new WallpaperShader()
+}, {
+    label: 'Rubber Sheet',
+    value: 'rubber-sheet',
+    shader: new RubberSheetShader()
 }];
 
 for (const {value, shader} of SHADER_OPTIONS) {
