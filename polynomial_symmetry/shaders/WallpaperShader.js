@@ -28,6 +28,7 @@ ${common.uniforms_wallpaper}
 ${common.uniforms_view}
 ${common.funcs_view}
 ${common.funcs_polar}
+${common.funcs_animation}
 
 vec2 compute_wallpaper(vec2 z, float animation_direction) {
     vec2 sum = vec2(0.0);
@@ -38,7 +39,7 @@ vec2 compute_wallpaper(vec2 z, float animation_direction) {
         vec2 a_nm = coeffs[i];
         a_nm.y += animation_direction * animation[i] * time;
         float angle = 2.0 * PI * dot(nm, lattice_coords) + a_nm.y;
-        sum += to_rect(vec2(a_nm.x, angle));
+        sum += blend_pairwise(float(i)) * to_rect(vec2(a_nm.x, angle));
     }
     return sum;
 }

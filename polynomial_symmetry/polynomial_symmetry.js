@@ -201,11 +201,9 @@ function attach_handlers() {
     find('#use-webcam').addEventListener('click', use_webcam); 
     find('#clear-symmetries').addEventListener('click', clear_symmetries);
 
-    find('#toggle-standing-waves')
-        .click(toggle_standing_waves);
-
-    find('#toggle-ref-geometry')
-        .click(update_ref_geometry);
+    find('#toggle-standing-waves').click(toggle_standing_waves);
+    find('#toggle-wave-components').click(toggle_wave_components);
+    find('#toggle-ref-geometry').click(update_ref_geometry);
 
     find('#builtin-textures')
         .set_options(BUILT_IN_TEXTURE_OPTIONS)
@@ -226,6 +224,10 @@ function use_webcam() {
 
 function toggle_standing_waves(checked) {
     shaders.set_uniform('enable_standing_waves', checked);
+}
+
+function toggle_wave_components(checked) {
+    shaders.set_uniform('show_wave_components', checked);
 }
 
 function update_ref_geometry(checked) {

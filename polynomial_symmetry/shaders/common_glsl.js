@@ -103,6 +103,53 @@ uniform float time;
 // animation direction reversed. For waves, this produces
 // a standing wave effect.
 uniform bool enable_standing_waves;
+// Even though MAX_TERMS terms are always provided, in practice only
+// the first N are used. This is helpful to know for blending through
+// the coefficients.
+uniform float num_terms;
+// If true, instead of showing the sum of terms, show them one by one,
+// blending between each pair.
+uniform bool show_wave_components;
+`;
+
+common.funcs_animation = `
+// Triangle wave whose range is [0, num_terms]. This way we can animate
+// back and forth through the terms.
+float back_and_forth(float t) {
+    float n = num_terms - 1.0;
+    return abs(mod(t - n, 2.0 * n) - n);
+}
+
+// Create a set of blending coefficients for N terms with the following
+// animation:
+// ---------------------------------------------
+//     time    | what's shown
+// ------------+--------------------------------
+//      0      | term 0 only
+// 0.25 - 0.75 | blend between terms 0 and 1
+//      1      | term 1 only
+// 1.25 - 0.75 | blend between terms 1 and 2
+//      2      | term 2 only
+//     ...     | ...and so on
+//      N      | term N only
+// N.25 - N.75 | blend between terms N and N-1
+//   (N + 1)   | term N - 1 only 
+//     ...     | ...progressing backwards
+//     2N      | term 0 only
+//     ...     | ...keep blending back and forth
+float blend_pairwise(float term) {
+    if (!show_wave_components) {
+        return 1.0;
+    }
+
+    // The blending function moves back and forth across the N terms
+    float t = back_and_forth(time);
+
+    // clamp a v-shaped function and flip to create a trapezoid shape.
+    // This allows a pause before each transition
+    float valley = 2.0 * abs(term - t) - 0.5;
+    return 1.0 - clamp(valley, 0.0, 1.0);
+}
 `;
 
 common.uniforms_texture = `

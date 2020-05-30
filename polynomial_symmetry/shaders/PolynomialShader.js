@@ -40,7 +40,7 @@ vec2 compute_polynomial(vec2 z, float animation_direction) {
         float theta = z_polar.y * (n - m) + coeff.y;
         
         vec2 rect = to_rect(vec2(r, theta));
-        sum += rect;
+        sum += blend_pairwise(float(i)) * rect;
     }
     return sum;
 }
@@ -68,7 +68,7 @@ vec2 compute_polynomial(vec2 z, float animation_direction) {
         float theta = z.x * (n - m) + a_nm.y;
         
         vec2 rect = to_rect(vec2(r, theta));
-        sum += rect;
+        sum += blend_pairwise(float(i)) * rect;
         
     }
     return sum;
@@ -86,10 +86,11 @@ ${common.uniforms_polynomial}
 ${common.uniforms_animation}
 ${common.uniforms_view}
 ${common.funcs_polar}
+${common.funcs_view}
+${common.funcs_animation}
 
 ${symmetry_func}
 
-${common.funcs_view}
 
 void main() {
     vec2 complex = to_complex(uv);

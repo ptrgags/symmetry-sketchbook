@@ -17,6 +17,7 @@ varying vec2 warped_pos;
 
 ${common.funcs_polar}
 ${common.funcs_view}
+${common.funcs_animation}
 ${symmetry_func}
 
 void main() {

@@ -124,6 +124,9 @@ export class SymmetryShader extends Shader {
         
         // Apply symmetries, which often adds more terms to the polynomial
         const actual_coefficients = this._apply_symmetries(this._coeffs);
+
+        program.setUniform('num_terms', actual_coefficients.size);
+
         //actual_coefficients.normalize();
         const {powers, coeffs} = actual_coefficients.arrays;
         
