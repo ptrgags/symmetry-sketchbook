@@ -205,6 +205,7 @@ function attach_handlers() {
     find('#add-wallpaper-symmetry').addEventListener('click', add_wallpaper_symmetry); 
     find('#use-webcam').addEventListener('click', use_webcam); 
     find('#clear-symmetries').addEventListener('click', clear_symmetries);
+    find('#polarization').addEventListener('input', update_polarization);
 
     find('#toggle-standing-waves').click(toggle_standing_waves);
     find('#toggle-wave-components').click(toggle_wave_components);
@@ -247,6 +248,12 @@ function select_shader(shader_id) {
 function select_lattice(lattice_type) {
     const [e1, e2] = LATTICE_BASIS_VECTORS[lattice_type];
     shaders.set_lattice(e1, e2);
+}
+
+function update_polarization(e) {
+    const val = e.target.value;
+    const angle = sketch.TWO_PI * val;
+    shaders.set_uniform('polarization', [sketch.cos(angle), sketch.sin(angle)]);
 }
 
 function draw(sketch) {

@@ -137,6 +137,7 @@ export class ShaderManager {
 
     set_lattice(e1, e2) {
         this._shaders.get('wallpaper').shader.set_lattice(e1, e2);
+        this._shaders.get('rubber-sheet').shader.set_lattice(e1, e2);
     }
 
     disable_all() {

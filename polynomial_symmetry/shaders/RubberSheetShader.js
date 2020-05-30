@@ -23,7 +23,7 @@ ${WALLPAPER_FUNC}
 varying vec2 uv;
 varying vec2 warped_pos;
 
-const vec2 POLARIZATION = vec2(1.0, 0.0);
+uniform vec2 polarization;
 
 void main() {
     uv = aTexCoord;
@@ -36,16 +36,25 @@ void main() {
         z += compute_wallpaper(complex, 1.0);
     }
 
-    //float height = dot(normalize(z), vec2(cos(time), sin(time)));
-
+    // Since the other shaders assumed clip coordinates, we'll need to use
+    // this as well for the effective UV
     warped_pos = complex_to_clip(z);
 
+    // The result is a complex number. Let's extract out a single direction.
+    // This is similar to sending light through a linear polarizer, hence
+    // the name.
+    float height = dot(normalize(z), polarization);
+
+    // for complex numbers,
+    // |sum a_i| <= sum |a_i|
+    // so we can use the RHS of the inequality to normalize the values
+    // between [-1, 1]
     float height_bound = 0.0;
     for (int i = 0; i < MAX_TERMS; i++) {
         height_bound += abs(coeffs[i].x);
     }
 
-    vec3 computed_pos = vec3(aPosition.xy, z.x / height_bound);
+    vec3 computed_pos = vec3(aPosition.xy, height / height_bound);
     vec4 position = vec4(computed_pos.xzy, 1.0);
     gl_Position = uProjectionMatrix * uModelViewMatrix * position;
 }
