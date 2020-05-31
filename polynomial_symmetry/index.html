@@ -96,8 +96,10 @@
         <label for="coeffs">Coefficients (n, m, amp=1, phase_deg=0)</label>
         <input id="coeffs" type="text" />
         <br/>
-        <button id="update-params">Update Parameters</button>
-        <button id="random-params">Random Parameters</button>
+        <button id="update-params">Update Coefficients</button>
+        <button id="random-params">Random Coefficients</button>
+        <button id="quasi-params-5">5-fold Quasicrystal Coefficients</button>
+        <button id="quasi-params-7">7-fold Quasicrystal Coefficients</button>
       </div>
       <div id="animation-settings">
         <h3>Animation Settings (results may not be symmetric)</h3>
@@ -109,6 +111,9 @@
         <button id="update-animation">Update Animation</button>
         <button id="random-animation">Random Animation</button>
         <button id="no-animation">No Animation</button>
+        <br/>
+        <bricks-checkbox id="toggle-standing-waves">Standing Waves</bricks-checkbox>
+        <bricks-checkbox id="toggle-wave-components">Show Components</bricks-checkbox>
       </div>
       <div id="symmetry-settings">
         <h3>Symmetry Settings</h3>
@@ -131,6 +136,24 @@
           <br/>
           <button id="add-point-symmetry">Add Symmetry</button>
         </div>
+        <div id="wallpaper-symmetry-settings">
+          <h4>Add Wallpaper Symmetry</h4>
+          <bricks-checkbox id="rule-negate-nm">Negate n, m</bricks-checkbox>
+          <bricks-checkbox id="rule-negate-n">Negate m</bricks-checkbox>
+          <bricks-checkbox id="rule-negate-m">Negate m</bricks-checkbox>
+          <br/>
+          <bricks-checkbox id="rule-swap-nm">Swap n, m</bricks-checkbox>
+          <br/>
+          <bricks-checkbox id="rule-hex">Hexagon rule (n, m, -(n + m))</bricks-checkbox>
+          <br/>
+          <button id="add-wallpaper-symmetry">Add Symmetry</button>
+        </div>
+      </div>
+      <div id="wallpaper-settings">
+        <h3>Wallpaper Settings</h3>
+        <div id="current-basis">
+        </div>
+        <bricks-dropdown id="lattice-select" label="Lattice Type"></bricks-dropdown>
       </div>
       <div id="display-settings">
        <h3>Display Settings</h3>

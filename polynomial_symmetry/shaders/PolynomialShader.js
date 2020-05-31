@@ -16,7 +16,7 @@ void main() {
 `;
 
 export const ROSETTE_FUNC = `
-vec2 compute_polynomial(vec2 z) {
+vec2 compute(vec2 z, float animation_direction) {
     vec2 z_polar = to_polar(z);
     vec2 sum = vec2(0.0);
     for (int i = 0; i < MAX_TERMS; i++) {
@@ -34,20 +34,20 @@ vec2 compute_polynomial(vec2 z) {
         
         // Animate the coefficients for a fun twist.
         // (sometimes literally)
-        coeff.y += animation[i] * time;
+        coeff.y += animation_direction * animation[i] * time;
         
         float r = coeff.x * pow(z_polar.x, n + m);
         float theta = z_polar.y * (n - m) + coeff.y;
         
         vec2 rect = to_rect(vec2(r, theta));
-        sum += rect;
+        sum += blend_pairwise(float(i)) * rect;
     }
     return sum;
 }
 `;
 
 export const FRIEZE_FUNC = `
-vec2 compute_polynomial(vec2 z) {    
+vec2 compute(vec2 z, float animation_direction) {    
     vec2 sum = vec2(0.0);
     for (int i = 0; i < MAX_TERMS; i++) {
         // Frieze symmetry is taken by composing the
@@ -62,13 +62,13 @@ vec2 compute_polynomial(vec2 z) {
         // amplitude, phase
         vec2 a_nm = coeffs[i];
         // Animate the phase
-        a_nm.y += animation[i] * time;
+        a_nm.y += animation_direction * animation[i] * time;
         
         float r =  a_nm.x * exp(-z.y * (n + m));
         float theta = z.x * (n - m) + a_nm.y;
         
         vec2 rect = to_rect(vec2(r, theta));
-        sum += rect;
+        sum += blend_pairwise(float(i)) * rect;
         
     }
     return sum;
@@ -76,41 +76,29 @@ vec2 compute_polynomial(vec2 z) {
 `;
 
 const FRAG_SHADER = (symmetry_func) => `
-${common.defines}
 precision highp float;
+${common.defines}
+${common.uniforms}
 
 varying vec2 uv;
 
-${common.uniforms_texture}
-${common.uniforms_polynomial}
-${common.uniforms_animation}
-${common.uniforms_view}
 ${common.funcs_polar}
+${common.funcs_view}
+${common.funcs_animation}
+${common.funcs_ref_geometry}
 
 ${symmetry_func}
-
-${common.funcs_view}
+${common.funcs_standing_waves}
 
 void main() {
     vec2 complex = to_complex(uv);
-    vec2 z = compute_polynomial(complex);
-    vec4 output_color = texture2D(texture0, to_texture(z));
+    vec2 z = standing_waves(complex);
+
+    vec4 tex_color = texture2D(texture0, to_texture(z));
+    vec4 ref_layer = ref_geometry(z);
     
-    float unit_circle_dist = abs(length(z) - 1.0);
-    float unit_circle_mask = smoothstep(0.02, 0.01, unit_circle_dist);
-    
-    float modulus = length(z);
-    float far_away = smoothstep(100.0, 200.0, modulus);
-    float near_zero = smoothstep(0.011, 0.01, modulus);
-    
-    const vec4 CYAN = vec4(0.0, 1.0, 1.0, 1.0);
-    const vec4 YELLOW = vec4(1.0, 1.0, 0.0, 1.0);
-    const vec4 BLACK = vec4(0.0, 0.0, 0.0, 1.0);
-    
-    vec4 image = output_color;
-    image = mix(image, CYAN, unit_circle_mask * show_ref_geometry);
-    image = mix(image, YELLOW, near_zero * show_ref_geometry);
-    image = mix(image, BLACK, far_away);
+    vec4 image = tex_color;
+    image = mix(image, ref_layer, ref_layer.a);
     gl_FragColor = image;
 }
 `;

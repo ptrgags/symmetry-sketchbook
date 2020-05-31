@@ -3,9 +3,11 @@ import { TextureManager, SymmetryManager, ShaderManager } from './managers.js';
 import { PolynomialShader } from './shaders/PolynomialShader.js';
 import { DemoShader } from './shaders/DemoShader.js';
 import { RosetteCurveShader } from './shaders/RosetteCurveShader.js';
+import { WallpaperShader } from './shaders/WallpaperShader.js';
 import { Checkerboard, HalfPlanes, WebcamTexture } from './Texture.js';
 import { Coefficients } from './Coefficients.js';
 import { PointSymmetry } from './PointSymmetry.js';
+import { WallpaperSymmetry } from './WallpaperSymmetry.js';
 import { MAX_TERMS, TWO_PI, mod } from './math_util.js';
 
 import './components/Checkbox.js';
@@ -36,13 +38,69 @@ const SHADER_OPTIONS = [{
     label: '"Tie-dye" Friezes',
     value: 'tie-dye-frieze',
     shader: new DemoShader('frieze')
+}, {
+    label: 'Wallpaper',
+    value: 'wallpaper',
+    shader: new WallpaperShader()
 }];
 
 for (const {value, shader} of SHADER_OPTIONS) {
     shaders.add_shader(value, shader);
 }
 
-let image_texture;
+const LATTICE_OPTIONS = [{
+    label: 'Square',
+    value: 'square'
+}, {
+    label: 'Rectangle',
+    value: 'rectangle'
+}, {
+    label: 'Rhombus',
+    value: 'rhombus'
+}, {
+    label: 'Hexagon',
+    value: 'hexagon',
+}, {
+    label: 'Parallelogram',
+    value: 'parallelogram',
+}, {
+    label: 'Random',
+    value: 'random'
+}];
+
+function random_vec() {
+    const x = 2.0 * Math.random() - 1.0;
+    const y = 2.0 * Math.random() - 1.0;
+    return [x, y]
+}
+
+const THIRD_TURN = 2.0 * Math.PI / 3.0;
+const LATTICE_BASIS_VECTORS = {
+    'square': [
+        [1, 0],
+        [0, 1],
+    ], 
+    'rectangle': [
+        [2, 0],
+        [0, 1]
+    ],
+    'rhombus': [
+        [1, 2],
+        [1, -2]
+    ],
+    'hexagon': [
+        [1, 0],
+        [Math.cos(THIRD_TURN), Math.sin(THIRD_TURN)]
+    ],
+    'parallelogram': [
+        [1, 0],
+        [1, 2]
+    ],
+    'random': [
+        random_vec(),
+        random_vec()
+    ],
+};
 
 const BUILT_IN_TEXTURES = {
     checkerboard: new Checkerboard(),
@@ -66,9 +124,9 @@ const DEFAULT_COEFFICIENTS = new Coefficients([
     [9, 0, 1/9, 0]
 ]);
 const DEFAULT_ANIMATION = [
-    0,
     1,
-    0
+    0.5,
+    0.8
 ];
 
 const DEFAULT_SYMMETRY = new PointSymmetry({
@@ -76,6 +134,7 @@ const DEFAULT_SYMMETRY = new PointSymmetry({
     input_rotation: 1
 });
 
+let enable_standing_waves = false;
 let zoom = 3;
 const ZOOM_DELTA = 0.5;
 
@@ -131,15 +190,20 @@ function attach_handlers() {
     find('#image-input').addEventListener('change', upload_image); 
     find('#update-params').addEventListener('click', update_coefficients); 
     find('#random-params').addEventListener('click', set_random_coefficients);
+    find('#quasi-params-5').addEventListener('click', set_quasi_coefficients(5));
+    find('#quasi-params-7').addEventListener('click', set_quasi_coefficients(7));
+
     find('#update-animation').addEventListener('click', update_animation); 
     find('#random-animation').addEventListener('click', random_animation);
     find('#no-animation').addEventListener('click', no_animation); 
     find('#add-point-symmetry').addEventListener('click', add_point_symmetry); 
+    find('#add-wallpaper-symmetry').addEventListener('click', add_wallpaper_symmetry); 
     find('#use-webcam').addEventListener('click', use_webcam); 
     find('#clear-symmetries').addEventListener('click', clear_symmetries);
 
-    find('#toggle-ref-geometry')
-        .click(update_ref_geometry);
+    find('#toggle-standing-waves').click(toggle_standing_waves);
+    find('#toggle-wave-components').click(toggle_wave_components);
+    find('#toggle-ref-geometry').click(update_ref_geometry);
 
     find('#builtin-textures')
         .set_options(BUILT_IN_TEXTURE_OPTIONS)
@@ -148,10 +212,22 @@ function attach_handlers() {
     find('#shader-select')
         .set_options(SHADER_OPTIONS)
         .change(select_shader);
+
+    find('#lattice-select')
+        .set_options(LATTICE_OPTIONS)
+        .change(select_lattice);
 }
 
 function use_webcam() {
     textures.texture = webcam;
+}
+
+function toggle_standing_waves(checked) {
+    shaders.set_uniform('enable_standing_waves', checked);
+}
+
+function toggle_wave_components(checked) {
+    shaders.set_uniform('show_wave_components', checked);
 }
 
 function update_ref_geometry(checked) {
@@ -161,6 +237,11 @@ function update_ref_geometry(checked) {
 function select_shader(shader_id) {
     shaders.hide_all();
     shaders.set_show(shader_id, true);
+}
+
+function select_lattice(lattice_type) {
+    const [e1, e2] = LATTICE_BASIS_VECTORS[lattice_type];
+    shaders.set_lattice(e1, e2);
 }
 
 function draw(sketch) {
@@ -190,6 +271,24 @@ function set_random_coefficients() {
     
     const coeffs = new Coefficients(terms);
     shaders.set_coefficients(coeffs);
+}
+
+function set_quasi_coefficients(k) {
+    return () => {
+        const terms = [];
+        for (let i = 0; i < k; i++) {
+            const angle = i * TWO_PI / k;
+            const n = sketch.cos(angle);
+            const m = sketch.sin(angle);
+            const amp = 1.0 / k;
+            const phase = 0.0;
+            terms.push([n, m, amp, phase]);
+        }
+
+        const coeffs = new Coefficients(terms);
+        shaders.set_coefficients(coeffs);
+
+    };
 }
 
 function update_coefficients() {
@@ -292,6 +391,17 @@ function add_point_symmetry() {
         input_inversion: checkbox_int('#inversion'),
         output_rotation: value_or_default('out-rotation', 0),
         output_mirror: checkbox_int('#out-reflection'),
+    });
+    symmetries.add_symmetry(symmetry);
+}
+
+function add_wallpaper_symmetry() {
+    const symmetry = new WallpaperSymmetry({
+        negate: checkbox_int('#rule-negate-nm'),
+        negate_n: checkbox_int('#rule-negate-n'),
+        negate_m: checkbox_int('#rule-negate-m'),
+        swap: checkbox_int('#rule-swap-nm'),
+        hex: checkbox_int('#rule-hex'),
     });
     symmetries.add_symmetry(symmetry);
 }

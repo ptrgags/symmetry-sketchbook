@@ -135,6 +135,10 @@ export class ShaderManager {
         }
     }
 
+    set_lattice(e1, e2) {
+        this._shaders.get('wallpaper').shader.set_lattice(e1, e2);
+    }
+
     disable_all() {
         for (const shaderInfo of this._shaders.values()) {
             shaderInfo.shader.disable();

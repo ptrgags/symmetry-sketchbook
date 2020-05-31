@@ -7,17 +7,17 @@ ${common.defines}
 attribute vec3 aPosition;
 attribute vec2 aTexCoord;
 
-${common.uniforms_view}
-${common.uniforms_mouse}
-${common.uniforms_polynomial}
-${common.uniforms_animation}
+${common.uniforms}
 
 varying vec2 uv;
 varying vec2 warped_pos;
 
 ${common.funcs_polar}
 ${common.funcs_view}
+${common.funcs_animation}
+
 ${symmetry_func}
+${common.funcs_standing_waves}
 
 void main() {
     uv = aTexCoord;
@@ -25,7 +25,7 @@ void main() {
     
     vec2 grid_position = aPosition.xy;
     vec2 complex = to_complex(uv);
-    vec2 z = compute_polynomial(complex);
+    vec2 z = standing_waves(complex);
     
     warped_pos = complex_to_clip(z);
     
@@ -42,17 +42,14 @@ const VERT_SHADERS = {
 };
 
 const FRAG_SHADER = `
-#define GRID_WIDTH 49.0
 precision highp float;
+${common.defines}
+#define GRID_WIDTH 49.0
 
 varying vec2 uv;
 varying vec2 warped_pos;
 
-${common.uniforms_texture}
-${common.uniforms_polynomial}
-${common.uniforms_animation}
-${common.uniforms_view}
-${common.uniforms_mouse}
+${common.uniforms}
 
 ${common.funcs_view}
 
