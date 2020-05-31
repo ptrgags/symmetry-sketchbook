@@ -101,13 +101,22 @@ export class ShaderManager {
         for (const shaderInfo of this._shaders.values()) {
             const shader = shaderInfo.shader;
             shader.symmetries = symmetries;
-            shader.set_coefficients();
         }
+
+        this.set_coefficients(undefined);
     }
 
     set_coefficients(coeffs) {
-        for (const shaderInfo of this._shaders.values()) {
-            shaderInfo.shader.set_coefficients(coeffs);
+        try {
+            for (const shaderInfo of this._shaders.values()) {
+                shaderInfo.shader.set_coefficients(coeffs);
+            }
+        } catch (e) {
+            if (e.message.startsWith("Too many terms")) {
+                log.warn(e.message);
+            } else {
+                throw e;
+            }
         }
     }
 

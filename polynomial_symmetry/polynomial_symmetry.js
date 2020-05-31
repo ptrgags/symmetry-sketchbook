@@ -7,7 +7,10 @@ import { WallpaperShader } from './shaders/WallpaperShader.js';
 import { Checkerboard, HalfPlanes, WebcamTexture } from './Texture.js';
 import { Coefficients } from './Coefficients.js';
 import { PointSymmetry } from './PointSymmetry.js';
-import { WallpaperSymmetry } from './WallpaperSymmetry.js';
+import { 
+    WallpaperSymmetry,
+    LATTICE_BASIS_VECTORS
+} from './WallpaperSymmetry.js';
 import { MAX_TERMS, TWO_PI, mod } from './math_util.js';
 
 import './components/Checkbox.js';
@@ -68,40 +71,6 @@ const LATTICE_OPTIONS = [{
     value: 'random'
 }];
 
-function random_vec() {
-    const x = 2.0 * Math.random() - 1.0;
-    const y = 2.0 * Math.random() - 1.0;
-    return [x, y]
-}
-
-const THIRD_TURN = 2.0 * Math.PI / 3.0;
-const LATTICE_BASIS_VECTORS = {
-    'square': [
-        [1, 0],
-        [0, 1],
-    ], 
-    'rectangle': [
-        [2, 0],
-        [0, 1]
-    ],
-    'rhombus': [
-        [1, 2],
-        [1, -2]
-    ],
-    'hexagon': [
-        [1, 0],
-        [Math.cos(THIRD_TURN), Math.sin(THIRD_TURN)]
-    ],
-    'parallelogram': [
-        [1, 0],
-        [1, 2]
-    ],
-    'random': [
-        random_vec(),
-        random_vec()
-    ],
-};
-
 const BUILT_IN_TEXTURES = {
     checkerboard: new Checkerboard(),
     half_planes: new HalfPlanes()
@@ -113,15 +82,10 @@ const BUILT_IN_TEXTURE_OPTIONS = Object.keys(BUILT_IN_TEXTURES).map(key => {
 const webcam = new WebcamTexture();
 
 const DEFAULT_COEFFICIENTS = new Coefficients([
-    [1, 0, 1, 0],
-    [2, 0, 1/2, 0],
-    [3, 0, 1/3, 0],
-    [4, 0, 1/4, 0],
-    [5, 0, 1/5, 0],
+    [1, 1, 1, 0],
+    [3, 1, 1/3, 0],
+    [5, 1, 1/5, 0],
     [6, 0, 1/6, 0],
-    [7, 0, 1/7, 0],
-    [8, 0, 1/8, 0],
-    [9, 0, 1/9, 0]
 ]);
 const DEFAULT_ANIMATION = [
     1,
@@ -130,7 +94,7 @@ const DEFAULT_ANIMATION = [
 ];
 
 const DEFAULT_SYMMETRY = new PointSymmetry({
-    folds: 4,
+    folds: 3,
     input_rotation: 1
 });
 
@@ -197,7 +161,7 @@ function attach_handlers() {
     find('#random-animation').addEventListener('click', random_animation);
     find('#no-animation').addEventListener('click', no_animation); 
     find('#add-point-symmetry').addEventListener('click', add_point_symmetry); 
-    find('#add-wallpaper-symmetry').addEventListener('click', add_wallpaper_symmetry); 
+    find('#set-wallpaper-symmetry').addEventListener('click', set_wallpaper_symmetry); 
     find('#use-webcam').addEventListener('click', use_webcam); 
     find('#clear-symmetries').addEventListener('click', clear_symmetries);
 
@@ -216,6 +180,9 @@ function attach_handlers() {
     find('#lattice-select')
         .set_options(LATTICE_OPTIONS)
         .change(select_lattice);
+
+    find('#wallpaper-select')
+        .set_options(WallpaperSymmetry.preset_options)
 }
 
 function use_webcam() {
@@ -367,8 +334,8 @@ function parse_animation_params(text) {
     return params;
 }
 
-function value_or_default(id, default_val) {
-    const element = document.getElementById(id);
+function value_or_default(query, default_val) {
+    const element = find(query);
     const value = parseInt(element.value);
     
     if (isFinite(value)) {
@@ -385,25 +352,24 @@ function checkbox_int(query) {
 
 function add_point_symmetry() {
     const symmetry = new PointSymmetry({
-        folds: value_or_default('folds', 1),
-        input_rotation: value_or_default('in-rotation', 0),
+        folds: value_or_default('#folds', 1),
+        input_rotation: value_or_default('#in-rotation', 0),
         input_mirror: checkbox_int('#in-reflection'),
         input_inversion: checkbox_int('#inversion'),
-        output_rotation: value_or_default('out-rotation', 0),
+        output_rotation: value_or_default('#out-rotation', 0),
         output_mirror: checkbox_int('#out-reflection'),
     });
     symmetries.add_symmetry(symmetry);
 }
 
-function add_wallpaper_symmetry() {
-    const symmetry = new WallpaperSymmetry({
-        negate: checkbox_int('#rule-negate-nm'),
-        negate_n: checkbox_int('#rule-negate-n'),
-        negate_m: checkbox_int('#rule-negate-m'),
-        swap: checkbox_int('#rule-swap-nm'),
-        hex: checkbox_int('#rule-hex'),
-    });
+function set_wallpaper_symmetry() {
+    const preset_name = find('#wallpaper-select').value;
+    const symmetry = WallpaperSymmetry.from_preset(preset_name);
+
+    symmetries.clear_symmetries();
     symmetries.add_symmetry(symmetry);
+
+    shaders.set_lattice(...symmetry.lattice);
 }
 
 function clear_symmetries() {
