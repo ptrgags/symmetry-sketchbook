@@ -21,16 +21,12 @@ precision highp float;
 
 varying vec2 uv;
 
-${common.uniforms_texture}
-${common.uniforms_polynomial}
-${common.uniforms_animation}
-${common.uniforms_wallpaper}
-${common.uniforms_view}
+${common.uniforms}
 ${common.funcs_view}
 ${common.funcs_polar}
 ${common.funcs_animation}
 
-vec2 compute_wallpaper(vec2 z, float animation_direction) {
+vec2 compute(vec2 z, float animation_direction) {
     vec2 sum = vec2(0.0);
     vec2 lattice_coords = mat2(inv_lattice) * z;
     for (int i = 0; i < MAX_TERMS; i++) {
@@ -46,33 +42,24 @@ vec2 compute_wallpaper(vec2 z, float animation_direction) {
     return sum;
 }
 
+${common.funcs_standing_waves}
+${common.funcs_ref_geometry}
+
 void main() {
     vec2 complex = to_complex(uv);
-    vec2 z = compute_wallpaper(complex, -1.0);
-    if (enable_standing_waves) {
-        z += compute_wallpaper(complex, 1.0);
-    }
-    vec4 output_color = texture2D(texture0, to_texture(z));
+    vec2 z = standing_waves(complex);
+
+    vec4 tex_color = texture2D(texture0, to_texture(z));
+    vec4 ref_layer = ref_geometry(z);
     
-    float unit_circle_dist = abs(length(z) - 1.0);
-    float unit_circle_mask = smoothstep(0.02, 0.01, unit_circle_dist);
-    
-    float modulus = length(z);
-    float far_away = smoothstep(100.0, 200.0, modulus);
-    float near_zero = smoothstep(0.011, 0.01, modulus);
-    
-    const vec4 CYAN = vec4(0.0, 1.0, 1.0, 1.0);
     const vec4 YELLOW = vec4(1.0, 1.0, 0.0, 1.0);
-    const vec4 BLACK = vec4(0.0, 0.0, 0.0, 1.0);
 
     vec2 cell_uv = fract(mat2(inv_lattice) * complex);
     vec2 grid = step(0.99, cell_uv);
     float grid_mask = max(grid.x, grid.y);
     
-    vec4 image = output_color;
-    image = mix(image, CYAN, unit_circle_mask * show_ref_geometry);
-    image = mix(image, YELLOW, near_zero * show_ref_geometry);
-    image = mix(image, BLACK, far_away);
+    vec4 image = tex_color;
+    image = mix(image, ref_layer, ref_layer.a);
     image = mix(image, YELLOW, grid_mask * show_ref_geometry);
     gl_FragColor = image;
 }

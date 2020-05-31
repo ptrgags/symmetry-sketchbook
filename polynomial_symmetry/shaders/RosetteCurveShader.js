@@ -5,12 +5,9 @@ const VERT_SHADER = `
 ${common.defines}
 #define THICKNESS 0.01
 
-attribute vec3 aPosition;
+${common.uniforms}
 
-${common.uniforms_polynomial}
-${common.uniforms_animation}
-${common.uniforms_view}
-${common.uniforms_mouse}
+attribute vec3 aPosition;
 
 varying vec2 uv;
 varying vec2 curve;
@@ -18,7 +15,7 @@ varying vec2 curve;
 ${common.funcs_polar}
 ${common.funcs_view}
 
-vec2 compute_rosette(vec2 z, float t) {
+vec2 compute(vec2 z, float t) {
     vec2 z_polar = to_polar(z);
     vec2 sum = vec2(0.0);
     for (int i = 0; i < MAX_TERMS; i++) {
@@ -59,7 +56,7 @@ void main() {
     
     float t = aPosition.x;
     
-    curve = compute_rosette(z, t);
+    curve = compute(z, t);
     vec2 clip_position = complex_to_clip(curve);
     
     gl_Position = vec4(clip_position, 0.0, 1.0);
@@ -72,11 +69,10 @@ const FRAG_SHADER = `
 ${common.defines}
 precision highp float;
 
+${common.uniforms}
+
 varying vec2 uv;
 varying vec2 curve;
-
-${common.uniforms_view}
-${common.uniforms_texture}
 
 ${common.funcs_view}
 
