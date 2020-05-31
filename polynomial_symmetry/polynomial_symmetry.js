@@ -124,9 +124,9 @@ const DEFAULT_COEFFICIENTS = new Coefficients([
     [9, 0, 1/9, 0]
 ]);
 const DEFAULT_ANIMATION = [
-    0,
     1,
-    0
+    0.5,
+    0.8
 ];
 
 const DEFAULT_SYMMETRY = new PointSymmetry({
@@ -401,8 +401,6 @@ function add_wallpaper_symmetry() {
         negate_n: checkbox_int('#rule-negate-n'),
         negate_m: checkbox_int('#rule-negate-m'),
         swap: checkbox_int('#rule-swap-nm'),
-        rotate_n: checkbox_int('#rule-rot-n'),
-        rotate_nm: checkbox_int('#rule-rot-nm'),
         hex: checkbox_int('#rule-hex'),
     });
     symmetries.add_symmetry(symmetry);
