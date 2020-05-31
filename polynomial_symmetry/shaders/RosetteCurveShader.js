@@ -38,8 +38,7 @@ vec2 compute_rosette(vec2 z, float t) {
         
         // Animate the coefficients for a fun twist.
         // (sometimes literally)
-        float omega = animation[0] * length(nm);
-        coeff.y -= omega * time;
+        coeff.y -= animation[i] * time;
         
         float r = coeff.x * pow(z_polar.x, n + m);
         float theta = (n - m) * (2.0 * PI * t + z_polar.y) + coeff.y;

@@ -112,7 +112,6 @@ export class SymmetryShader extends Shader {
         for (const symmetry of this._symmetries) {
             coefficients = symmetry.apply_symmetry(coefficients);
         }
-        console.log('computed coefficients', coefficients);
         return coefficients;
     }
     
