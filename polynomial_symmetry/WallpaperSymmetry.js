@@ -38,7 +38,6 @@ const BASE_RULES = {
     ],
     hexagon: [
         ["hex"],
-        ["hex", "hex"]
     ],
 }
 
@@ -160,20 +159,23 @@ const SYMMETRY_PRESETS = {
 }
 
 const SYMMETRY_OPS = {
-    noop: (x) => x,
-    negate: ([n, m, amp, phase]) => [-n, -m, amp, phase],
-    negate_n: ([n, m, amp, phase]) => [-n, m, amp, phase],
-    negate_m: ([n, m, amp, phase]) => [n, -m, amp, phase],
+    noop: (x) => [x],
+    negate: ([n, m, amp, phase]) => [[-n, -m, amp, phase]],
+    negate_n: ([n, m, amp, phase]) => [[-n, m, amp, phase]],
+    negate_m: ([n, m, amp, phase]) => [[n, -m, amp, phase]],
     rot2_n: ([n, m, amp, phase]) => {
         const sign = Math.pow(-1, n);
-        return [n, m, sign * amp, phase]
+        return [[n, m, sign * amp, phase]];
     },
     rot2_nm: ([n, m, amp, phase]) => {
         const sign = Math.pow(-1, n + m);
-        return [n, m, sign * amp, phase]
+        return [[n, m, sign * amp, phase]];
     },
-    swap: ([n, m, amp, phase]) => [m, n, amp, phase],
-    hex: ([n, m, amp, phase]) => [m, -(n + m), amp, phase]
+    swap: ([n, m, amp, phase]) => [[m, n, amp, phase]],
+    hex: ([n, m, amp, phase]) => [
+        [m, -(n + m), amp, phase],
+        [-(n + m), n, amp, phase],
+    ]
 };
 
 export class WallpaperSymmetry {
@@ -237,13 +239,13 @@ export class WallpaperSymmetry {
         return op;
     }
 
-    static bake_rule(ops) { 
-        return (term) => {
-            let result = term;
+    static bake_rule(ops) {
+        return (terms) => {
+            let results = terms;
             for (const op of ops) {
-                result = op(result);
+                results = results.flatMap(op);
             }
-            return result;
+            return results;
         }
     }
 
@@ -275,7 +277,7 @@ export class WallpaperSymmetry {
         // exponentially, but typically there are 0-2 rules
         let terms = [...coefficients];
         for (const rule of this._rules) {
-            const new_terms = terms.map(rule);
+            const new_terms = rule(terms);
             terms = terms.concat(new_terms);
         }
 
