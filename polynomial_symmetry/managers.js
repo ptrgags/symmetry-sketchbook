@@ -103,13 +103,14 @@ export class ShaderManager {
             shader.symmetries = symmetries;
         }
 
-        this.set_coefficients(undefined);
+        this.set_coefficients();
     }
 
     set_coefficients(coeffs) {
         try {
             for (const shaderInfo of this._shaders.values()) {
                 shaderInfo.shader.set_coefficients(coeffs);
+
             }
         } catch (e) {
             if (e.message.startsWith("Too many terms")) {

@@ -228,7 +228,7 @@ function upload_image(e) {
 
 function set_random_coefficients() {
     const terms = [];
-    for (let i = 0; i < 10; i++) {
+    for (let i = 0; i < 5; i++) {
         const n = sketch.floor(sketch.random(-10, 10 + 1));
         const m = sketch.floor(sketch.random(-10, 10 + 1));
         const amp = 1.0 / (n - m + 1);
