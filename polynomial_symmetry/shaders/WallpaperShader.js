@@ -52,7 +52,7 @@ void main() {
     vec4 tex_color = texture2D(texture0, to_texture(z));
     vec4 ref_layer = ref_geometry(z);
     
-    const vec4 YELLOW = vec4(1.0, 1.0, 0.0, 1.0);
+    const vec4 WHITE = vec4(1.0);
 
     vec2 cell_uv = fract(mat2(inv_lattice) * complex);
     vec2 grid = step(0.99, cell_uv);
@@ -60,7 +60,7 @@ void main() {
     
     vec4 image = tex_color;
     image = mix(image, ref_layer, ref_layer.a);
-    image = mix(image, YELLOW, grid_mask * show_ref_geometry);
+    image = mix(image, WHITE, grid_mask * show_ref_geometry);
     gl_FragColor = image;
 }
 `;

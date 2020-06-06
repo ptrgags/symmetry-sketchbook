@@ -33,7 +33,8 @@ export const LATTICE_BASIS_VECTORS = {
 const BASE_RULES = {
     square: [
         ["negate_n", "swap"],
-        ["negate_m", "swap"],
+        // (negate_n, swap)^2 = negate
+        ["negate"],
     ],
     hexagon: [
         ["hex"],
@@ -165,11 +166,11 @@ const SYMMETRY_OPS = {
     negate_m: ([n, m, amp, phase]) => [n, -m, amp, phase],
     rot2_n: ([n, m, amp, phase]) => {
         const sign = Math.pow(-1, n);
-        return [sign * n, sign * m, amp, phase]
+        return [n, m, sign * amp, phase]
     },
     rot2_nm: ([n, m, amp, phase]) => {
         const sign = Math.pow(-1, n + m);
-        return [sign * n, sign * m, amp, phase]
+        return [n, m, sign * amp, phase]
     },
     swap: ([n, m, amp, phase]) => [m, n, amp, phase],
     hex: ([n, m, amp, phase]) => [m, -(n + m), amp, phase]
