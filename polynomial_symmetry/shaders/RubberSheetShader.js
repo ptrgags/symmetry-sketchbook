@@ -1,6 +1,6 @@
 import { common } from './common_glsl.js';
 import { SymmetryShader } from './Shader.js';
-import { WALLPAPER_FUNC } from './WallpaperShader.js';
+import { WALLPAPER_FUNC, WALLPAPER_FRAG_SHADER } from './WallpaperShader.js';
 
 const VERT_SHADER = `
 ${common.defines}
@@ -10,15 +10,14 @@ attribute vec2 aTexCoord;
 uniform mat4 uModelViewMatrix;
 uniform mat4 uProjectionMatrix;
 
-${common.uniforms_view}
-${common.uniforms_polynomial}
-${common.uniforms_wallpaper}
-${common.uniforms_animation}
+${common.uniforms}
 
 ${common.funcs_view}
 ${common.funcs_polar}
 ${common.funcs_animation}
 ${WALLPAPER_FUNC}
+
+${common.funcs_standing_waves}
 
 varying vec2 uv;
 varying vec2 warped_pos;
@@ -30,15 +29,7 @@ void main() {
     uv.y = 1.0 - uv.y;
 
     vec2 complex = to_complex(uv);
-    vec2 z = compute_wallpaper(complex, -1.0);
-
-    if (enable_standing_waves) {
-        z += compute_wallpaper(complex, 1.0);
-    }
-
-    // Since the other shaders assumed clip coordinates, we'll need to use
-    // this as well for the effective UV
-    warped_pos = complex_to_clip(z);
+    vec2 z = standing_waves(complex);
 
     // The result is a complex number. Let's extract out a single direction.
     // This is similar to sending light through a linear polarizer, hence
@@ -60,24 +51,8 @@ void main() {
 }
 `;
 
-const FRAG_SHADER = `
-precision highp float;
-varying vec2 uv;
-varying vec2 warped_pos;
-
-${common.uniforms_texture}
-${common.uniforms_view}
-
-${common.funcs_view}
-
-void main() {
-    vec4 tex_color = texture2D(texture0, to_texture(warped_pos));
-    gl_FragColor = tex_color;
-}
-`;
-
-const CAMERA_HEIGHT = -2.0;
-const CAMERA_RADIUS = 1.1;
+const CAMERA_HEIGHT = -1.5;
+const CAMERA_RADIUS = 0.5;
 const CAMERA_SPEED = 0.0;
 export class RubberSheetShader extends SymmetryShader {
     constructor() {
@@ -90,9 +65,10 @@ export class RubberSheetShader extends SymmetryShader {
     }
     
     init(sketch) {
-        super.init(sketch, VERT_SHADER, FRAG_SHADER);
+        super.init(sketch, VERT_SHADER, WALLPAPER_FRAG_SHADER);
         sketch.frustum(-0.1, 0.1, -0.1, 0.1, 0.1, 200);
         window.sketch = this._sketch;
+        this.set_uniform('polarization', [1, 0]);
         this.set_uniform('inv_lattice', [
             1, 0, 0,
             0, 1, 0,

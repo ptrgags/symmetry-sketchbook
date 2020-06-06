@@ -16,7 +16,7 @@ void main() {
 `;
 
 export const WALLPAPER_FUNC = `
-vec2 compute_wallpaper(vec2 z, float animation_direction) {
+vec2 compute(vec2 z, float animation_direction) {
     vec2 sum = vec2(0.0);
     vec2 lattice_coords = mat2(inv_lattice) * z;
     for (int i = 0; i < MAX_TERMS; i++) {
@@ -32,7 +32,7 @@ vec2 compute_wallpaper(vec2 z, float animation_direction) {
 }
 `;
 
-const FRAG_SHADER = `
+export const WALLPAPER_FRAG_SHADER = `
 ${common.defines}
 precision highp float;
 
@@ -70,7 +70,7 @@ void main() {
 
 export class WallpaperShader extends SymmetryShader {
     init(sketch) {
-        super.init(sketch, VERT_SHADER, FRAG_SHADER);
+        super.init(sketch, VERT_SHADER, WALLPAPER_FRAG_SHADER);
         this.set_uniform('inv_lattice', [
             1, 0, 0,
             0, 1, 0,
