@@ -27,6 +27,10 @@
       border: 2px solid #888888;
       border-radius: 4px;
   }
+
+  a {
+      color: #FF8800;
+  }
   
   .log {
       color: black;
@@ -138,18 +142,9 @@
         </div>
         <div id="wallpaper-symmetry-settings">
           <h4>Add Wallpaper Symmetry</h4>
-          <bricks-checkbox id="rule-negate-nm">Negate n, m</bricks-checkbox>
-          <bricks-checkbox id="rule-negate-n">Negate m</bricks-checkbox>
-          <bricks-checkbox id="rule-negate-m">Negate m</bricks-checkbox>
+          <bricks-dropdown id="wallpaper-select" label="Wallpaper Type"></bricks-dropdown> (<a href="https://en.wikipedia.org/wiki/Wallpaper_group">See here for more info</a>)
           <br/>
-          <bricks-checkbox id="rule-swap-nm">Swap n, m</bricks-checkbox>
-          <br/>
-          <bricks-checkbox id="rule-rot-n">Rotate n times</bricks-checkbox>
-          <bricks-checkbox id="rule-rot-nm">Rotate n + m times</bricks-checkbox>
-          <br/>
-          <bricks-checkbox id="rule-hex">Hexagon rule (n, m, -(n + m))</bricks-checkbox>
-          <br/>
-          <button id="add-wallpaper-symmetry">Add Symmetry</button>
+          <button id="set-wallpaper-symmetry">Set Wallpaper Symmetry</button>
         </div>
       </div>
       <div id="wallpaper-settings">

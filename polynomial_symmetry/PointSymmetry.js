@@ -222,7 +222,6 @@ export class PointSymmetry {
      * but the most recent coefficient will be used.
      */
     apply_symmetry(coefficients) {
-        //const terms = new TermMap(coefficients);
         const output_terms = new TermMap([]);
         for (const [n, m, amp, phase] of coefficients) {
             let [i, j] = this._find_partner(n, m);

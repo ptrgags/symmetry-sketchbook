@@ -75,7 +75,9 @@ export class Shader {
 function pad_zeros(values, desired_length) {
     const len = values.length;
     if (len > desired_length) {
-        throw new Error(`Array is too long. Got ${len} elements, it should be ${desired_length}`);
+        const len_str = `(${len / 2}, max=${desired_length / 2})`;
+        throw new Error(
+            `Too many terms ${len_str}. Try again with fewer terms`);
     }
     
     const pad_length = desired_length - len;
@@ -112,7 +114,6 @@ export class SymmetryShader extends Shader {
         for (const symmetry of this._symmetries) {
             coefficients = symmetry.apply_symmetry(coefficients);
         }
-        console.log('computed coefficients', coefficients);
         return coefficients;
     }
     
