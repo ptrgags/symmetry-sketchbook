@@ -193,7 +193,7 @@ vec4 ref_geometry(vec2 z) {
 
     vec4 image = vec4(0.0);
     image = mix(image, CYAN, unit_circle_mask * show_ref_geometry);
-    image = mix(image, YELLOW, unit_circle_mask * show_ref_geometry);
+    image = mix(image, YELLOW, near_zero * show_ref_geometry);
     image = mix(image, BLACK, far_away);
     return image;
 }

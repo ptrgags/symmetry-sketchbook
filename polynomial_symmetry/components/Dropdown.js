@@ -47,6 +47,10 @@ class Dropdown extends HTMLElement {
         const dropdown = this.find_shadow('#dropdown');
         for (const option of options) {
             const value = option.value;
+
+            // If we don't already have a value, set it.
+            this._value = this._value || value;
+
             const label = (option.label !== undefined) ? option.label : value; 
             const option_tag = document.createElement('option');
             option_tag.value = value;
