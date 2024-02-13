@@ -1,18 +1,55 @@
 <!DOCTYPE>
 <html>
 <head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <style>
     body {
+        padding: 0;
+        margin: 0;
         color: white;
         background-color: #555555;
+        font-family: sans-serif;
+    }
+
+    a:link {
+        color: #eeeeee;
+    }
+
+    a:visited {
+        color: #999999;
+    }
+
+    a:hover {
+        color: #257bd2;
+    }
+
+    a:active {
+        color: #872342;
+    }
+
+    .container {
+        width: 50%;
+        margin: 0 auto;
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+    }
+
+    .link {
+        background-color: #777777;
+        padding: 10px;
+        margin: 10px 0;
     }
     </style>
 </head>
 <body>
-    <h2>Symmetry Sketchbook</h2>
-    <p>This repo has a few experiments based on the book <i>Creating Symmetry</i> by Frank A. Farris and implemented in p5.js</p>
-    <p><a href="polynomial_symmetry">Polynomial Symmetry</a></p>
-    <p><a href="parametric_rosettes">Parametric Rosettes</a></p>
-    <p><a href="complex_rosettes">Complex Rosettes</a></p>
+    <div class="container">
+        <h2>Symmetry Sketchbook</h2>
+        <p>This repo has a few experiments based on the book <i>Creating Symmetry</i> by Frank A. Farris and implemented in p5.js</p>
+        <div class="link"><a href="polynomial_symmetry">Polynomial Symmetry</a></div>
+        <div class="link"><a href="parametric_rosettes">Parametric Rosettes</a></div>
+        <div class="link"><a href="complex_rosettes">Complex Rosettes</a></div>
+    </div>
 </body>
 </html>
