@@ -153,7 +153,7 @@ class Texture extends Palette {
 }
 
 export const PALETTES = {
-    "abstract texture": new Texture({
+    abstract: new Texture({
         image_id: "abstract",
         max_x: 5.0,
         max_y: 5.0,

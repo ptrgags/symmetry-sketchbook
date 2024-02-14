@@ -23,12 +23,20 @@
         background-color: #333333;
       }
 
+      canvas {
+        margin: 10px;
+      }
+
       .container {
-        width: 50%;
+        width: 1040px;
         margin: 0 auto;
         display: flex;
         flex-direction: column;
         justify-content: center;
+      }
+
+      .row {
+        display: flex;
       }
     </style>
   </head>
@@ -36,8 +44,10 @@
   <body>
     <div class="container">
       <h2>Complex Rosettes</h2>
-      <div id="rosette"></div>
-      <div id="color-wheel"></div>
+      <div class="row">
+        <div id="rosette"></div>
+        <div id="color-wheel"></div>
+      </div>
     </div>
   </body>
 </html>
