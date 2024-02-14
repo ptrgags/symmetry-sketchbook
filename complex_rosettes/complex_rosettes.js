@@ -83,6 +83,42 @@ function random_box(x, y, w, h) {
     return [rand_x, rand_y];
 }
 
+/*
+ * Rendering pixel-by-pixel on the CPU is too slow,
+ * so render one pixel in each NxN block, scanning through
+ * over time. 
+ * 
+ * callback is a function Complex -> Complex to visualize
+ */
+function interleave_render(p, palette, callback) {
+    if (palette.uses_hsb) {
+        p.colorMode(p.HSB, 1, 1, 1, 1);
+    }
+
+    const blocks_wide = Math.ceil(p.width / BLOCK_SIZE);
+    const blocks_tall = Math.ceil(p.height / BLOCK_SIZE);
+    const x_offset = p.frameCount % BLOCK_SIZE;
+    const y_offset = Math.floor(p.frameCount / BLOCK_SIZE) % BLOCK_SIZE;
+
+    p.noFill();
+    for (let i = 0; i < blocks_wide; i++) {
+        const x = i * BLOCK_SIZE + x_offset;
+
+        for (let j = 0; j < blocks_tall; j++) {
+            const y = j * BLOCK_SIZE + y_offset;
+            const z = get_z(p, x, y);
+            const w = callback(z);
+            const c = palette.get_color(p, w);
+            p.stroke(c);
+            p.point(x, y);
+        }
+    }
+
+    if (palette.uses_hsb) {
+        p.colorMode(p.RGB, 255, 255, 255, 255);
+    }
+}
+
 function compute_polynomial(p, pattern, palette) {
     if (palette.uses_hsb) {
         p.colorMode(p.HSB, 1, 1, 1, 1);
@@ -132,7 +168,9 @@ export const rosette_sketch = (p) => {
     };
 
     p.draw = () => {
-        compute_polynomial(p, state.pattern, state.palette);
+        interleave_render(p, state.palette, z => {
+            return state.pattern.compute(z);
+        });
     }
 };
 
@@ -169,9 +207,8 @@ export const color_wheel_sketch = (p) => {
             return;
         }
 
-        if (state.color_wheel_dirty) {
-            show_color_wheel(p, state.palette);
-            state.color_wheel_dirty = false;
-        }
+        // To display the color wheel, just render the
+        // identity function, f(z) = z
+        interleave_render(p, state.palette, z => z);
     }
 };
