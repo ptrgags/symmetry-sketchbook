@@ -4,10 +4,10 @@ const COLOR_WHEEL_SECTORS = 5 * 1;
 const ZERO_THRESHOLD = 0.2;
 const MAX_THRESHOLD = 1e9;
 const POINTS_PER_FRAME = 2000;
+const BLOCK_SIZE = 16;
 let palette = PALETTES[Object.keys(PALETTES)[0]];
 let pattern = ROSETTES[Object.keys(ROSETTES)[0]];
 
-let display_polynomial = true;
 let images = {};
 
 function make_rosette_select() {
@@ -47,7 +47,7 @@ function preload() {
 }
 
 function setup() {
-    createCanvas(2 * 500, 750);
+    createCanvas(2 * 500, 700);
     background(0);
     make_rosette_select();
     make_palette_select();
@@ -98,21 +98,29 @@ function show_color_wheel() {
 
 function compute_polynomial() {
     enable_hsb(palette);
-    for (let i = 0; i < POINTS_PER_FRAME; i++) {
-        const [x, y] = random_box(0, 0, width / 2, height);
-        const z = get_z(x, y);
-        const w = pattern.compute(z);
-        const c = palette.get_color(w);
-        noFill();
-        stroke(c);
-        point(x, y);
+    const blocks_wide = Math.ceil(width/ 2 / BLOCK_SIZE);
+    const blocks_tall = Math.ceil(height / BLOCK_SIZE);
+    const x_offset = frameCount % BLOCK_SIZE;
+    const y_offset = Math.floor(frameCount / BLOCK_SIZE) % BLOCK_SIZE;
+
+    noFill();
+    for (let i = 0; i < blocks_wide; i++) {
+        const x = i * BLOCK_SIZE + x_offset;
+
+        for (let j = 0; j < blocks_tall; j++) {
+            const y = j * BLOCK_SIZE + y_offset;
+            const z = get_z(x, y);
+            const w = pattern.compute(z);
+            const c = palette.get_color(w);
+            stroke(c);
+            point(x, y);
+        }
     }
     disable_hsb(palette);
 }
 
 function keyReleased() {
     if (key === ' ') {
-        display_polynomial = !display_polynomial;
         background(0);
     }
 }
