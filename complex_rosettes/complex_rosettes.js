@@ -1,3 +1,8 @@
+import { PALETTES } from './colors.js';
+import { ROSETTES } from './patterns.js';
+import { ComplexPolynomial } from './ComplexPolynomial.js';
+import { Complex } from './Complex.js';
+
 const MAX_X = 1.5;
 const THICKNESS = 2.0;
 const COLOR_WHEEL_SECTORS = 5 * 1;
@@ -5,10 +10,16 @@ const ZERO_THRESHOLD = 0.2;
 const MAX_THRESHOLD = 1e9;
 const POINTS_PER_FRAME = 2000;
 const BLOCK_SIZE = 16;
-let palette = PALETTES[Object.keys(PALETTES)[0]];
-let pattern = ROSETTES[Object.keys(ROSETTES)[0]];
 
 let images = {};
+
+const state = {
+    images: {},
+    images_loaded: false,
+    color_wheel_dirty: true,
+    palette: PALETTES[Object.keys(PALETTES)[0]],
+    pattern: ROSETTES[Object.keys(ROSETTES)[0]],
+}
 
 function make_rosette_select() {
     const sel = createSelect();
@@ -40,12 +51,6 @@ function change_palette(e) {
     background(0);
 }
 
-function preload() {
-    images = {
-        abstract: loadImage('abstract.jpg'),
-    };
-}
-
 function setup() {
     createCanvas(2 * 500, 700);
     background(0);
@@ -63,10 +68,9 @@ function refresh() {
     show_color_wheel();
 }
 
-function get_z(x, y) {
-    const w = width / 2;
-    const hw = w / 2.0;
-    const hh = height / 2.0;
+function get_z(p, x, y) {
+    const hw = p.width / 2.0;
+    const hh = p.height / 2.0;
     const u = (x - hw) / hw * MAX_X;
     const v = -(y - hh) / hw * MAX_X;
     
@@ -79,48 +83,95 @@ function random_box(x, y, w, h) {
     return [rand_x, rand_y];
 }
 
-function show_color_wheel() {
-    enable_hsb(palette);
-    for (let i = 0; i < POINTS_PER_FRAME; i++) {
-        const [x, y] = random_box(0, 0, width / 2, height);
-        const z = get_z(x, y);
-        const c = palette.get_color(z);
-        noFill();
-        stroke(c);
-        point(x + width / 2, y);
+function compute_polynomial(p, pattern, palette) {
+    if (palette.uses_hsb) {
+        p.colorMode(p.HSB, 1, 1, 1, 1);
     }
-    disable_hsb(palette);
-    
-    fill(255);
-    stroke(0);
-    textSize(16);
-}
 
-function compute_polynomial() {
-    enable_hsb(palette);
-    const blocks_wide = Math.ceil(width/ 2 / BLOCK_SIZE);
-    const blocks_tall = Math.ceil(height / BLOCK_SIZE);
-    const x_offset = frameCount % BLOCK_SIZE;
-    const y_offset = Math.floor(frameCount / BLOCK_SIZE) % BLOCK_SIZE;
+    const blocks_wide = Math.ceil(p.width / BLOCK_SIZE);
+    const blocks_tall = Math.ceil(p.height / BLOCK_SIZE);
+    const x_offset = p.frameCount % BLOCK_SIZE;
+    const y_offset = Math.floor(p.frameCount / BLOCK_SIZE) % BLOCK_SIZE;
 
-    noFill();
+    p.noFill();
     for (let i = 0; i < blocks_wide; i++) {
         const x = i * BLOCK_SIZE + x_offset;
 
         for (let j = 0; j < blocks_tall; j++) {
             const y = j * BLOCK_SIZE + y_offset;
-            const z = get_z(x, y);
+            const z = get_z(p, x, y);
             const w = pattern.compute(z);
-            const c = palette.get_color(w);
-            stroke(c);
-            point(x, y);
+            const c = palette.get_color(p, w);
+            p.stroke(c);
+            p.point(x, y);
         }
     }
-    disable_hsb(palette);
-}
 
-function keyReleased() {
-    if (key === ' ') {
-        background(0);
+    if (palette.uses_hsb) {
+        p.colorMode(p.RGB, 255, 255, 255, 255);
     }
 }
+
+export const rosette_sketch = (p) => {
+    // HACK: Texture palette needs to access the
+    // images object in Texture.color_impl, but since
+    // that's declared after Texture, stash it on the
+    // sketch so it can be accessed in that function.
+    p.symmetry_state = state;
+
+    p.preload = () => {
+        state.images.abstract = p.loadImage('abstract.jpg', (img) => {
+            img.loadPixels();
+            state.images_loaded = true;
+        });
+    };
+
+    p.setup = () => {
+        p.createCanvas(500, 700);
+        p.background(0);
+    };
+
+    p.draw = () => {
+        compute_polynomial(p, state.pattern, state.palette);
+    }
+};
+
+function show_color_wheel(p, palette) {
+    if (palette.uses_hsb) {
+        p.colorMode(p.HSB, 1, 1, 1, 1);
+    }
+
+    p.noFill();
+    for (let x = 0; x < p.width; x++) {
+        for (let y = 0; y < p.height; y++) {
+            const z = get_z(p, x, y);
+            const c = palette.get_color(p, z);
+            p.stroke(c);
+            p.point(x, y);
+        }
+    }
+
+    if (palette.uses_hsb) {
+        p.colorMode(p.RGB, 255, 255, 255, 255);
+    }
+}
+
+export const color_wheel_sketch = (p) => {
+    p.symmetry_state = state;
+
+    p.setup = () => {
+        p.createCanvas(500, 700);
+        p.background(0);
+    };
+
+    p.draw = () => {
+        if (!state.images_loaded) {
+            return;
+        }
+
+        if (state.color_wheel_dirty) {
+            show_color_wheel(p, state.palette);
+            state.color_wheel_dirty = false;
+        }
+    }
+};

@@ -1,5 +1,7 @@
+import { ComplexPolynomial } from "./ComplexPolynomial.js";
+
 const PI = Math.PI;
-const ROSETTES = {
+export const ROSETTES = {
     // scaling symmetry
     // only include terms with n = -m
     "radial symmetry": new ComplexPolynomial([

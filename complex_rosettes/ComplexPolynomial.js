@@ -1,4 +1,6 @@
-class ComplexPolynomial {
+import { Complex } from "./Complex.js";
+
+export class ComplexPolynomial {
     constructor(terms) {
         this.terms = terms.sort();
     }

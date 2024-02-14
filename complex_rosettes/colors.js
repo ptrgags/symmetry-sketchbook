@@ -1,21 +1,3 @@
-function enable_hsb(palette) {
-    if (!palette.uses_hsb) {
-        return;
-    }
-    
-    colorMode(HSB, 1, 1, 1, 1);
-}
-
-function disable_hsb(palette) {
-    if (!palette.uses_hsb) {
-        return;
-    }
-    
-    colorMode(RGB, 255, 255, 255, 255);
-}
-
-let foo = false;
-
 class Palette {
     constructor(params) {
         this.params = {
@@ -35,24 +17,24 @@ class Palette {
      * Color small and large values with special colors
      * to make it more obvious.
      */
-    check_radius(z) {
+    check_radius(p, z) {
         const r = z.mod;
         if (r < this.params.zero_threshold) {
-            return color(...this.params.zero_color);
+            return p.color(...this.params.zero_color);
         } else if (r > this.params.max_threshold) {
-            return color(...this.params.max_color);
+            return p.color(...this.params.max_color);
         }
         
         return undefined;
     }
     
-    get_color(z) {
-        const extreme_color = this.check_radius(z);
+    get_color(p, z) {
+        const extreme_color = this.check_radius(p, z);
         if (extreme_color !== undefined) {
             return extreme_color;
         }
         
-        return this.color_impl(z);
+        return this.color_impl(p, z);
     }
 }
 
@@ -65,13 +47,13 @@ class ColorWheel extends Palette {
         });
     }
     
-    color_impl(z) {
+    color_impl(p, z) {
         const n = this.params.num_sectors;
         const theta_normalized = z.arg / TWO_PI;
         const bucket = Math.floor(theta_normalized * n);
         const hue = bucket / n;
         
-        return color(hue, this.params.saturation, this.params.brightness);
+        return p.color(hue, this.params.saturation, this.params.brightness);
     }
 }
 
@@ -84,13 +66,13 @@ class AngleBrightness extends Palette {
         });
     }
     
-    color_impl(z) {
+    color_impl(p, z) {
         const n = this.params.num_sectors;
         const theta_normalized = z.arg / TWO_PI;
         const bucket = Math.floor(theta_normalized * n);
         const brightness = bucket / n;
         
-        return color(this.params.hue, this.params.saturation, brightness);
+        return p.color(this.params.hue, this.params.saturation, brightness);
     }
 }
 
@@ -104,13 +86,13 @@ class RadiusBrightness extends Palette {
         });
     }
     
-    color_impl(z) {
+    color_impl(p, z) {
         const n = this.params.num_sectors;
         const r_normalized = z.mod / this.params.max_value;
         const bucket = Math.floor(r_normalized * n);
         const brightness = bucket / n;
         
-        return color(this.params.hue, this.params.saturation, brightness);
+        return p.color(this.params.hue, this.params.saturation, brightness);
     }
 }
 
@@ -123,12 +105,12 @@ class Checkerboard extends Palette {
         });
     }
     
-    color_impl(z) {
+    color_impl(p, z) {
         const x = Math.floor(z.real);
         const y = Math.floor(z.imag);
         const parity = (Math.abs(x) + Math.abs(y)) % 2;
         
-        return color(this.params.hue, this.params.saturation, parity);
+        return p.color(this.params.hue, this.params.saturation, parity);
     }
 }
 
@@ -146,22 +128,31 @@ class Texture extends Palette {
         return false;
     }
     
-    color_impl(z) {
-        const img = images[this.params.image_id];
+    color_impl(p, z) {
+        const img = p.symmetry_state.images[this.params.image_id];
+
         const cx = 0.5 * img.width;
         const cy = 0.5 * img.height;
         const x = z.real / this.params.max_x * cx;
         const y = z.imag / this.params.max_y * -cy;
-        
-        try {
-            return img.get(cx + x, cy + y);
-        } catch(e) {
-            return color(255, 0, 255, 255);
+
+        const pixel_x = Math.round(cx + x);
+        const pixel_y = Math.round(cy + y);
+        const pixel_index = pixel_y * img.width + pixel_x;
+
+        if (pixel_x < 0 || pixel_x >= img.width || pixel_y < 0 || pixel_y >= img.height) {
+            return p.color(255, 0, 255);
         }
+
+        const r = img.pixels[4 * pixel_index];
+        const g = img.pixels[4 * pixel_index + 1];
+        const b = img.pixels[4 * pixel_index + 2];
+        const a = img.pixels[4 * pixel_index + 3];
+        return p.color(r, g, b, a)
     }
 }
 
-const PALETTES = {
+export const PALETTES = {
     "abstract texture": new Texture({
         image_id: "abstract",
         max_x: 5.0,
