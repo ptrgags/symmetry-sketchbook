@@ -1,7 +1,7 @@
 <html>
   <head>
     <meta charset="UTF-8" />
-    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <!-- <meta name="viewport" content="width=device-width, initial-scale=1.0" /> -->
     <script
       language="javascript"
       type="text/javascript"
@@ -24,19 +24,28 @@
       }
 
       canvas {
-        margin: 10px;
+        height: auto;
+        /* For small screens, shrink the canvas but keep the aspect ratio */
+        max-width: 80vw;
+        object-fit: contain;
       }
 
       .container {
-        width: 1040px;
+        width: 90%;
         margin: 0 auto;
         display: flex;
         flex-direction: column;
         justify-content: center;
+        flex-wrap: wrap;
       }
 
       .row {
+        width: 100%;
         display: flex;
+        flex-direction: row;
+        flex-wrap: wrap;
+        justify-content: center;
+        gap: 10px;
       }
     </style>
   </head>
