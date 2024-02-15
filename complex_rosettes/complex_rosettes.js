@@ -1,6 +1,6 @@
-import { PALETTES } from './colors.js';
-import { ROSETTES } from './patterns.js';
-import { Complex } from './Complex.js';
+import { PALETTES } from "./colors.js";
+import { ROSETTES } from "./patterns.js";
+import { Complex } from "./Complex.js";
 
 const MAX_X = 1.5;
 const BLOCK_SIZE = 16;
@@ -9,54 +9,45 @@ const state = {
     images: {},
     images_loaded: false,
     color_wheel_dirty: true,
-    palette: PALETTES.abstract,
-    pattern: ROSETTES[Object.keys(ROSETTES)[0]],
-}
+    palette: "abstract",
+    pattern: "rot2_1",
+};
 
-function make_rosette_select() {
-    const sel = createSelect();
-    sel.position(10, 10);
-    for (const x of Object.keys(ROSETTES)) {
-        sel.option(x);
+function populate_dropdown(id, options, initial_value, on_change) {
+    const select = document.getElementById(id);
+    for (const [key, { name }] of Object.entries(options)) {
+        const option = document.createElement("option");
+        option.value = key;
+        option.innerText = name;
+        select.appendChild(option);
     }
-    sel.changed(change_rosette);
+    select.onchange = on_change;
+    select.value = initial_value;
 }
 
-function change_rosette(e) {
-    const selected = e.target.value;
-    pattern = ROSETTES[selected];
-    background(0);
-}
-
-function make_palette_select() {
-    const sel = createSelect();
-    sel.position(width / 2 + 10, 10);
-    for (const x of Object.keys(PALETTES)) {
-        sel.option(x);
-    }
-    sel.changed(change_palette);
-}
-
-function change_palette(e) {
-    const selected = e.target.value;
-    palette = PALETTES[selected];
-    background(0);
+export function init_ui() {
+    populate_dropdown("pattern-select", ROSETTES, state.pattern, (e) => {
+        state.pattern = e.target.value;
+    });
+    populate_dropdown("palette-select", PALETTES, state.palette, (e) => {
+        state.palette = e.target.value;
+    });
 }
 
 function get_z(p, x, y) {
     const hw = p.width / 2.0;
     const hh = p.height / 2.0;
-    const u = (x - hw) / hw * MAX_X;
-    const v = -(y - hh) / hw * MAX_X;
-    
+    const u = ((x - hw) / hw) * MAX_X;
+    const v = (-(y - hh) / hw) * MAX_X;
+
     return new Complex(u, v);
 }
 
 /**
  * Rendering pixel-by-pixel on the CPU is too slow,
  * so render one pixel in each NxN block, scanning through
- * over time. 
- * 
+ * over time.
+ *
  * callback is a function Complex -> Complex to visualize
  */
 function interleave_render(p, palette, callback) {
@@ -68,6 +59,7 @@ function interleave_render(p, palette, callback) {
     const blocks_tall = Math.ceil(p.height / BLOCK_SIZE);
     const x_offset = p.frameCount % BLOCK_SIZE;
     const y_offset = Math.floor(p.frameCount / BLOCK_SIZE) % BLOCK_SIZE;
+    console.log(x_offset, y_offset);
 
     p.noFill();
     for (let i = 0; i < blocks_wide; i++) {
@@ -96,7 +88,7 @@ export const rosette_sketch = (p) => {
     p.symmetry_state = state;
 
     p.preload = () => {
-        state.images.abstract = p.loadImage('abstract.jpg', (img) => {
+        state.images.abstract = p.loadImage("abstract.jpg", (img) => {
             img.loadPixels();
             state.images_loaded = true;
         });
@@ -108,10 +100,12 @@ export const rosette_sketch = (p) => {
     };
 
     p.draw = () => {
-        interleave_render(p, state.palette, z => {
-            return state.pattern.compute(z);
+        const pattern = ROSETTES[state.pattern].value;
+        const palette = PALETTES[state.palette].value;
+        interleave_render(p, palette, (z) => {
+            return pattern.compute(z);
         });
-    }
+    };
 };
 
 export const color_wheel_sketch = (p) => {
@@ -127,8 +121,10 @@ export const color_wheel_sketch = (p) => {
             return;
         }
 
+        const palette = PALETTES[state.palette].value;
+
         // To display the color wheel, just render the
         // identity function, f(z) = z
-        interleave_render(p, state.palette, z => z);
-    }
+        interleave_render(p, palette, (z) => z);
+    };
 };

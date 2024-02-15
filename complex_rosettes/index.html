@@ -2,18 +2,15 @@
   <head>
     <meta charset="UTF-8" />
     <!-- <meta name="viewport" content="width=device-width, initial-scale=1.0" /> -->
-    <script
-      language="javascript"
-      type="text/javascript"
-      src="../libraries/p5.min.js"
-    ></script>
+    <script language="javascript" type="text/javascript" src="../libraries/p5.min.js"></script>
     <script type="module">
-      import {
-        rosette_sketch,
-        color_wheel_sketch,
-      } from "./complex_rosettes.js";
+      import { rosette_sketch, color_wheel_sketch, init_ui } from "./complex_rosettes.js";
       const rosette = new p5(rosette_sketch, "rosette");
       const color_wheel = new p5(color_wheel_sketch, "color-wheel");
+
+      window.onload = () => {
+        init_ui();
+      };
     </script>
 
     <style>
@@ -53,6 +50,10 @@
   <body>
     <div class="container">
       <h2>Complex Rosettes</h2>
+      <div class="ui">
+        <select id="pattern-select"></select>
+        <select id="palette-select"></select>
+      </div>
       <div class="row">
         <div id="rosette"></div>
         <div id="color-wheel"></div>
