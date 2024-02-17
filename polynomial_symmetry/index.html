@@ -1,170 +1,174 @@
 <html>
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
 
-  <script language="javascript" type="text/javascript" src="libraries/p5.min.js"></script>
-  <script type="module" src="polynomial_symmetry.js"></script>
+    <script language="javascript" type="text/javascript" src="libraries/p5.min.js"></script>
+    <script type="module" src="polynomial_symmetry.js"></script>
 
-  <style> 
-  body { 
-      padding: 0; 
-      margin: 0;
-      background-color: #555555;
-      color: #BBBBBB;
-  }
-  
-  button, input[type=file]::-webkit-file-upload-button {
-      background-color: #444444;
-      border: 2px solid #888888;
-      border-radius: 4px;
-      color: #BBBBBB;
-  }
-  
-  input[type=text] {
-      background-color: #000000;
-      color: #BBBBBB;
-      border: 2px solid #888888;
-      border-radius: 4px;
-  }
+    <style>
+      body {
+        padding: 0;
+        margin: 0;
+        background-color: #555555;
+        color: #bbbbbb;
+      }
 
-  a {
-      color: #FF8800;
-  }
-  
-  .log {
-      color: black;
-  }
-  
-  .warn {
-      color: #999900;
-  }
-  
-  .error {
-      color: #990000;
-  }
-  
-  .container {
-      display: flex;
-      flex-wrap: wrap;
-      height: 100%;
-  }
-  
-  .half-page {
-      width: 50%;
-  }
+      button,
+      input[type="file"]::-webkit-file-upload-button {
+        background-color: #444444;
+        border: 2px solid #888888;
+        border-radius: 4px;
+        color: #bbbbbb;
+      }
 
-  #canvas-pane {
-      height: 80%;
-  }
-  
-  h3, h4 {
-      margin: 2px;
-  }
-  
-  .or {
-      font-weight: bold;
-  }
-  
-  .hidden {
-      display: none
-  } 
+      input[type="text"] {
+        background-color: #000000;
+        color: #bbbbbb;
+        border: 2px solid #888888;
+        border-radius: 4px;
+      }
 
-  #p5-canvas {
-      margin: 16px;
-  }
-  </style>
-</head>
-<body>
-  <div class="container">
-    <div class="half-page" id='canvas-pane'>
-      <div id="p5-canvas">
+      a {
+        color: #ff8800;
+      }
+
+      .log {
+        color: black;
+      }
+
+      .warn {
+        color: #999900;
+      }
+
+      .error {
+        color: #990000;
+      }
+
+      .container {
+        display: flex;
+        flex-wrap: wrap;
+        height: 100%;
+      }
+
+      .half-page {
+        width: 50%;
+      }
+
+      #canvas-pane {
+        height: 80%;
+      }
+
+      h3,
+      h4 {
+        margin: 2px;
+      }
+
+      .or {
+        font-weight: bold;
+      }
+
+      .hidden {
+        display: none;
+      }
+
+      #p5-canvas {
+        margin: 16px;
+      }
+    </style>
+  </head>
+  <body>
+    <div class="container">
+      <div class="half-page" id="canvas-pane">
+        <div id="p5-canvas"></div>
+      </div>
+      <div class="half-page">
+        <div id="texture-settings">
+          <h3>Texture Settings</h3>
+          <bricks-dropdown id="builtin-textures" label="Choose a built-in texture"></bricks-dropdown>
+          <br />
+          <span class="or">OR</span>
+          <label for="image-input">Choose a PNG or JPEG image texture:</label>
+          <input id="image-input" type="file" accept="image/png, image/jpeg" />
+          <br />
+          <span class="or">OR</span>
+          <button id="use-webcam">Use Webcam</button>
+        </div>
+        <div id="coefficient-settings">
+          <h3>Coefficient Settings</h3>
+          <div id="current-coefficients"></div>
+          <label for="coeffs">Coefficients (n, m, amp=1, phase_deg=0)</label>
+          <input id="coeffs" type="text" />
+          <br />
+          <button id="update-params">Update Coefficients</button>
+          <button id="random-params">Random Coefficients</button>
+          <button id="quasi-params-5">5-fold Quasicrystal Coefficients</button>
+          <button id="quasi-params-7">7-fold Quasicrystal Coefficients</button>
+        </div>
+        <div id="animation-settings">
+          <h3>Animation Settings (results may not be symmetric)</h3>
+          <div id="current-animation"></div>
+          <label for="animation">Animation parameters (rad)</label>
+          <input id="animation" type="text" />
+          <br />
+          <button id="update-animation">Update Animation</button>
+          <button id="random-animation">Random Animation</button>
+          <button id="no-animation">No Animation</button>
+          <br />
+          <bricks-checkbox id="toggle-standing-waves">Standing Waves</bricks-checkbox>
+          <bricks-checkbox id="toggle-wave-components">Show Components</bricks-checkbox>
+        </div>
+        <div id="symmetry-settings">
+          <h3>Symmetry Settings</h3>
+          <div id="current-symmetries"></div>
+          <button id="clear-symmetries">Clear Symmetries</button>
+          <!-- Point Symmetry only... but maybe too advanced? -->
+          <div id="point-symmetry-settings">
+            <h4>Add Point Symmetry</h4>
+            <label for="folds">k-fold rotations (k)</label>
+            <input id="folds" type="text" />
+            <label for="in-rotation">Input Rotation (l)</label>
+            <input id="in-rotation" type="text" />
+            <br />
+            <bricks-checkbox id="inversion">Input inversion (p)</bricks-checkbox>
+            <bricks-checkbox id="in-reflection">Input Reflection(q)</bricks-checkbox>
+            <br />
+            <label for="out-rotation">Output Rotation (u)</label>
+            <input id="out-rotation" type="text" />
+            <bricks-checkbox id="out-reflection">Output Reflection (v)</bricks-checkbox>
+            <br />
+            <button id="add-point-symmetry">Add Symmetry</button>
+          </div>
+          <!-- Wallpaper shaders only -->
+          <div id="wallpaper-symmetry-settings">
+            <h4>Add Wallpaper Symmetry</h4>
+            <bricks-dropdown id="wallpaper-select" label="Wallpaper Type"></bricks-dropdown> (<a
+              href="https://en.wikipedia.org/wiki/Wallpaper_group"
+              >See here for more info</a
+            >)
+            <br />
+            <button id="set-wallpaper-symmetry">Set Wallpaper Symmetry</button>
+          </div>
+        </div>
+        <!-- Wallpaper shaders only -->
+        <div id="wallpaper-settings">
+          <h3>Wallpaper Settings</h3>
+          <div id="current-basis"></div>
+          <bricks-dropdown id="lattice-select" label="Lattice Type"></bricks-dropdown>
+        </div>
+        <div id="display-settings">
+          <h3>Display Settings</h3>
+          <!-- Remove this, just have separate pages -->
+          <bricks-dropdown id="shader-select" label="Select Shader"></bricks-dropdown>
+          <br />
+          <bricks-checkbox id="toggle-ref-geometry">Show Reference Geometry</bricks-checkbox>
+        </div>
+        <!-- Everything -->
+        <div id="log-panel">
+          <h3>Log</h3>
+          <div id="log"></div>
+        </div>
       </div>
     </div>
-    <div class="half-page">
-      <div id="texture-settings">
-        <h3>Texture Settings</h3>
-        <bricks-dropdown id="builtin-textures" label="Choose a built-in texture"></bricks-dropdown>
-        <br/>
-        <span class="or">OR</span>
-        <label for="image-input">Choose a PNG or JPEG image texture:</label>
-        <input id="image-input" type="file" accept="image/png, image/jpeg" />
-        <br/>
-        <span class="or">OR</span>
-        <button id="use-webcam">Use Webcam</button>
-      </div>
-      <div id="coefficient-settings">
-        <h3>Coefficient Settings</h3>
-        <div id="current-coefficients">
-        </div>
-        <label for="coeffs">Coefficients (n, m, amp=1, phase_deg=0)</label>
-        <input id="coeffs" type="text" />
-        <br/>
-        <button id="update-params">Update Coefficients</button>
-        <button id="random-params">Random Coefficients</button>
-        <button id="quasi-params-5">5-fold Quasicrystal Coefficients</button>
-        <button id="quasi-params-7">7-fold Quasicrystal Coefficients</button>
-      </div>
-      <div id="animation-settings">
-        <h3>Animation Settings (results may not be symmetric)</h3>
-        <div id="current-animation">
-        </div>
-        <label for="animation">Animation parameters (rad)</label>
-        <input id="animation" type="text" />
-        <br/>
-        <button id="update-animation">Update Animation</button>
-        <button id="random-animation">Random Animation</button>
-        <button id="no-animation">No Animation</button>
-        <br/>
-        <bricks-checkbox id="toggle-standing-waves">Standing Waves</bricks-checkbox>
-        <bricks-checkbox id="toggle-wave-components">Show Components</bricks-checkbox>
-      </div>
-      <div id="symmetry-settings">
-        <h3>Symmetry Settings</h3>
-        <div id="current-symmetries">
-        </div>
-        <button id="clear-symmetries">Clear Symmetries</button>
-        <div id="point-symmetry-settings">
-          <h4>Add Point Symmetry</h4>
-          <label for="folds">k-fold rotations (k)</label>
-          <input id="folds" type="text" />
-          <label for="in-rotation">Input Rotation (l)</label>
-          <input id="in-rotation" type="text" />
-          <br/>
-          <bricks-checkbox id="inversion">Input inversion (p)</bricks-checkbox>
-          <bricks-checkbox id="in-reflection">Input Reflection(q)</bricks-checkbox>
-          <br/>
-          <label for="out-rotation">Output Rotation (u)</label>
-          <input id="out-rotation" type="text" />
-          <bricks-checkbox id="out-reflection">Output Reflection (v)</bricks-checkbox>
-          <br/>
-          <button id="add-point-symmetry">Add Symmetry</button>
-        </div>
-        <div id="wallpaper-symmetry-settings">
-          <h4>Add Wallpaper Symmetry</h4>
-          <bricks-dropdown id="wallpaper-select" label="Wallpaper Type"></bricks-dropdown> (<a href="https://en.wikipedia.org/wiki/Wallpaper_group">See here for more info</a>)
-          <br/>
-          <button id="set-wallpaper-symmetry">Set Wallpaper Symmetry</button>
-        </div>
-      </div>
-      <div id="wallpaper-settings">
-        <h3>Wallpaper Settings</h3>
-        <div id="current-basis">
-        </div>
-        <bricks-dropdown id="lattice-select" label="Lattice Type"></bricks-dropdown>
-      </div>
-      <div id="display-settings">
-       <h3>Display Settings</h3>
-       <bricks-dropdown id="shader-select" label="Select Shader"></bricks-dropdown>
-       <br/>
-       <bricks-checkbox id="toggle-ref-geometry">Show Reference Geometry</bricks-checkbox>
-      </div>
-      <div id="log-panel">
-        <h3>Log</h3>
-        <div id="log">
-        </div>
-      </div>
-    </div>
-  </div>
-</body>
+  </body>
 </html>

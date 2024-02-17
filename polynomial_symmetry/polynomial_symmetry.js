@@ -106,19 +106,9 @@ function preload(sketch) {
     shaders.preload(sketch);
 }
 
-function pick_size() {
-    const container = find("#canvas-pane");
-    const style = getComputedStyle(container);
-    const margin = 2 * 16;
-    return [
-        parseFloat(style.width) - margin,
-        parseFloat(style.height) - margin
-    ];
-}
-
 function setup(sketch) {
-    const [w, h] = pick_size();
-    const canvas = sketch.createCanvas(w, h, sketch.WEBGL);
+    const canvas = sketch.createCanvas(500, 700, sketch.WEBGL);
+
     canvas.parent('p5-canvas');
     canvas.canvas.addEventListener('wheel', update_zoom);
     sketch.textureMode(sketch.NORMAL);
@@ -127,7 +117,7 @@ function setup(sketch) {
 
     shaders.init(sketch);
     shaders.set_uniform('zoom', zoom);
-    shaders.set_uniform('aspect', w / h);
+    shaders.set_uniform('aspect', 5/7);
     shaders.set_coefficients(DEFAULT_COEFFICIENTS);
     shaders.set_animation(DEFAULT_ANIMATION);
     shaders.disable_all();
@@ -398,19 +388,12 @@ function mouse_dragged(sketch, event) {
     shaders.set_pan_uv(pan_uv);
 }
 
-function resize(sketch) {
-    const [w, h] = pick_size();
-    sketch.resizeCanvas(w, h);
-    shaders.set_uniform('aspect', w / h);
-}
-
 function main() {
     const closure = (sketch) => {
         sketch.preload = () => preload(sketch);
         sketch.setup = () => setup(sketch);
         sketch.draw = () => draw(sketch);
         sketch.mouseMoved = () => mouse_moved(sketch);
-        sketch.windowResized = () => resize(sketch);
         sketch.mouseDragged = (event) => mouse_dragged(sketch, event);
     }
     window.sketch = new p5(closure);
