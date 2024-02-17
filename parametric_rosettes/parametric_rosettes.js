@@ -3,10 +3,11 @@ import { ROSETTES } from "./patterns.js";
 const MAX_X = 2.0;
 const PERIOD = 800;
 const THICKNESS = 3.0;
+const INITIAL_PATTERN = "2k + 1";
 
 const state = {
     display_arm: true,
-    pattern: ROSETTES["2k + 1"],
+    pattern: ROSETTES[INITIAL_PATTERN],
     curve: [],
     start_frame: 0
 };
@@ -34,15 +35,16 @@ function change_rosette(p, e) {
     set_pattern(p, ROSETTES[selected]);
 }
 
-function make_select(p) {
-    const sel = p.createSelect();
-    sel.position(10, 10);
-    for (const x of Object.keys(ROSETTES)) {
-        sel.option(x);
+function populate_dropdown(id, options, initial_value, on_change) {
+    const select = document.getElementById(id);
+    for (const key of Object.keys(options)) {
+        const option = document.createElement("option");
+        option.value = key;
+        option.innerText = key;
+        select.appendChild(option);
     }
-    sel.changed((e) => {
-        change_rosette(p, e);
-    });
+    select.onchange = on_change;
+    select.value = initial_value;
 }
 
 function custom_string_changed(e) {
@@ -72,7 +74,9 @@ function set_pattern(p, series) {
 }
 
 function init_ui(p) {
-    make_select(p);
+    populate_dropdown('pattern-select', ROSETTES, INITIAL_PATTERN, (e) => {
+        change_rosette(p, e);
+    });
     make_input_box(p);
 }
 
