@@ -85,7 +85,7 @@
       <div class="half-page">
         <div id="texture-settings">
           <h3>Texture Settings</h3>
-          <bricks-dropdown id="builtin-textures" label="Choose a built-in texture"></bricks-dropdown>
+          <sym-dropdown id="builtin-textures" label="Choose a built-in texture"></sym-dropdown>
           <br />
           <span class="or">OR</span>
           <label for="image-input">Choose a PNG or JPEG image texture:</label>
@@ -115,8 +115,8 @@
           <button id="random-animation">Random Animation</button>
           <button id="no-animation">No Animation</button>
           <br />
-          <bricks-checkbox id="toggle-standing-waves">Standing Waves</bricks-checkbox>
-          <bricks-checkbox id="toggle-wave-components">Show Components</bricks-checkbox>
+          <sym-checkbox id="toggle-standing-waves">Standing Waves</sym-checkbox>
+          <sym-checkbox id="toggle-wave-components">Show Components</sym-checkbox>
         </div>
         <div id="symmetry-settings">
           <h3>Symmetry Settings</h3>
@@ -130,19 +130,19 @@
             <label for="in-rotation">Input Rotation (l)</label>
             <input id="in-rotation" type="text" />
             <br />
-            <bricks-checkbox id="inversion">Input inversion (p)</bricks-checkbox>
-            <bricks-checkbox id="in-reflection">Input Reflection(q)</bricks-checkbox>
+            <sym-checkbox id="inversion">Input inversion (p)</sym-checkbox>
+            <sym-checkbox id="in-reflection">Input Reflection(q)</sym-checkbox>
             <br />
             <label for="out-rotation">Output Rotation (u)</label>
             <input id="out-rotation" type="text" />
-            <bricks-checkbox id="out-reflection">Output Reflection (v)</bricks-checkbox>
+            <sym-checkbox id="out-reflection">Output Reflection (v)</sym-checkbox>
             <br />
             <button id="add-point-symmetry">Add Symmetry</button>
           </div>
           <!-- Wallpaper shaders only -->
           <div id="wallpaper-symmetry-settings">
             <h4>Add Wallpaper Symmetry</h4>
-            <bricks-dropdown id="wallpaper-select" label="Wallpaper Type"></bricks-dropdown> (<a
+            <sym-dropdown id="wallpaper-select" label="Wallpaper Type"></sym-dropdown> (<a
               href="https://en.wikipedia.org/wiki/Wallpaper_group"
               >See here for more info</a
             >)
@@ -154,14 +154,14 @@
         <div id="wallpaper-settings">
           <h3>Wallpaper Settings</h3>
           <div id="current-basis"></div>
-          <bricks-dropdown id="lattice-select" label="Lattice Type"></bricks-dropdown>
+          <sym-dropdown id="lattice-select" label="Lattice Type"></sym-dropdown>
         </div>
         <div id="display-settings">
           <h3>Display Settings</h3>
           <!-- Remove this, just have separate pages -->
-          <bricks-dropdown id="shader-select" label="Select Shader"></bricks-dropdown>
+          <sym-dropdown id="shader-select" label="Select Shader"></sym-dropdown>
           <br />
-          <bricks-checkbox id="toggle-ref-geometry">Show Reference Geometry</bricks-checkbox>
+          <sym-checkbox id="toggle-ref-geometry">Show Reference Geometry</sym-checkbox>
         </div>
         <!-- Everything -->
         <div id="log-panel">

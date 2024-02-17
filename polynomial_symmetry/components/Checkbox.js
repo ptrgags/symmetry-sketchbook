@@ -33,4 +33,4 @@ class Checkbox extends HTMLElement {
     }
 }
 
-customElements.define('bricks-checkbox', Checkbox);
+customElements.define('sym-checkbox', Checkbox);

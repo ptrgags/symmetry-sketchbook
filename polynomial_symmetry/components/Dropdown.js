@@ -66,4 +66,4 @@ class Dropdown extends HTMLElement {
     }
 }
 
-customElements.define('bricks-dropdown', Dropdown);
+customElements.define('sym-dropdown', Dropdown);
