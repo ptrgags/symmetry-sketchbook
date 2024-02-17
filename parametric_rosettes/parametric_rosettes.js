@@ -16,7 +16,7 @@ const state = {
 
 function display_params(pattern) {
     const triples = pattern.to_string().replace(/:/g, "<br/>");
-    const value = `Current parameters (frequency, amplitude, phase):<br/>${triples}`;
+    const value = `<strong>Current parameters (frequency, amplitude, phase):</strong><br/>${triples}`;
     document.getElementById('params').innerHTML = value; 
 }
 
@@ -57,12 +57,9 @@ function custom_string_changed(e) {
     }
 }
 
-function make_input_box(p) {
-    const input = p.createInput();
-    input.position(100, 10);
-    input.attribute('placeholder', 'freq1,amp1,phase1:freq2,amp2,phase2:...');
-    input.style('width: 300');
-    input.changed(custom_string_changed);
+function init_custom_pattern(p) {
+    const input = document.getElementById("custom-pattern");
+    input.onchange = custom_string_changed;
 }
 
 function set_pattern(p, series) {
@@ -77,7 +74,7 @@ function init_ui(p) {
     populate_dropdown('pattern-select', ROSETTES, INITIAL_PATTERN, (e) => {
         change_rosette(p, e);
     });
-    make_input_box(p);
+    init_custom_pattern(p);
 }
 
 function draw_polyline(p, points, close) {
@@ -87,7 +84,7 @@ function draw_polyline(p, points, close) {
     }
 
     if (close) {
-        p.endShape(CLOSE);
+        p.endShape(p.CLOSE);
     } else {
         p.endShape();
     }
@@ -95,7 +92,7 @@ function draw_polyline(p, points, close) {
 
 export const sketch = (p) => {
     p.setup = () => {
-        p.createCanvas(500, 750);
+        p.createCanvas(500, 700);
 
         init_ui(p);
         display_params(state.pattern);

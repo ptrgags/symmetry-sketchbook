@@ -29,8 +29,8 @@
       .container {
         display: flex;
         flex-direction: column;
-        justify-content: center;
         align-items: center;
+        justify-content: center;
         width: 100%;
       }
 
@@ -38,10 +38,13 @@
         display: flex;
         flex-direction: row;
         flex-wrap: wrap;
+        align-items: center;
+        justify-content: center;
       }
 
       .sketch {
         width: 500px;
+        max-width: 80vw;
       }
 
       canvas {
@@ -54,6 +57,16 @@
         max-width: 80vw;
         padding: 20px;
       }
+
+      label,
+      strong {
+        color: #4f83e2;
+      }
+
+      #custom-pattern {
+        width: 100%;
+        margin-top: 8px;
+      }
     </style>
   </head>
 
@@ -64,9 +77,11 @@
         <div id="sketch" class="sketch"></div>
         <div class="info">
           <div id="ui">
-            <label for="pattern-select">Symmetry Pattern:</label>
+            <label for="pattern-select">Preset Pattern:</label>
             <select id="pattern-select"></select>
             <br />
+            <label for="custom-pattern">Custom Pattern:</label>
+            <input id="custom-pattern" type="text" placeholder="freq1,amp1,phase1:freq2,amp2,phase2:..." />
           </div>
           <p>
             This sketch can be used to generate curves created by adding together various circular motions. Each joint
@@ -74,10 +89,10 @@
             of the joint), and phase (starting angle).
           </p>
           <p>
-            <strong>Basic Usage</strong>: Use the dropdown in the top left to pick one of the preset patterns I made,
-            listed by symmetry type. Spacebar toggles the drawing machine arm. <br /><br />
-            <strong>Advanced Usage</strong>: Use the input box to type in frequencies, amplitudes and phases. Then press
-            Enter. <strong>Note:</strong> phases are listed as multiples of pi
+            <strong>Basic Usage</strong>: Use the "Preset Pattern" dropdown in the top left to pick one of the preset
+            patterns I made, listed by symmetry type. Spacebar toggles the drawing machine arm. <br /><br />
+            <strong>Advanced Usage</strong>: Use the "Custom Pattern" input box to type in frequencies, amplitudes and
+            phases. Then press Enter. <strong>Note:</strong> phases are listed as multiples of pi
           </p>
           <p class="error" id="error"></p>
           <p class="params" id="params"></p>
