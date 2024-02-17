@@ -98,7 +98,6 @@ const DEFAULT_SYMMETRY = new PointSymmetry({
     input_rotation: 1
 });
 
-let enable_standing_waves = false;
 let zoom = 3;
 const ZOOM_DELTA = 0.5;
 
