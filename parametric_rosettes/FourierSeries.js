@@ -7,7 +7,7 @@
  *       n_k is an integer
  *       t is a real number, typically in the range [0, 2 pi]
  */
-class FourierSeries {
+export class FourierSeries {
     /**
      * terms - an array of triples [frequency, amplitude, phase]
      * the terms must be specified in ascending order so the
@@ -26,8 +26,8 @@ class FourierSeries {
         let y = 0.0;
         yield [0, 0,];
         for (const [frequency, amplitude, phase] of this.terms) {
-            let term_x = amplitude * cos(frequency * t - phase);
-            let term_y = amplitude * sin(frequency * t - phase);
+            let term_x = amplitude * Math.cos(frequency * t - phase);
+            let term_y = amplitude * Math.sin(frequency * t - phase);
             x += term_x;
             y += term_y;
             yield [x, y,];

@@ -1,6 +1,8 @@
+import { FourierSeries } from "./FourierSeries.js";
+
 const PI = Math.PI;
 
-const ROSETTES = {
+export const ROSETTES = {
     "2k + 1": new FourierSeries([
         [-3, 1/2, PI,],
         [-1, 1, 0,],

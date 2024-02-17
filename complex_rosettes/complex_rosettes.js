@@ -59,7 +59,6 @@ function interleave_render(p, palette, callback) {
     const blocks_tall = Math.ceil(p.height / BLOCK_SIZE);
     const x_offset = p.frameCount % BLOCK_SIZE;
     const y_offset = Math.floor(p.frameCount / BLOCK_SIZE) % BLOCK_SIZE;
-    console.log(x_offset, y_offset);
 
     p.noFill();
     for (let i = 0; i < blocks_wide; i++) {
@@ -97,6 +96,8 @@ export const rosette_sketch = (p) => {
     p.setup = () => {
         p.createCanvas(500, 700);
         p.background(0);
+
+        init_ui();
     };
 
     p.draw = () => {

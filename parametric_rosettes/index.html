@@ -1,69 +1,83 @@
 <html>
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <script language="javascript" type="text/javascript" src="../libraries/p5.min.js"></script>
+    <script type="module">
+      import { sketch } from "./parametric_rosettes.js";
+      const rosette = new p5(sketch, "sketch");
+    </script>
 
-  <!-- PLEASE NO CHANGES BELOW THIS LINE (UNTIL I SAY SO) -->
-  <script language="javascript" type="text/javascript" src="libraries/p5.min.js"></script>
-  <script language="javascript" type="text/javascript" src="libraries/p5.dom.min.js"></script>
-  <script language="javascript" type="text/javascript" src="FourierSeries.js"></script>
-  <script language="javascript" type="text/javascript" src="patterns.js"></script>
-  <script language="javascript" type="text/javascript" src="parametric_rosettes.js"></script>
-  <!-- OK, YOU CAN MAKE CHANGES BELOW THIS LINE AGAIN -->
+    <style>
+      body {
+        padding: 0;
+        margin: 0;
+        background-color: #333333;
+        color: #eeeeee;
+        font-family: sans-serif;
+      }
 
-  <!-- This line removes any default padding and style.
-       You might only need one of these values set. -->
-  <style> 
-      body { 
-          padding: 0; 
-          margin: 0; 
-          background-color: #333333;
-          color: #eeeeee;
-      } 
-      
       .error {
-          margin: 2px;
-          position: absolute;
-          color: red;
-          left: 500px;
-          top: 350px;
+        top: 400px;
+        color: #ff0000;
       }
-      
-      .params {
-          position: absolute;
-          left: 500px;
-          top: 370px;
-          width: 400px;
-      }
-      
-      .info {
-          position: absolute;
-          left: 500px;
-          width: 400px;
-          top: 0px;
-          padding: 0;
-          margin: 0;
-      }
-  </style>
-</head>
 
-<body>
-<p class="info">
-    This sketch can be used to generate curves created
-    by adding together various circular motions. Each joint of the 
-    drawing machine represents a circular motion with a frequency
-    (how fast it spins), amplitude (length of the joint), and phase
-    (starting angle).
-    <br/><br/>
-    <b>Basic Usage</b>: Use the dropdown in the top left to pick one of the
-    preset patterns I made, listed by symmetry type. Spacebar toggles the
-    drawing machine arm.
-    <br/><br/>
-    <b>Advanced Usage</b>: Use the input box to type in frequencies, amplitudes
-    and phases. Then press Enter. <b>Note:</b> phases are listed as
-    multiples of pi
-</p>
-<span class="error" id="error"></span>
-<span class="params" id="params"></span>
-</body>
+      .params {
+        width: 400px;
+      }
+
+      .container {
+        display: flex;
+        flex-direction: column;
+        justify-content: center;
+        align-items: center;
+        width: 100%;
+      }
+
+      .row {
+        display: flex;
+        flex-direction: row;
+        flex-wrap: wrap;
+      }
+
+      .sketch {
+        width: 500px;
+      }
+
+      canvas {
+        max-width: 80vw;
+        object-fit: contain;
+      }
+
+      .info {
+        width: 500px;
+        max-width: 80vw;
+        padding: 20px;
+      }
+    </style>
+  </head>
+
+  <body>
+    <div class="container">
+      <h1>Parametric Rosettes</h1>
+      <div class="row">
+        <div id="sketch" class="sketch"></div>
+        <div class="info">
+          <p>
+            This sketch can be used to generate curves created by adding together various circular motions. Each joint
+            of the drawing machine represents a circular motion with a frequency (how fast it spins), amplitude (length
+            of the joint), and phase (starting angle).
+          </p>
+          <p>
+            <strong>Basic Usage</strong>: Use the dropdown in the top left to pick one of the preset patterns I made,
+            listed by symmetry type. Spacebar toggles the drawing machine arm. <br /><br />
+            <strong>Advanced Usage</strong>: Use the input box to type in frequencies, amplitudes and phases. Then press
+            Enter. <strong>Note:</strong> phases are listed as multiples of pi
+          </p>
+          <p class="error" id="error"></p>
+          <p class="params" id="params"></p>
+        </div>
+      </div>
+    </div>
+  </body>
 </html>
