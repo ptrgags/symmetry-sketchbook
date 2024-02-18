@@ -5,6 +5,17 @@ const BUILT_IN_TEXTURE_OPTIONS = Object.keys(BUILT_IN_TEXTURES).map(key => {
     return {label: key, value: key};
 });
 
+async function make_data_url(file) {
+    const reader = new FileReader();
+    const promise = new Promise((resolve) => {
+        reader.addEventListener('load', (e) => {
+            resolve(e.target.result);
+        });
+    });
+    reader.readAsDataURL(file);
+    return await promise;
+}
+
 class TextureSettings extends HTMLElement {
     constructor() {
         super();
@@ -26,18 +37,7 @@ class TextureSettings extends HTMLElement {
             <span class="or">OR</span>
             <button id="use-webcam">Use Webcam</button>
         `;
-    }
-
-    async make_data_url(file) {
-        const reader = new FileReader();
-        const promise = new Promise((resolve) => {
-            reader.addEventListener('load', (e) => {
-                resolve(e.target.result);
-            });
-        });
-        reader.readAsDataURL(file);
-        return await promise;
-    }
+    }    
 
     async make_image_texture(url) {
         return await new Promise((resolve) => {
@@ -50,7 +50,7 @@ class TextureSettings extends HTMLElement {
 
     async read_image(e) {
         const file = e.target.files[0];
-        const url = await this.make_data_url(file);
+        const url = await make_data_url(file);
         const texture = await this.make_image_texture(url);
         this._on_texture_changed(texture);
     }

@@ -17,6 +17,7 @@ import { find } from './core/ui_util.js';
 import './components/Checkbox.js';
 import './components/Dropdown.js';
 import './components/TextureSettings.js';
+import './components/CoefficientSettings.js';
 import './components/PointSymmetryPicker.js';
 
 window.log = new Log();
@@ -128,6 +129,10 @@ function change_texture(texture) {
     textures.texture = texture;
 }
 
+function change_coefficients(coefficients) {
+    shaders.set_coefficients(coefficients);
+}
+
 function add_point_symmetry(symmetry) {
     symmetries.add_symmetry(symmetry);
 }
@@ -138,11 +143,9 @@ function attach_handlers(sketch) {
     find('#texture-settings')
         .set_sketch(sketch)
         .on_texture_changed(change_texture);
-
-    find('#update-params').addEventListener('click', update_coefficients); 
-    find('#random-params').addEventListener('click', set_random_coefficients);
-    find('#quasi-params-5').addEventListener('click', set_quasi_coefficients(5));
-    find('#quasi-params-7').addEventListener('click', set_quasi_coefficients(7));
+    
+    find('#coefficient-settings')
+        .on_coefficients_changed(change_coefficients);
 
     find('#update-animation').addEventListener('click', update_animation); 
     find('#random-animation').addEventListener('click', random_animation);
@@ -196,44 +199,6 @@ function draw(sketch) {
     shaders.draw();
 }
 
-function set_random_coefficients() {
-    const terms = [];
-    for (let i = 0; i < 5; i++) {
-        const n = sketch.floor(sketch.random(-10, 10 + 1));
-        const m = sketch.floor(sketch.random(-10, 10 + 1));
-        const amp = 1.0 / (n - m + 1);
-        const phase = sketch.random(TWO_PI);
-        terms.push([n, m, amp, phase]);
-    }
-    
-    const coeffs = new Coefficients(terms);
-    shaders.set_coefficients(coeffs);
-}
-
-function set_quasi_coefficients(k) {
-    return () => {
-        const terms = [];
-        for (let i = 0; i < k; i++) {
-            const angle = i * TWO_PI / k;
-            const n = sketch.cos(angle);
-            const m = sketch.sin(angle);
-            const amp = 1.0 / k;
-            const phase = 0.0;
-            terms.push([n, m, amp, phase]);
-        }
-
-        const coeffs = new Coefficients(terms);
-        shaders.set_coefficients(coeffs);
-
-    };
-}
-
-function update_coefficients() {
-    const coeff_input = document.getElementById('coeffs');
-    const coefficients = parse_coefficients(coeff_input.value);
-    shaders.set_coefficients(coefficients); 
-}
-
 function update_animation() {
     const animation_input = document.getElementById('animation');
     const anim_params = parse_animation_params(animation_input.value);
@@ -254,42 +219,6 @@ function random_animation() {
 function no_animation() {
     const anim_params = new Array(MAX_TERMS).fill(0);
     shaders.set_animation(anim_params);
-}
-
-function * parse_tuples(text) {
-    const tuple_regex = /\(([^)]*)\)/g;
-    const separator_regex = /,\s*/;
-    
-    var match = tuple_regex.exec(text);
-    while(match) {
-        const tuple = match[1];
-        const fields = tuple.split(separator_regex);
-        const values = fields.map(parseFloat);
-        yield values;
-        match = tuple_regex.exec(text);
-    }
-}
-
-function parse_coefficients(text) {
-    const tuples = [];
-    for (const tuple of parse_tuples(text)) {
-        if (tuple.length < 2 || 4 < tuple.length) {
-            console.warn(`Coefficients should have 2-4 components, got ${tuple} instead`);
-        }
-
-        // Start with defaults and fill in what values are given
-        const coeffs = [0, 0, 1, 0,];
-        for (let i = 0; i < tuple.length; i++) {
-            coeffs[i] = tuple[i];
-        }
-        
-        const [n, m, amp, phase] = coeffs;
-        const adjusted_phase = mod(sketch.radians(phase), TWO_PI);
-        
-        tuples.push([n, m, amp, adjusted_phase]);
-    }
-    
-    return new Coefficients(tuples);
 }
 
 function parse_animation_params(text) {
