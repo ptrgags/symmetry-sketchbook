@@ -1,8 +1,8 @@
 import { common } from './common_glsl.js';
-import { ROSETTE_FUNC, FRIEZE_FUNC } from './PolynomialShader.js';
+import { ROSETTE_FUNC } from './PolynomialShader.js';
 import { SymmetryShader } from './Shader.js';
 
-const VERT_SHADER = (symmetry_func) => `
+const VERT_SHADER = `
 ${common.defines}
 attribute vec3 aPosition;
 attribute vec2 aTexCoord;
@@ -16,7 +16,7 @@ ${common.funcs_polar}
 ${common.funcs_view}
 ${common.funcs_animation}
 
-${symmetry_func}
+${ROSETTE_FUNC}
 ${common.funcs_standing_waves}
 
 void main() {
@@ -35,11 +35,6 @@ void main() {
     gl_Position = vec4(pos, 0.0, 1.0); 
 }
 `;
-
-const VERT_SHADERS = {
-    rosette: VERT_SHADER(ROSETTE_FUNC),
-    frieze: VERT_SHADER(FRIEZE_FUNC)
-};
 
 const FRAG_SHADER = `
 precision highp float;
@@ -68,10 +63,9 @@ void main() {
 }
 `;
 
-export class DemoShader extends SymmetryShader {
+export class TieDyeShader extends SymmetryShader {
     constructor(type) {
         super()
-        this._vert_shader = VERT_SHADERS[type];
         this._grid_model = undefined;
     }
 
@@ -80,7 +74,7 @@ export class DemoShader extends SymmetryShader {
     }
     
     init(sketch) {
-        super.init(sketch, this._vert_shader, FRAG_SHADER);
+        super.init(sketch, VERT_SHADER, FRAG_SHADER);
     }
     
     draw() {

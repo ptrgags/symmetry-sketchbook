@@ -1,7 +1,7 @@
 import { Log } from './Log.js';
 import { TextureManager, SymmetryManager, ShaderManager } from './core/managers.js';
 import { PolynomialShader } from './shaders/PolynomialShader.js';
-import { DemoShader } from './shaders/DemoShader.js';
+import { TieDyeShader } from './shaders/TieDyeShader.js';
 import { RosetteCurveShader } from './shaders/RosetteCurveShader.js';
 import { WallpaperShader } from './shaders/WallpaperShader.js';
 import { Coefficients } from './core/Coefficients.js';
@@ -38,13 +38,9 @@ const SHADER_OPTIONS = [{
     value: 'rosette-curve',
     shader: new RosetteCurveShader()
 }, {
-    label: '"Tie-dye" Rosettes',
+    label: 'Tie-dye Analogy',
     value: 'tie-dye-rosette',
-    shader: new DemoShader('rosette')
-}, {
-    label: '"Tie-dye" Friezes',
-    value: 'tie-dye-frieze',
-    shader: new DemoShader('frieze')
+    shader: new TieDyeShader()
 }, {
     label: 'Wallpaper',
     value: 'wallpaper',
