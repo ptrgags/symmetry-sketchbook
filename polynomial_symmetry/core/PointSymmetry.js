@@ -358,3 +358,8 @@ export class PointSymmetry {
         return true;
     }
 }
+
+export const DEFAULT_SYMMETRY = new PointSymmetry({
+    folds: 3,
+    input_rotation: 1
+});

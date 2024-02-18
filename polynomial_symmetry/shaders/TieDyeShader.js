@@ -9,6 +9,9 @@ attribute vec2 aTexCoord;
 
 ${common.uniforms}
 
+// Value from 0 to 1 indicating how much to "tie" the fabric
+uniform float tie;
+
 varying vec2 uv;
 varying vec2 warped_pos;
 
@@ -29,7 +32,7 @@ void main() {
     
     warped_pos = complex_to_clip(z);
     
-    float t = clamp(mouse_uv.x, 0.0, 1.0);
+    float t = clamp(tie, 0.0, 1.0);
     vec2 pos = mix(grid_position, warped_pos, t);
     
     gl_Position = vec4(pos, 0.0, 1.0); 
@@ -46,12 +49,15 @@ varying vec2 warped_pos;
 
 ${common.uniforms}
 
+// Value from 0 to 1 indicating how much to color the fabric
+uniform float dye;
+
 ${common.funcs_view}
 
 void main() {
     vec4 tex_color = texture2D(texture0, to_texture(warped_pos));
     vec4 grid_lines = vec4(1.0);
-    float t = clamp(mouse_uv.y, 0.0, 1.0);
+    float t = clamp(dye, 0.0, 1.0);
     vec4 color = mix(grid_lines, tex_color, t); 
     
     vec2 cell_uv = fract(GRID_WIDTH * uv);
@@ -64,7 +70,7 @@ void main() {
 `;
 
 export class TieDyeShader extends SymmetryShader {
-    constructor(type) {
+    constructor() {
         super()
         this._grid_model = undefined;
     }

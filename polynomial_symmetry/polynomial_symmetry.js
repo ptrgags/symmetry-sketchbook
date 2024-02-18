@@ -4,14 +4,15 @@ import { PolynomialShader } from './shaders/PolynomialShader.js';
 import { TieDyeShader } from './shaders/TieDyeShader.js';
 import { RosetteCurveShader } from './shaders/RosetteCurveShader.js';
 import { WallpaperShader } from './shaders/WallpaperShader.js';
-import { Coefficients } from './core/Coefficients.js';
-import { PointSymmetry } from './core/PointSymmetry.js';
+import { NO_ANIMATION } from './core/Animation.js';
+import { DEFAULT_COEFFICIENTS } from './core/Coefficients.js';
+import { DEFAULT_SYMMETRY } from './core/PointSymmetry.js';
 import { BUILT_IN_TEXTURES } from './core/Texture.js';
 import { 
     WallpaperSymmetry,
     LATTICE_BASIS_VECTORS
 } from './core/WallpaperSymmetry.js';
-import { MAX_TERMS, TWO_PI, mod } from './core/math_util.js';
+import { MAX_TERMS, TWO_PI } from './core/math_util.js';
 import { find } from './core/ui_util.js';
 
 import './components/Checkbox.js';
@@ -19,6 +20,7 @@ import './components/Dropdown.js';
 import './components/TextureSettings.js';
 import './components/CoefficientSettings.js';
 import './components/PointSymmetryPicker.js';
+
 
 window.log = new Log();
 const shaders = new ShaderManager();
@@ -71,22 +73,11 @@ const LATTICE_OPTIONS = [{
     value: 'random'
 }];
 
-const DEFAULT_COEFFICIENTS = new Coefficients([
-    [1, 1, 1, 0],
-    [3, 1, 1/3, 0],
-    [5, 1, 1/5, 0],
-    [6, 0, 1/6, 0],
-]);
 const DEFAULT_ANIMATION = [
     1,
     0.5,
     0.8
 ];
-
-const DEFAULT_SYMMETRY = new PointSymmetry({
-    folds: 3,
-    input_rotation: 1
-});
 
 let zoom = 3;
 const ZOOM_DELTA = 0.5;
@@ -213,8 +204,7 @@ function random_animation() {
 }
 
 function no_animation() {
-    const anim_params = new Array(MAX_TERMS).fill(0);
-    shaders.set_animation(anim_params);
+    shaders.set_animation(NO_ANIMATION);
 }
 
 function parse_animation_params(text) {

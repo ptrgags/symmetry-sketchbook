@@ -81,3 +81,10 @@ export class Coefficients {
         return new Coefficients(terms);
     }
 }
+
+export const DEFAULT_COEFFICIENTS = new Coefficients([
+    [1, 1, 1, 0],
+    [3, 1, 1/3, 0],
+    [5, 1, 1/5, 0],
+    [6, 0, 1/6, 0],
+]);
