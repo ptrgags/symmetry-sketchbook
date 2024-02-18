@@ -80,37 +80,8 @@ const DEFAULT_ANIMATION = [
 ];
 
 let zoom = 3;
+let pan = {x: 0, y: 0};
 const ZOOM_DELTA = 0.5;
-
-function preload(sketch) {
-    shaders.preload(sketch);
-}
-
-function setup(sketch) {
-    const canvas = sketch.createCanvas(500, 700, sketch.WEBGL);
-
-    canvas.parent('p5-canvas');
-    canvas.canvas.addEventListener('wheel', update_zoom);
-    sketch.textureMode(sketch.NORMAL);
-    
-    log.connect();
-
-    shaders.init(sketch);
-    shaders.set_uniform('zoom', zoom);
-    shaders.set_uniform('aspect', 5/7);
-    shaders.set_coefficients(DEFAULT_COEFFICIENTS);
-    shaders.set_animation(DEFAULT_ANIMATION);
-    shaders.disable_all();
-    shaders.set_show('poly-rosette', true);
-    
-    symmetries.add_symmetry(DEFAULT_SYMMETRY);
-    symmetries.update_panel();
-    
-    textures.init(sketch);
-    textures.texture = BUILT_IN_TEXTURES.checkerboard;
-    
-    attach_handlers(sketch);
-}
 
 function change_texture(texture) {
     textures.texture = texture;
@@ -181,11 +152,6 @@ function select_lattice(lattice_type) {
     shaders.set_lattice(e1, e2);
 }
 
-function draw(sketch) {
-    sketch.background(0, 40, 45);
-    shaders.draw();
-}
-
 function update_animation() {
     const animation_input = document.getElementById('animation');
     const anim_params = parse_animation_params(animation_input.value);
@@ -241,31 +207,56 @@ function update_zoom(event) {
     event.preventDefault();
 }
 
-function mouse_moved(sketch) {
-    const mouse_uv = [sketch.mouseX / sketch.width, 1.0 - sketch.mouseY / sketch.height];
-    shaders.set_mouse_uv(mouse_uv);
-    shaders.set_uniform('tie', mouse_uv[0]);
-    shaders.set_uniform('dye', mouse_uv[1]);
-}
-
-let pan = {x: 0, y: 0};
-function mouse_dragged(sketch, event) {
-    pan.x += event.movementX;
-    pan.y += event.movementY;
-
-    const pan_uv = [pan.x / sketch.width, -pan.y / sketch.height];
-    shaders.set_pan_uv(pan_uv);
-}
-
-function main() {
-    const closure = (sketch) => {
-        sketch.preload = () => preload(sketch);
-        sketch.setup = () => setup(sketch);
-        sketch.draw = () => draw(sketch);
-        sketch.mouseMoved = () => mouse_moved(sketch);
-        sketch.mouseDragged = (event) => mouse_dragged(sketch, event);
+export const sketch = (p) => {
+    p.preload = () => {
+        shaders.preload(p);
     }
-    window.sketch = new p5(closure);
-}
 
-main();
+    p.setup = () => {
+        const canvas = p.createCanvas(500, 700, p.WEBGL);
+
+        canvas.parent('p5-canvas');
+        canvas.canvas.addEventListener('wheel', update_zoom);
+        p.textureMode(p.NORMAL);
+
+        log.connect();
+
+        shaders.init(p);
+        shaders.set_uniform('zoom', zoom);
+        shaders.set_uniform('aspect', 5/7);
+        shaders.set_coefficients(DEFAULT_COEFFICIENTS);
+        shaders.set_animation(DEFAULT_ANIMATION);
+        shaders.disable_all();
+        shaders.set_show('poly-rosette', true);
+
+        symmetries.add_symmetry(DEFAULT_SYMMETRY);
+        symmetries.update_panel();
+
+        textures.init(p);
+        textures.texture = BUILT_IN_TEXTURES.checkerboard;
+
+        attach_handlers(p);
+    }
+
+    p.draw = () => {
+        p.background(0, 40, 45);
+        shaders.draw();
+    }
+
+    p.mouseMoved = () => {
+        const mouse_uv = [p.mouseX / p.width, 1.0 - p.mouseY / p.height];
+        shaders.set_mouse_uv(mouse_uv);
+
+        // Temporary until I remove tie dye shader
+        shaders.set_uniform('tie', mouse_uv[0]);
+        shaders.set_uniform('dye', mouse_uv[1]);
+    }
+
+    p.mouseDragged = (event) => {
+        pan.x += event.movementX;
+        pan.y += event.movementY;
+
+        const pan_uv = [pan.x / p.width, -pan.y / p.height];
+        shaders.set_pan_uv(pan_uv);
+    }
+}

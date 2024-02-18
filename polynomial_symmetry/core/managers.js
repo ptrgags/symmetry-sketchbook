@@ -24,7 +24,7 @@ export class TextureManager {
 
     set texture(tex) {
         const [w, h] = this._dims;
-        tex.init(sketch, w, h);
+        tex.init(this._sketch, w, h);
         this._texture = tex;
         this._shaders.set_texture(this._texture);
     }
