@@ -2,7 +2,7 @@ class Checkbox extends HTMLElement {
     constructor() {
         super();
         this._checked = false;
-        this._on_click = undefined;
+        this._on_change = undefined;
         const shadow = this.attachShadow({mode: 'open'});
         shadow.innerHTML = `
             <label id="label" for="checkbox">${this.innerHTML}</label>
@@ -15,20 +15,16 @@ class Checkbox extends HTMLElement {
     }
 
     connectedCallback() {
-        this.attach_handlers();
-    }
-
-    attach_handlers() {
-        this.shadowRoot.querySelector('#checkbox').addEventListener('click', (e) => {
+        this.shadowRoot.querySelector('#checkbox').addEventListener('change', (e) => {
             this._checked = e.target.checked;
-            if (this._on_click) {
-                this._on_click(this._checked);
+            if (this._on_change) {
+                this._on_change(this._checked);
             }
         });
     }
 
-    click(callback) {
-        this._on_click = callback;
+    on_change(callback) {
+        this._on_change = callback;
         return this;
     }
 }

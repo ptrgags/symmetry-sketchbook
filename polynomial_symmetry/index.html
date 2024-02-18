@@ -123,22 +123,7 @@
           <div id="current-symmetries"></div>
           <button id="clear-symmetries">Clear Symmetries</button>
           <!-- Point Symmetry only... but maybe too advanced? -->
-          <div id="point-symmetry-settings">
-            <h4>Add Point Symmetry</h4>
-            <label for="folds">k-fold rotations (k)</label>
-            <input id="folds" type="text" />
-            <label for="in-rotation">Input Rotation (l)</label>
-            <input id="in-rotation" type="text" />
-            <br />
-            <sym-checkbox id="inversion">Input inversion (p)</sym-checkbox>
-            <sym-checkbox id="in-reflection">Input Reflection(q)</sym-checkbox>
-            <br />
-            <label for="out-rotation">Output Rotation (u)</label>
-            <input id="out-rotation" type="text" />
-            <sym-checkbox id="out-reflection">Output Reflection (v)</sym-checkbox>
-            <br />
-            <button id="add-point-symmetry">Add Symmetry</button>
-          </div>
+          <sym-point-symmetry-picker id="add-point-symmetry"></sym-point-symmetry-picker>
           <!-- Wallpaper shaders only -->
           <div id="wallpaper-symmetry-settings">
             <h4>Add Wallpaper Symmetry</h4>

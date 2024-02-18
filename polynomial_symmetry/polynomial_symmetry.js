@@ -12,9 +12,11 @@ import {
     LATTICE_BASIS_VECTORS
 } from './WallpaperSymmetry.js';
 import { MAX_TERMS, TWO_PI, mod } from './math_util.js';
+import { find } from './core/ui_util.js';
 
 import './components/Checkbox.js';
 import './components/Dropdown.js';
+import './components/PointSymmetryPicker.js';
 
 window.log = new Log();
 const shaders = new ShaderManager();
@@ -135,8 +137,8 @@ function select_texture(name) {
     textures.texture = BUILT_IN_TEXTURES[name];
 }
 
-function find(query) {
-    return document.querySelector(query);
+function add_point_symmetry(symmetry) {
+    symmetries.add_symmetry(symmetry);
 }
 
 function attach_handlers() {
@@ -149,7 +151,6 @@ function attach_handlers() {
     find('#update-animation').addEventListener('click', update_animation); 
     find('#random-animation').addEventListener('click', random_animation);
     find('#no-animation').addEventListener('click', no_animation); 
-    find('#add-point-symmetry').addEventListener('click', add_point_symmetry); 
     find('#set-wallpaper-symmetry').addEventListener('click', set_wallpaper_symmetry); 
     find('#use-webcam').addEventListener('click', use_webcam); 
     find('#clear-symmetries').addEventListener('click', clear_symmetries);
@@ -158,17 +159,20 @@ function attach_handlers() {
     find('#toggle-wave-components').click(toggle_wave_components);
     find('#toggle-ref-geometry').click(update_ref_geometry);
 
+    find('#add-point-symmetry')
+        .on_submit(add_point_symmetry);
+
     find('#builtin-textures')
         .set_options(BUILT_IN_TEXTURE_OPTIONS)
-        .change(select_texture);
+        .on_change(select_texture);
 
     find('#shader-select')
         .set_options(SHADER_OPTIONS)
-        .change(select_shader);
+        .on_change(select_shader);
 
     find('#lattice-select')
         .set_options(LATTICE_OPTIONS)
-        .change(select_lattice);
+        .on_change(select_lattice);
 
     find('#wallpaper-select')
         .set_options(WallpaperSymmetry.preset_options)
@@ -321,34 +325,6 @@ function parse_animation_params(text) {
         params.push(parseFloat(token));
     }
     return params;
-}
-
-function value_or_default(query, default_val) {
-    const element = find(query);
-    const value = parseInt(element.value);
-    
-    if (isFinite(value)) {
-        return value;
-    }
-    
-    return default_val;
-}
-
-function checkbox_int(query) {
-    const checked = find(query).checked;
-    return checked ? 1 : 0
-}
-
-function add_point_symmetry() {
-    const symmetry = new PointSymmetry({
-        folds: value_or_default('#folds', 1),
-        input_rotation: value_or_default('#in-rotation', 0),
-        input_mirror: checkbox_int('#in-reflection'),
-        input_inversion: checkbox_int('#inversion'),
-        output_rotation: value_or_default('#out-rotation', 0),
-        output_mirror: checkbox_int('#out-reflection'),
-    });
-    symmetries.add_symmetry(symmetry);
 }
 
 function set_wallpaper_symmetry() {

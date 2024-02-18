@@ -60,7 +60,7 @@ class Dropdown extends HTMLElement {
         return this;
     }
 
-    change(callback) {
+    on_change(callback) {
         this._on_change = callback;
         return this;
     }
