@@ -98,3 +98,8 @@ export class WebcamTexture extends Texture {
         this._sketch.textureWrap(this._sketch.CLAMP);
     }
 }
+
+export const BUILT_IN_TEXTURES = {
+    checkerboard: new Checkerboard(),
+    half_planes: new HalfPlanes(),
+}

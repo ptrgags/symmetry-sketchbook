@@ -4,9 +4,9 @@ import { PolynomialShader } from './shaders/PolynomialShader.js';
 import { DemoShader } from './shaders/DemoShader.js';
 import { RosetteCurveShader } from './shaders/RosetteCurveShader.js';
 import { WallpaperShader } from './shaders/WallpaperShader.js';
-import { Checkerboard, HalfPlanes, WebcamTexture } from './Texture.js';
 import { Coefficients } from './Coefficients.js';
 import { PointSymmetry } from './PointSymmetry.js';
+import { BUILT_IN_TEXTURES } from './Texture.js';
 import { 
     WallpaperSymmetry,
     LATTICE_BASIS_VECTORS
@@ -16,6 +16,7 @@ import { find } from './core/ui_util.js';
 
 import './components/Checkbox.js';
 import './components/Dropdown.js';
+import './components/TextureSettings.js';
 import './components/PointSymmetryPicker.js';
 
 window.log = new Log();
@@ -73,16 +74,6 @@ const LATTICE_OPTIONS = [{
     value: 'random'
 }];
 
-const BUILT_IN_TEXTURES = {
-    checkerboard: new Checkerboard(),
-    half_planes: new HalfPlanes()
-};
-const BUILT_IN_TEXTURE_OPTIONS = Object.keys(BUILT_IN_TEXTURES).map(key => {
-    return {label: key, value: key};
-});
-
-const webcam = new WebcamTexture();
-
 const DEFAULT_COEFFICIENTS = new Coefficients([
     [1, 1, 1, 0],
     [3, 1, 1/3, 0],
@@ -130,19 +121,24 @@ function setup(sketch) {
     textures.init(sketch);
     textures.texture = BUILT_IN_TEXTURES.checkerboard;
     
-    attach_handlers();
+    attach_handlers(sketch);
 }
 
-function select_texture(name) {
-    textures.texture = BUILT_IN_TEXTURES[name];
+function change_texture(texture) {
+    textures.texture = texture;
 }
 
 function add_point_symmetry(symmetry) {
     symmetries.add_symmetry(symmetry);
 }
 
-function attach_handlers() {
-    find('#image-input').addEventListener('change', upload_image); 
+function attach_handlers(sketch) {
+    // The TextureSettings UI needs a reference to the sketch in order
+    // to load images as p5.Image
+    find('#texture-settings')
+        .set_sketch(sketch)
+        .on_texture_changed(change_texture);
+
     find('#update-params').addEventListener('click', update_coefficients); 
     find('#random-params').addEventListener('click', set_random_coefficients);
     find('#quasi-params-5').addEventListener('click', set_quasi_coefficients(5));
@@ -152,7 +148,6 @@ function attach_handlers() {
     find('#random-animation').addEventListener('click', random_animation);
     find('#no-animation').addEventListener('click', no_animation); 
     find('#set-wallpaper-symmetry').addEventListener('click', set_wallpaper_symmetry); 
-    find('#use-webcam').addEventListener('click', use_webcam); 
     find('#clear-symmetries').addEventListener('click', clear_symmetries);
 
     find('#toggle-standing-waves').click(toggle_standing_waves);
@@ -161,10 +156,6 @@ function attach_handlers() {
 
     find('#add-point-symmetry')
         .on_submit(add_point_symmetry);
-
-    find('#builtin-textures')
-        .set_options(BUILT_IN_TEXTURE_OPTIONS)
-        .on_change(select_texture);
 
     find('#shader-select')
         .set_options(SHADER_OPTIONS)
@@ -176,10 +167,6 @@ function attach_handlers() {
 
     find('#wallpaper-select')
         .set_options(WallpaperSymmetry.preset_options)
-}
-
-function use_webcam() {
-    textures.texture = webcam;
 }
 
 function toggle_standing_waves(checked) {
@@ -207,16 +194,6 @@ function select_lattice(lattice_type) {
 function draw(sketch) {
     sketch.background(0, 40, 45);
     shaders.draw();
-}
-
-function upload_image(e) {
-    const file = e.target.files[0];
-    const reader = new FileReader();
-    reader.addEventListener('load', (e) => {
-        const url = e.target.result;
-        textures.load_image(url);
-    });
-    reader.readAsDataURL(file);
 }
 
 function set_random_coefficients() {

@@ -83,17 +83,7 @@
         <div id="p5-canvas"></div>
       </div>
       <div class="half-page">
-        <div id="texture-settings">
-          <h3>Texture Settings</h3>
-          <sym-dropdown id="builtin-textures" label="Choose a built-in texture"></sym-dropdown>
-          <br />
-          <span class="or">OR</span>
-          <label for="image-input">Choose a PNG or JPEG image texture:</label>
-          <input id="image-input" type="file" accept="image/png, image/jpeg" />
-          <br />
-          <span class="or">OR</span>
-          <button id="use-webcam">Use Webcam</button>
-        </div>
+        <sym-texture-settings id="texture-settings"></sym-texture-settings>
         <div id="coefficient-settings">
           <h3>Coefficient Settings</h3>
           <div id="current-coefficients"></div>

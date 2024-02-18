@@ -32,7 +32,7 @@ class PointSymmetryPicker extends HTMLElement {
             <sym-checkbox id="out-reflection">Output Reflection (v)</sym-checkbox>
             <br />
             <button id="add-point-symmetry">Add Symmetry</button>
-        `
+        `;
     }
 
     connectedCallback() {
