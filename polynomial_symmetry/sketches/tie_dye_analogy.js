@@ -43,17 +43,14 @@ function update_animation(frame, state) {
         state.transition_percent = 0.0;
 
         if (elapsed_frames >= PAUSING_FRAMES) {
-            console.log("Done pausing!");
             state.animation_state = AnimationState.ANIMATING;
             state.reference_frame = frame;
         }
     } else if (state.animation_state === AnimationState.ANIMATING) {
         // Create an interpolation factor based on the frame count.
         state.transition_percent = elapsed_frames / (ANIMATING_FRAMES - 1);
-        console.log("animating:", state.transition_percent);
 
         if (elapsed_frames >= ANIMATING_FRAMES) {
-            console.log("Transition!");
             state.tie_dye_state = (state.tie_dye_state + 1) % 4;
             state.animation_state = AnimationState.PAUSING;
             state.reference_frame = frame;
@@ -102,14 +99,16 @@ export const sketch = (p) => {
         p.createCanvas(500, 700, p.WEBGL);
         p.textureMode(p.NORMAL);
 
-        texture.init(p, 256, 256);
-
         shader.init(p);
+        shader.set_uniform('zoom', 3);
+        shader.set_uniform('aspect', 5/7);
         shader.symmetries = [DEFAULT_SYMMETRY];
-        shader.set_texture(texture);
         shader.set_coefficients(DEFAULT_COEFFICIENTS);
         shader.set_animation(NO_ANIMATION);
         shader.disable();
+
+        texture.init(p, 256, 256);
+        shader.set_texture(texture);
     }
 
     p.draw = () => {
@@ -117,7 +116,6 @@ export const sketch = (p) => {
         update_uniforms(shader, state);
 
         p.background(0, 40, 45);
-        //p.image(texture.texture, 0, 0, 256, 256);
         shader.draw();
     }
 };

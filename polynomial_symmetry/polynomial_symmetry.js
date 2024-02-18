@@ -244,6 +244,8 @@ function update_zoom(event) {
 function mouse_moved(sketch) {
     const mouse_uv = [sketch.mouseX / sketch.width, 1.0 - sketch.mouseY / sketch.height];
     shaders.set_mouse_uv(mouse_uv);
+    shaders.set_uniform('tie', mouse_uv[0]);
+    shaders.set_uniform('dye', mouse_uv[1]);
 }
 
 let pan = {x: 0, y: 0};

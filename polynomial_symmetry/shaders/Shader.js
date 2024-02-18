@@ -24,6 +24,10 @@ export class Shader {
     }
 
     enable() {
+        if (!this._sketch) {
+            return;
+        }
+
         if (!this._enabled) {
             this._sketch.shader(this._shader);
             this._enabled = true;
@@ -31,6 +35,10 @@ export class Shader {
     }
 
     disable() {
+        if (!this._sketch) {
+            return;
+        }
+
         if (this._enabled) {
             this._sketch.resetShader();
             this._enabled = false;
@@ -38,6 +46,10 @@ export class Shader {
     }
 
     set_uniform(name, value) {
+        if (!this._sketch || !this._shader) {
+            return;
+        }
+
         this.enable();
         this._shader.setUniform(name, value);
     }
