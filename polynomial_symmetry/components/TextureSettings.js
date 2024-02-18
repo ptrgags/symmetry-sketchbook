@@ -1,4 +1,4 @@
-import { BUILT_IN_TEXTURES, ImageTexture, WebcamTexture } from "../Texture.js";
+import { BUILT_IN_TEXTURES, ImageTexture, WebcamTexture } from "../core/Texture.js";
 import { shadow_event } from "../core/ui_util.js";
 
 const BUILT_IN_TEXTURE_OPTIONS = Object.keys(BUILT_IN_TEXTURES).map(key => {

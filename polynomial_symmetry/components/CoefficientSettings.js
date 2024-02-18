@@ -1,6 +1,6 @@
-import { Coefficients } from "../Coefficients.js";
+import { Coefficients } from "../core/Coefficients.js";
 import { shadow_event } from "../core/ui_util.js";
-import { mod, radians, TWO_PI } from "../math_util.js";
+import { mod, radians, TWO_PI } from "../core/math_util.js";
 
 function * parse_tuples(text) {
     const tuple_regex = /\(([^)]*)\)/g;

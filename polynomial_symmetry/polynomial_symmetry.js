@@ -1,17 +1,17 @@
 import { Log } from './Log.js';
-import { TextureManager, SymmetryManager, ShaderManager } from './managers.js';
+import { TextureManager, SymmetryManager, ShaderManager } from './core/managers.js';
 import { PolynomialShader } from './shaders/PolynomialShader.js';
 import { DemoShader } from './shaders/DemoShader.js';
 import { RosetteCurveShader } from './shaders/RosetteCurveShader.js';
 import { WallpaperShader } from './shaders/WallpaperShader.js';
-import { Coefficients } from './Coefficients.js';
-import { PointSymmetry } from './PointSymmetry.js';
-import { BUILT_IN_TEXTURES } from './Texture.js';
+import { Coefficients } from './core/Coefficients.js';
+import { PointSymmetry } from './core/PointSymmetry.js';
+import { BUILT_IN_TEXTURES } from './core/Texture.js';
 import { 
     WallpaperSymmetry,
     LATTICE_BASIS_VECTORS
-} from './WallpaperSymmetry.js';
-import { MAX_TERMS, TWO_PI, mod } from './math_util.js';
+} from './core/WallpaperSymmetry.js';
+import { MAX_TERMS, TWO_PI, mod } from './core/math_util.js';
 import { find } from './core/ui_util.js';
 
 import './components/Checkbox.js';

@@ -1,4 +1,4 @@
-import {MAX_TERMS} from '../math_util.js';
+import {MAX_TERMS} from '../core/math_util.js';
 
 export const common = {};
 

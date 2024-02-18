@@ -1,5 +1,5 @@
 import { shadow_event, value_or_default} from "../core/ui_util.js";
-import { PointSymmetry } from "../PointSymmetry.js";
+import { PointSymmetry } from "../core/PointSymmetry.js";
 
 import "./Checkbox.js";
 
