@@ -173,8 +173,8 @@ class CoefficientPicker extends HTMLElement {
     }
 
     connectedCallback() {
-        const parent = this.shadowRoot.getElementById("picker");
-        this._sketch = new p5(sketch, parent);
+        const container = this.shadowRoot.getElementById("picker");
+        this._sketch = new p5(sketch, container);
     }
 
     on_change(callback) {
