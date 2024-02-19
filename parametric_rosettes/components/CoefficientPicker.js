@@ -63,6 +63,9 @@ function snap_pixel(pixel) {
     return to_pixel(snapped_z);
 }
 
+// p5 sketch to make custom UI for selecting the coefficient.
+// the sketch will have a couple extra callbacks set so
+// CoefficientPicker can interact with it.
 const sketch = (p) => {
     const state = {
         coefficient: {
@@ -100,12 +103,19 @@ const sketch = (p) => {
             state.coefficient.real,
             state.coefficient.imag,
         ]);
-        p.stroke(255, 127, 0);
+        const orange = p.color(255, 127, 0);
+        p.stroke(orange);
+        p.noFill();
         p.line(cx, cy, saved_x, saved_y);
+        p.fill(orange);
+        p.noStroke();
+        const DOT_RADIUS = 4;
+        p.circle(saved_x, saved_y, 2 * DOT_RADIUS);
 
         // Draw a line to the mouse, snapping to
         // geometry
         p.stroke(255);
+        p.noFill();
         const [mx, my] = snap_pixel([p.mouseX, p.mouseY]);
         p.line(cx, cy, mx, my);
     };
