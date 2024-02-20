@@ -193,6 +193,19 @@ class CoefficientGrid extends HTMLElement {
         }
     }
 
+    dispatch_select(index, coefficient) {
+        const [amp, phase] = coefficient;
+        this.dispatchEvent(
+            new CustomEvent("coefficient-selected", {
+                detail: {
+                    amp,
+                    phase,
+                    index,
+                },
+            })
+        );
+    }
+
     connectedCallback() {
         const container = this.shadowRoot.getElementById("container");
         this._sketch = new p5(sketch, container);
@@ -200,16 +213,7 @@ class CoefficientGrid extends HTMLElement {
             index,
             coefficient
         ) => {
-            const [amp, phase] = coefficient;
-            this.dispatchEvent(
-                new CustomEvent("coefficient-selected", {
-                    detail: {
-                        amp,
-                        phase,
-                        index,
-                    },
-                })
-            );
+            this.dispatch_select(index, coefficient);
         };
 
         this.resize();
