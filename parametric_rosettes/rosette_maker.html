@@ -13,14 +13,20 @@
         const output = document.getElementById("coefficient");
 
         grid.addEventListener("coefficient-selected", (e) => {
-          console.log(e.detail);
+          picker.coefficient = e.detail;
         });
-        picker.on_change((coefficient) => {
+
+        picker.addEventListener("change", (e) => {
+          const coefficient = e.detail;
+
+          // Display the selected value on the page
           const amp = coefficient.amplitude.toPrecision(2);
           const phase = coefficient.phase.toPrecision(2);
           const real = coefficient.real.toPrecision(2);
           const imag = coefficient.imag.toPrecision(3);
           output.innerHTML = `Amplitude: ${amp}, phase: ${phase}<br/>(${real} + ${imag} i)`;
+
+          // Update the currently selected coefficient
           grid.update_selected([coefficient.amplitude, coefficient.phase]);
         });
       });

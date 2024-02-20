@@ -67,17 +67,28 @@ function snap_pixel(pixel) {
 // the sketch will have a couple extra callbacks set so
 // CoefficientPicker can interact with it.
 const sketch = (p) => {
-    const state = {
+    p.state = {
         coefficient: {
             real: 0,
             imag: 0,
+            amp: 0,
             phase: 0,
-            angle: 0,
         },
+        on_coefficient_changed: () => {},
     };
 
-    // The component will set this callback
-    p._on_coefficient_changed = undefined;
+    p.set_coefficient = (coefficient) => {
+        const { amp, phase } = coefficient;
+        const real = amp * Math.cos(phase);
+        const imag = amp * Math.sin(phase);
+
+        p.state.coefficient = {
+            real,
+            imag,
+            amp,
+            phase,
+        };
+    };
 
     p.setup = () => {
         const canvas = p.createCanvas(WIDTH, HEIGHT);
@@ -100,8 +111,8 @@ const sketch = (p) => {
 
         // Draw a line and dot for the current coefficient
         const [saved_x, saved_y] = to_pixel([
-            state.coefficient.real,
-            state.coefficient.imag,
+            p.state.coefficient.real,
+            p.state.coefficient.imag,
         ]);
         const orange = p.color(255, 127, 0);
         p.stroke(orange);
@@ -141,15 +152,15 @@ const sketch = (p) => {
         );
         const phase = Math.atan2(imag_snapped, real_snapped);
 
-        state.coefficient = {
+        p.state.coefficient = {
             real: real_snapped,
             imag: imag_snapped,
             amplitude,
             phase,
         };
 
-        if (p._on_coefficient_changed) {
-            p._on_coefficient_changed(state.coefficient);
+        if (p.state.on_coefficient_changed) {
+            p.state.on_coefficient_changed(p.state.coefficient);
         }
 
         return false;
@@ -172,14 +183,30 @@ class CoefficientPicker extends HTMLElement {
         shadow.innerHTML = `<div id="picker"></div>`;
     }
 
+    get coefficient() {
+        if (!this._sketch) {
+            return undefined;
+        }
+        return this._sketch.state.coefficient;
+    }
+
+    set coefficient(value) {
+        if (!this._sketch) {
+            throw new Error("Can't set coefficient before sketch is created!");
+        }
+
+        this._sketch.set_coefficient(value);
+    }
+
     connectedCallback() {
         const container = this.shadowRoot.getElementById("picker");
         this._sketch = new p5(sketch, container);
-    }
 
-    on_change(callback) {
-        this._sketch._on_coefficient_changed = callback;
-        return this;
+        this._sketch.state.on_coefficient_changed = (coefficient) => {
+            this.dispatchEvent(
+                new CustomEvent("change", { detail: coefficient })
+            );
+        };
     }
 }
 
