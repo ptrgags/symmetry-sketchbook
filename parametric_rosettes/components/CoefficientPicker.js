@@ -10,14 +10,14 @@ const PIXELS_PER_UNIT = WIDTH / (2.0 * SCALE);
 function to_complex(pixel) {
     const [x, y] = pixel;
     const real = (x - WIDTH / 2) / PIXELS_PER_UNIT;
-    const imag = (y - HEIGHT / 2) / PIXELS_PER_UNIT;
+    const imag = -(y - HEIGHT / 2) / PIXELS_PER_UNIT;
     return [real, imag];
 }
 
 function to_pixel(complex) {
     const [real, imag] = complex;
     const x = real * PIXELS_PER_UNIT + WIDTH / 2;
-    const y = imag * PIXELS_PER_UNIT + HEIGHT / 2;
+    const y = -imag * PIXELS_PER_UNIT + HEIGHT / 2;
     return [x, y];
 }
 

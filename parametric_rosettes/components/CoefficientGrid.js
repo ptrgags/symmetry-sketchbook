@@ -7,12 +7,15 @@ const sketch = (p) => {
             cols: 1,
         },
         coefficients: [],
+        selected_index: 0,
+        coefficient_selected_callback: () => {},
     };
 
     p.resize_grid = (dimensions) => {
         p.state.dimensions = dimensions;
         p.resizeCanvas(dimensions.width, dimensions.height);
         p.state.coefficients = [];
+        p.state.selected_index = 0;
     };
 
     p.set_coefficients = (coefficients) => {
@@ -24,6 +27,10 @@ const sketch = (p) => {
         }
 
         p.state.coefficients = coefficients;
+    };
+
+    p.update_selected_coefficient = (coefficient) => {
+        p.state.coefficients[p.state.selected_index] = coefficient;
     };
 
     p.setup = () => {
@@ -73,6 +80,10 @@ const sketch = (p) => {
                     const x = center_x + real * pixels_per_unit_x;
                     const y = center_y + imag * pixels_per_unit_y;
 
+                    p.stroke(255, 127, 0);
+                    p.noFill();
+                    p.line(center_x, center_y, x, y);
+
                     p.noStroke();
                     p.fill(255, 127, 0);
                     p.circle(x, y, 8);
@@ -82,6 +93,40 @@ const sketch = (p) => {
                     p.circle(center_x, center_y, 8);
                 }
             }
+        }
+
+        const selected_index = p.state.selected_index;
+        const selected_row = Math.floor(selected_index / dimensions.cols);
+        const selected_col = selected_index % dimensions.cols;
+        p.stroke(255, 255, 0);
+        p.noFill();
+        p.rect(
+            selected_col * cell_width,
+            selected_row * cell_height,
+            cell_width,
+            cell_height
+        );
+    };
+
+    p.mouseReleased = () => {
+        const dimensions = p.state.dimensions;
+
+        const cell_width = dimensions.width / dimensions.cols;
+        const cell_height = dimensions.height / dimensions.rows;
+
+        const col = Math.floor(p.mouseX / cell_width);
+        const row = Math.floor(p.mouseY / cell_height);
+
+        if (
+            0 <= col &&
+            col < dimensions.cols &&
+            0 <= row &&
+            row < dimensions.rows
+        ) {
+            const index = row * dimensions.cols + col;
+            p.state.selected_index = index;
+            const coefficient = p.state.coefficients[index];
+            p.state.coefficient_selected_callback(index, coefficient);
         }
     };
 };
@@ -151,10 +196,24 @@ class CoefficientGrid extends HTMLElement {
     connectedCallback() {
         const container = this.shadowRoot.getElementById("container");
         this._sketch = new p5(sketch, container);
+        this._sketch.state.coefficient_selected_callback = (
+            index,
+            coefficient
+        ) => {
+            const [amp, phase] = coefficient;
+            this.dispatchEvent(
+                new CustomEvent("coefficient-selected", {
+                    detail: {
+                        amp,
+                        phase,
+                        index,
+                    },
+                })
+            );
+        };
+
         this.resize();
         this.change_coefficients();
-
-        console.log("connected");
     }
 
     resize() {
@@ -171,6 +230,10 @@ class CoefficientGrid extends HTMLElement {
         }
 
         this._sketch.set_coefficients(this._coefficients);
+    }
+
+    update_selected(coefficient) {
+        this._sketch.update_selected_coefficient(coefficient);
     }
 }
 

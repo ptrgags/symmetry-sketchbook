@@ -8,14 +8,20 @@
       import "./components/CoefficientGrid.js";
 
       window.addEventListener("load", () => {
+        const grid = document.getElementById("coefficient-grid");
         const picker = document.getElementById("coefficient-picker");
         const output = document.getElementById("coefficient");
+
+        grid.addEventListener("coefficient-selected", (e) => {
+          console.log(e.detail);
+        });
         picker.on_change((coefficient) => {
           const amp = coefficient.amplitude.toPrecision(2);
           const phase = coefficient.phase.toPrecision(2);
           const real = coefficient.real.toPrecision(2);
           const imag = coefficient.imag.toPrecision(3);
           output.innerHTML = `Amplitude: ${amp}, phase: ${phase}<br/>(${real} + ${imag} i)`;
+          grid.update_selected([coefficient.amplitude, coefficient.phase]);
         });
       });
     </script>
@@ -27,7 +33,7 @@
       height="100"
       rows="1"
       cols="3"
-      coefficients="1,0,0.8,0.3,0.4,0.2"
+      coefficients="1,0,0.8,0.3,0.4,-2.0"
     ></sym-coefficient-grid>
     <sym-coefficient-picker id="coefficient-picker"></sym-coefficient-picker>
     <span id="coefficient"></span>
