@@ -1,4 +1,4 @@
-import { ComplexPolynomial } from "./ComplexPolynomial.js";
+import { ComplexPolynomial } from "../complex_rosettes/ComplexPolynomial.js";
 
 const PI = Math.PI;
 export const ROSETTES = {
