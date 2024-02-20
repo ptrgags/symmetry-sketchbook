@@ -6,6 +6,7 @@
     <script type="module">
       import "./components/CoefficientPicker.js";
       import "./components/CoefficientGrid.js";
+      import "./components/ParametricRosetteViewer.js";
 
       window.addEventListener("load", () => {
         const grid = document.getElementById("coefficient-grid");
@@ -35,13 +36,14 @@
   <body>
     <sym-coefficient-grid
       id="coefficient-grid"
-      width="300"
-      height="100"
+      width="550"
+      height="50"
       rows="1"
-      cols="3"
+      cols="11"
       coefficients="1,0,0.8,0.3,0.4,-2.0"
     ></sym-coefficient-grid>
     <sym-coefficient-picker id="coefficient-picker"></sym-coefficient-picker>
     <span id="coefficient"></span>
+    <sym-parametric-rosette show-arm preset="2k + 1"></sym-parametric-rosette>
   </body>
 </html>

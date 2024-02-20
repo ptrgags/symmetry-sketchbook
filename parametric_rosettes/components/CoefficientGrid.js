@@ -20,13 +20,15 @@ const sketch = (p) => {
 
     p.set_coefficients = (coefficients) => {
         const dimensions = p.state.dimensions;
-        if (coefficients.length !== dimensions.rows * dimensions.cols) {
-            throw new Error(
-                "The number of coefficients must be the same as the grid size"
-            );
-        }
+        const new_coefficients = new Array(
+            dimensions.rows * dimensions.cols
+        ).fill([0, 0]);
 
-        p.state.coefficients = coefficients;
+        const length = Math.min(coefficients.length, new_coefficients.length);
+        for (let i = 0; i < length; i++) {
+            new_coefficients[i] = coefficients[i];
+        }
+        p.state.coefficients = new_coefficients;
     };
 
     p.update_selected_coefficient = (coefficient) => {
@@ -73,7 +75,10 @@ const sketch = (p) => {
                     2.0 * pixels_per_unit_y
                 );
 
-                if (coefficient) {
+                // Check if the amplitude is nonzero
+                const coefficient_nonzero = coefficient && coefficient[0] !== 0;
+
+                if (coefficient_nonzero) {
                     const [amplitude, phase] = coefficient;
                     const real = amplitude * p.cos(phase);
                     const imag = amplitude * -p.sin(phase);
