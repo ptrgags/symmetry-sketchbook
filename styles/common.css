@@ -1,0 +1,63 @@
+:root {
+    --color-background-dark: #1d3c55;
+    --color-background: #224866;
+
+    --color-text: #e7e7e7;
+
+    --color-accent-dark: #abc45c;
+    --color-accent: #c1df56;
+
+    --color-accent2: #9d25ee;
+}
+
+body {
+    padding: 0;
+    margin: 0;
+    color: var(--color-text);
+    background-color: var(--color-background-dark);
+    font-family: sans-serif;
+}
+
+a:link {
+    color: var(--color-accent);
+}
+
+a:visited {
+    color: var(--color-accent-dark);
+}
+
+a:hover {
+    color: var(--color-accent2);
+}
+
+a:active {
+    color: var(--color-accent);
+}
+
+.horizontal {
+    display: flex;
+    flex-wrap: wrap;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+}
+
+.vertical {
+    display: flex;
+    flex-wrap: wrap;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+}
+
+/* Container where all the content is in a single column */
+.one-column {
+    width: 50%;
+    margin: 0 auto;
+}
+
+/* One of two columns */
+.two-column {
+    width: 40%;
+    display: inline-block;
+}

@@ -1,5 +1,5 @@
-import { FourierSeries } from "../FourierSeries.js";
-import { ROSETTES } from "../patterns.js";
+import { FourierSeries } from "../../curve_symmetry/FourierSeries.js";
+import { ROSETTES } from "../../curve_symmetry/patterns.js";
 
 const MAX_X = 2.0;
 const PERIOD = 800;

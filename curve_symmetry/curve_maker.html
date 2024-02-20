@@ -1,12 +1,13 @@
+<!DOCTYPE html>
 <html>
   <head>
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <script language="javascript" type="text/javascript" src="../libraries/p5-0.10.2.min.js"></script>
     <script type="module">
-      import "./components/CoefficientPicker.js";
-      import "./components/CoefficientGrid.js";
-      import "./components/ParametricRosetteViewer.js";
+      import "../src/components/CoefficientPicker.js";
+      import "../src/components/CoefficientGrid.js";
+      import "../src/components/ParametricRosetteViewer.js";
 
       window.addEventListener("load", () => {
         const grid = document.getElementById("coefficient-grid");
@@ -59,27 +60,16 @@
         });
       });
     </script>
+    <link rel="stylesheet" href="../styles/common.css" />
     <style>
-      .row {
-        display: flex;
-        flex-direction: row;
-        flex-wrap: wrap;
-        /*align-items: center;*/
-        justify-content: center;
-      }
-
-      .ui {
-        width: 50%;
-      }
-
-      .sketch {
-        width: 50%;
+      .container {
+        width: 100%;
       }
     </style>
   </head>
   <body>
-    <div class="row">
-      <div class="ui">
+    <div class="container row">
+      <div class="two-column">
         <sym-coefficient-grid
           id="coefficient-grid"
           width="550"
@@ -91,7 +81,7 @@
         <sym-coefficient-picker id="coefficient-picker"></sym-coefficient-picker>
         <span id="coefficient"></span>
       </div>
-      <div class="sketch">
+      <div class="two-column">
         <sym-parametric-rosette id="rosette" show-arm="false" preset="3k + 1"></sym-parametric-rosette>
       </div>
     </div>

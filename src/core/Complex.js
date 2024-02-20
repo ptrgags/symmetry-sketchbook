@@ -1,9 +1,12 @@
+/**
+ * The complex number a + bi;
+ */
 export class Complex {
     constructor(real, imag) {
         this.real = real;
         this.imag = imag;
     }
-    
+
     /**
      * Complex modulus (length)
      *
@@ -12,7 +15,7 @@ export class Complex {
     get mod() {
         return Math.sqrt(this.real * this.real + this.imag * this.imag);
     }
-    
+
     /**
      * Argument of the complex number (angle around the circle)
      *
@@ -25,11 +28,11 @@ export class Complex {
         if (original >= 0) {
             return original;
         }
-        
+
         // I want the results from [0, 2pi], not [-pi, pi]
-        return 2.0 * Math.PI + original; 
+        return 2.0 * Math.PI + original;
     }
-    
+
     /**
      * Complex conjugate:
      * conj(a + bi) = a - bi
@@ -37,7 +40,7 @@ export class Complex {
     get conj() {
         return new Complex(this.real, -this.imag);
     }
-    
+
     /**
      * Complex numbers add component-wise
      *
@@ -46,9 +49,9 @@ export class Complex {
     add(other) {
         const x = this.real + other.real;
         const y = this.imag + other.imag;
-        return new Complex(x, y); 
+        return new Complex(x, y);
     }
-    
+
     /**
      * Complex numbers multiply with the foil method, but
      * i^2 = -1 so one of the signs is flipped.
@@ -60,7 +63,7 @@ export class Complex {
         const y = this.imag * other.real + this.real * other.imag;
         return new Complex(x, y);
     }
-    
+
     /**
      * To raise a complex number to a power, raise the modulus
      * to the power, but multiply the angle instead.
@@ -72,7 +75,7 @@ export class Complex {
         const new_theta = theta * n;
         return Complex.from_polar(new_r, new_theta);
     }
-    
+
     static from_polar(r, theta) {
         const x = r * Math.cos(theta);
         const y = r * Math.sin(theta);
