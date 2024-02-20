@@ -18,6 +18,32 @@
           picker.coefficient = e.detail;
         });
 
+        grid.addEventListener("coefficients-changed", (e) => {
+          const { coefficients } = e.detail;
+
+          const term_strings = [];
+          for (let i = 0; i < coefficients.length; i++) {
+            const [amp, phase] = coefficients[i];
+
+            // Skip empty terms
+            if (amp === 0) {
+              continue;
+            }
+
+            // There are 11 coefficients, corresponding to frequencies
+            // k = [-5, 5]
+            const k = i - 5;
+
+            // Force a 5k + 2 symmetry:
+            const n = 5 * k + 2;
+            const term_string = `${n},${amp},${phase}`;
+            term_strings.push(term_string);
+          }
+
+          const terms = term_strings.join(":");
+          rosette.setAttribute("terms", terms);
+        });
+
         picker.addEventListener("change", (e) => {
           const coefficient = e.detail;
 
@@ -33,19 +59,41 @@
         });
       });
     </script>
+    <style>
+      .row {
+        display: flex;
+        flex-direction: row;
+        flex-wrap: wrap;
+        /*align-items: center;*/
+        justify-content: center;
+      }
+
+      .ui {
+        width: 50%;
+      }
+
+      .sketch {
+        width: 50%;
+      }
+    </style>
   </head>
   <body>
-    <sym-coefficient-grid
-      id="coefficient-grid"
-      width="550"
-      height="50"
-      rows="1"
-      cols="11"
-      coefficients="1,0,0.8,0.3,0.4,-2.0"
-    ></sym-coefficient-grid>
-    <sym-coefficient-picker id="coefficient-picker"></sym-coefficient-picker>
-    <span id="coefficient"></span>
-    <sym-parametric-rosette id="rosette" show-arm="false" preset="3k + 1"></sym-parametric-rosette>
-    <sym-parametric-rosette show-arm="true" preset="2k + 1"></sym-parametric-rosette>
+    <div class="row">
+      <div class="ui">
+        <sym-coefficient-grid
+          id="coefficient-grid"
+          width="550"
+          height="50"
+          rows="1"
+          cols="11"
+          coefficients="0,0,0,0,0,0,0,0,0,0,0,0,1,0,0.8,0.2,0.6,0.3,0,0,0,0"
+        ></sym-coefficient-grid>
+        <sym-coefficient-picker id="coefficient-picker"></sym-coefficient-picker>
+        <span id="coefficient"></span>
+      </div>
+      <div class="sketch">
+        <sym-parametric-rosette id="rosette" show-arm="false" preset="3k + 1"></sym-parametric-rosette>
+      </div>
+    </div>
   </body>
 </html>

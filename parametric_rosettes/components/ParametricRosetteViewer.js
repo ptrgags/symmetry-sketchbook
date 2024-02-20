@@ -1,3 +1,4 @@
+import { FourierSeries } from "../FourierSeries.js";
 import { ROSETTES } from "../patterns.js";
 
 const MAX_X = 2.0;
@@ -35,6 +36,15 @@ const sketch = (p) => {
     p.set_preset = (id) => {
         const pattern = ROSETTES[id];
         p.set_pattern(pattern);
+    };
+
+    p.set_terms = (term_string) => {
+        try {
+            const pattern = FourierSeries.from_string(term_string);
+            p.set_pattern(pattern);
+        } catch (error) {
+            p.set_pattern(undefined);
+        }
     };
 
     p.setup = () => {
@@ -99,7 +109,14 @@ class ParametricRosetteViewer extends HTMLElement {
         this._terms = undefined;
 
         const shadow = this.attachShadow({ mode: "open" });
-        shadow.innerHTML = '<div id="container"></div>';
+        shadow.innerHTML = `
+            <div id="container"></div>
+            <style>
+                #container {
+                    display: inline-block;
+                }
+            </style>
+        `;
     }
 
     connectedCallback() {

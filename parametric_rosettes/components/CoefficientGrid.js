@@ -243,6 +243,17 @@ class CoefficientGrid extends HTMLElement {
 
     update_selected(coefficient) {
         this._sketch.update_selected_coefficient(coefficient);
+
+        const state = this._sketch.state;
+        this.dispatchEvent(
+            new CustomEvent("coefficients-changed", {
+                detail: {
+                    rows: state.dimensions.rows,
+                    cols: state.dimensions.cols,
+                    coefficients: state.coefficients,
+                },
+            })
+        );
     }
 }
 
