@@ -5,9 +5,9 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <script language="javascript" type="text/javascript" src="../libraries/p5-0.10.2.min.js"></script>
     <script type="module">
-      import "../src/components/CoefficientPicker.js";
-      import "../src/components/CoefficientGrid.js";
-      import "../src/components/ParametricRosetteViewer.js";
+      import "../common/components/CoefficientPicker.js";
+      import "../common/components/CoefficientGrid.js";
+      import "./ParametricRosetteViewer.js";
 
       window.addEventListener("load", () => {
         const grid = document.getElementById("coefficient-grid");
@@ -61,14 +61,9 @@
       });
     </script>
     <link rel="stylesheet" href="../styles/common.css" />
-    <style>
-      .container {
-        width: 100%;
-      }
-    </style>
   </head>
   <body>
-    <div class="container row">
+    <div class="horizontal">
       <div class="two-column">
         <sym-coefficient-grid
           id="coefficient-grid"

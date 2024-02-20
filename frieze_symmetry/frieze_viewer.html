@@ -1,18 +1,22 @@
+<!DOCTYPE html>
 <html>
   <head>
-    <link rel="stylesheet" href="main.css" />
     <script language="javascript" type="text/javascript" src="../libraries/p5-0.10.2.min.js"></script>
     <script type="module">
-      import { sketch } from "./sketches/tie_dye_analogy.js";
+      import { sketch } from "./frieze_viewer.js";
       const p5_sketch = new p5(sketch, "p5-canvas");
     </script>
+
+    <link rel="stylesheet" href="../styles/common.css" />
   </head>
   <body>
-    <div class="container">
-      <div class="half-page">
+    <div class="vertical">
+      <div class="two-column">
         <div id="p5-canvas"></div>
       </div>
-      <div class="half-page"></div>
+      <div class="two-column">
+        <h2>Rosette Viewer</h2>
+      </div>
     </div>
   </body>
 </html>

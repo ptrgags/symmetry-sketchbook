@@ -1,0 +1,22 @@
+<!DOCTYPE html>
+<html>
+  <head>
+    <script language="javascript" type="text/javascript" src="../libraries/p5-0.10.2.min.js"></script>
+    <script type="module">
+      import { sketch } from "./rosette_viewer.js";
+      const p5_sketch = new p5(sketch, "p5-canvas");
+    </script>
+
+    <link rel="stylesheet" href="../styles/common.css" />
+  </head>
+  <body>
+    <div class="vertical">
+      <div class="two-column">
+        <div id="p5-canvas"></div>
+      </div>
+      <div class="two-column">
+        <h2>Rosette Viewer</h2>
+      </div>
+    </div>
+  </body>
+</html>

@@ -1,6 +1,6 @@
-import { common } from './common_glsl.js';
-import { ROSETTE_FUNC } from './PolynomialShader.js';
-import { SymmetryShader } from './Shader.js';
+import { common } from "../polynomial_symmetry/shaders/common_glsl.js";
+import { ROSETTE_FUNC } from "../polynomial_symmetry/shaders/PolynomialShader.js";
+import { SymmetryShader } from "../polynomial_symmetry/shaders/Shader.js";
 
 const VERT_SHADER = `
 ${common.defines}
@@ -71,23 +71,23 @@ void main() {
 
 export class TieDyeShader extends SymmetryShader {
     constructor() {
-        super()
+        super();
         this._grid_model = undefined;
     }
 
     preload(sketch) {
-        this._grid_model = sketch.loadModel('assets/grid.obj');
+        this._grid_model = sketch.loadModel("./assets/grid.obj");
     }
-    
+
     init(sketch) {
         super.init(sketch, VERT_SHADER, FRAG_SHADER);
     }
-    
+
     draw() {
         this.update_time();
         this._sketch.fill(0, 0, 0, 0);
         this._sketch.model(this._grid_model);
-        
+
         // Disable when done to get ready for the next shader
         this.disable();
     }

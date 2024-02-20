@@ -1,8 +1,8 @@
-import { DEFAULT_COEFFICIENTS } from "../core/Coefficients.js";
-import { DEFAULT_SYMMETRY } from "../core/PointSymmetry.js";
-import { Checkerboard } from "../core/Texture.js";
-import { TieDyeShader } from "../shaders/TieDyeShader.js";
-import { NO_ANIMATION } from "../core/Animation.js";
+import { DEFAULT_COEFFICIENTS } from "../polynomial_symmetry/core/Coefficients.js";
+import { DEFAULT_SYMMETRY } from "../polynomial_symmetry/core/PointSymmetry.js";
+import { Checkerboard } from "../polynomial_symmetry/core/Texture.js";
+import { TieDyeShader } from "./TieDyeShader.js";
+import { NO_ANIMATION } from "../polynomial_symmetry/core/Animation.js";
 
 const shader = new TieDyeShader();
 const texture = new Checkerboard();
@@ -16,7 +16,7 @@ const TieDyeState = {
     DYING: 2,
     // Unwarp the grid, to see the
     UNTYING: 3,
-}
+};
 
 const AnimationState = {
     // Animation pauses for a moment at each state
@@ -34,7 +34,7 @@ const state = {
     reference_frame: 0,
     // Percentage between the current and next tie dye states.
     transition_percent: 0.0,
-}
+};
 
 function update_animation(frame, state) {
     const elapsed_frames = frame - state.reference_frame;
@@ -84,24 +84,23 @@ function get_dye_amount(state) {
     }
 }
 
-
 function update_uniforms(shader, state) {
-    shader.set_uniform('tie', get_tie_amount(state));
-    shader.set_uniform('dye', get_dye_amount(state));
+    shader.set_uniform("tie", get_tie_amount(state));
+    shader.set_uniform("dye", get_dye_amount(state));
 }
 
 export const sketch = (p) => {
     p.preload = () => {
         shader.preload(p);
-    }
+    };
 
     p.setup = () => {
         p.createCanvas(500, 700, p.WEBGL);
         p.textureMode(p.NORMAL);
 
         shader.init(p);
-        shader.set_uniform('zoom', 3);
-        shader.set_uniform('aspect', 5/7);
+        shader.set_uniform("zoom", 3);
+        shader.set_uniform("aspect", 5 / 7);
         shader.symmetries = [DEFAULT_SYMMETRY];
         shader.set_coefficients(DEFAULT_COEFFICIENTS);
         shader.set_animation(NO_ANIMATION);
@@ -109,7 +108,7 @@ export const sketch = (p) => {
 
         texture.init(p, 256, 256);
         shader.set_texture(texture);
-    }
+    };
 
     p.draw = () => {
         update_animation(p.frameCount, state);
@@ -117,5 +116,5 @@ export const sketch = (p) => {
 
         p.background(0, 40, 45);
         shader.draw();
-    }
+    };
 };
