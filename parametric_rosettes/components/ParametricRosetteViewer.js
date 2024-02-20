@@ -19,7 +19,7 @@ function draw_polyline(p, points, close) {
 
 const sketch = (p) => {
     p.state = {
-        display_arm: true,
+        show_arm: true,
         pattern: undefined,
         curve: [],
         start_frame: 0,
@@ -50,7 +50,7 @@ const sketch = (p) => {
 
     p.draw = () => {
         p.background(0);
-        const { start_frame, pattern, curve, display_arm } = p.state;
+        const { start_frame, pattern, curve, show_arm } = p.state;
 
         if (!pattern) {
             return;
@@ -75,7 +75,7 @@ const sketch = (p) => {
         p.stroke(71, 142, 204);
         draw_polyline(p, curve, frame >= PERIOD);
 
-        if (display_arm) {
+        if (show_arm) {
             p.stroke(255);
             draw_polyline(p, sums, false);
         }

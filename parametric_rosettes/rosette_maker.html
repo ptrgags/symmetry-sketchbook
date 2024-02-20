@@ -12,6 +12,7 @@
         const grid = document.getElementById("coefficient-grid");
         const picker = document.getElementById("coefficient-picker");
         const output = document.getElementById("coefficient");
+        const rosette = document.getElementById("rosette");
 
         grid.addEventListener("coefficient-selected", (e) => {
           picker.coefficient = e.detail;
@@ -44,6 +45,7 @@
     ></sym-coefficient-grid>
     <sym-coefficient-picker id="coefficient-picker"></sym-coefficient-picker>
     <span id="coefficient"></span>
-    <sym-parametric-rosette show-arm preset="2k + 1"></sym-parametric-rosette>
+    <sym-parametric-rosette id="rosette" show-arm="false" preset="3k + 1"></sym-parametric-rosette>
+    <sym-parametric-rosette show-arm="true" preset="2k + 1"></sym-parametric-rosette>
   </body>
 </html>
