@@ -46,14 +46,6 @@ export class FourierSeries {
   }
 
   /**
-   * For convenience, this gets the final sum from this.partial_sums()
-   */
-  position(t: number) {
-    const sums = [...this.partial_sums(t)]
-    return sums[sums.length - 1]
-  }
-
-  /**
    * Return a new curve scaled by a real number.
    * this is done by scaling the amplitudes
    */

@@ -7,10 +7,11 @@ const MAX_X = 2.0
 const PERIOD = 800
 const THICKNESS = 3.0
 
+// TODO: How much of this state should be exposed?
+// the pattern and showing the arm are the main things,
+// start_frame and curve are internal details...
 export interface ParametricCurveState {
-  start_frame: number
   pattern?: FourierSeries
-  curve: Pixel[]
   show_arm: boolean
 }
 
@@ -28,23 +29,23 @@ function draw_polyline(p: p5, points: Pixel[], close: boolean) {
 }
 
 export class ParametricCurveViewer extends Sketch<ParametricCurveState> {
+  start_frame: number = 0
+  curve: Pixel[] = []
+
   setup(p: p5) {
-    console.log('setup')
     const canvas = p.createCanvas(500, 700)
     Sketch.show_canvas(canvas.elt)
   }
 
   draw(p: p5) {
     p.background(0)
-
-    p.background(0)
-    const { start_frame, pattern, curve, show_arm } = this.state
+    const { pattern, show_arm } = this.state
 
     if (!pattern) {
       return
     }
 
-    const frame = p.frameCount - start_frame
+    const frame = p.frameCount - this.start_frame
     const t = (frame / PERIOD) * p.TWO_PI
 
     p.push()
@@ -57,13 +58,13 @@ export class ParametricCurveViewer extends Sketch<ParametricCurveState> {
       return { x: z.real, y: z.imag }
     })
     if (frame < PERIOD) {
-      curve.push(sums[sums.length - 1])
+      this.curve.push(sums[sums.length - 1])
     }
 
     p.noFill()
     p.strokeJoin(p.ROUND)
     p.stroke(71, 142, 204)
-    draw_polyline(p, curve, frame >= PERIOD)
+    draw_polyline(p, this.curve, frame >= PERIOD)
 
     if (show_arm) {
       p.stroke(255)
@@ -71,5 +72,10 @@ export class ParametricCurveViewer extends Sketch<ParametricCurveState> {
     }
 
     p.pop()
+  }
+
+  restart_animation() {
+    this.curve.length = 0
+    this.start_frame = this.sketch?.frameCount ?? 0
   }
 }

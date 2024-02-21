@@ -1,17 +1,46 @@
 <script setup lang="ts">
 import P5Sketch from '@/components/P5Sketch.vue'
 import TwoColumns from '@/components/TwoColumns.vue'
-import { type ParametricCurveState, ParametricCurveViewer } from '@/sketches/ParametricCurveViewer'
 import { ROSETTES } from '@/presets/parametric_curves'
+import { ParametricCurveViewer, type ParametricCurveState } from '@/sketches/ParametricCurveViewer'
+import { ref, type Ref } from 'vue'
+import { useRoute } from 'vue-router'
 
-const sketch_state: ParametricCurveState = {
-  start_frame: 0,
-  pattern: ROSETTES['2k + 1'],
-  curve: [],
-  show_arm: false
+import type { FourierSeries } from '@/core/FourierSeries'
+
+const route = useRoute()
+console.log(route.query)
+
+const DEFAULT_PRESET = '2k + 1'
+const selected_preset = ref(DEFAULT_PRESET)
+
+function pick_initial_pattern(): FourierSeries {
+  const query = route.query
+  if (query.preset) {
+    const preset_str = query.preset as string
+    const preset = ROSETTES[preset_str]
+    if (preset) {
+      selected_preset.value = preset_str
+      return preset
+    }
+  }
+
+  return ROSETTES[DEFAULT_PRESET]
 }
 
-const sketch = new ParametricCurveViewer(sketch_state)
+const sketch_state: Ref<ParametricCurveState> = ref({
+  pattern: pick_initial_pattern(),
+  // can be set by UI
+  show_arm: true
+})
+
+const sketch = new ParametricCurveViewer(sketch_state.value)
+
+function change_pattern(event: Event) {
+  const select = event.target as HTMLSelectElement
+  sketch_state.value.pattern = ROSETTES[select.value]
+  sketch.restart_animation()
+}
 </script>
 
 <template>
@@ -21,6 +50,9 @@ const sketch = new ParametricCurveViewer(sketch_state)
     </template>
     <template #right>
       <h1>Curve Viewer</h1>
+      <select @change="change_pattern" :value="selected_preset">
+        <option v-for="key in Object.keys(ROSETTES)" :key="key" :value="key">{{ key }}</option>
+      </select>
       <p>
         This sketch generates curves by adding together circular motions. Each joint of the drawing
         machine represents a circular motion with a frequency (how fast it spins), and amplitude

@@ -9,34 +9,9 @@ const props = defineProps<{
 
 const container: Ref<HTMLElement | null> = ref(null)
 
-// What do I want in a sketch?
-//
-// - p5 closure, p5 -> void that attaches callbacks to p5
-// - state, some struct type that changes per sketch
-// - actions that modify the sketch state
-// - a way to subscribe to events the sketch may generate
-//   (especially in sketches used for components)
-
-const closure = (p: p5) => {
-  p.setup = () => {
-    const canvas = p.createCanvas(500, 700)
-
-    const canvas_element = canvas.elt as HTMLElement
-
-    canvas_element.style.visibility = ''
-    canvas_element.removeAttribute('data-hidden')
-  }
-
-  p.draw = () => {
-    p.background(127, 0, 255)
-    p.rect(10, 10, 100, 100)
-  }
-}
-
 onMounted(() => {
-  console.log('mounted')
   if (container.value) {
-    new p5(props.sketch.to_closure(), container.value)
+    props.sketch.wrap(container.value)
   }
 })
 </script>
@@ -48,5 +23,10 @@ onMounted(() => {
 <style>
 .container {
   display: inline-block;
+}
+
+.container canvas {
+  max-width: 80vw;
+  object-fit: contain;
 }
 </style>
