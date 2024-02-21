@@ -4,6 +4,14 @@ import { ref, onMounted, type Ref } from 'vue'
 
 const container: Ref<HTMLElement | null> = ref(null)
 
+// What do I want in a sketch?
+//
+// - p5 closure, p5 -> void that attaches callbacks to p5
+// - state, some struct type that changes per sketch
+// - actions that modify the sketch state
+// - a way to subscribe to events the sketch may generate
+//   (especially in sketches used for components)
+
 const closure = (p: p5) => {
   p.setup = () => {
     const canvas = p.createCanvas(500, 700)
@@ -28,5 +36,11 @@ onMounted(() => {
 </script>
 
 <template>
-  <div ref="container"></div>
+  <div class="container" ref="container"></div>
 </template>
+
+<style>
+.container {
+  display: inline-block;
+}
+</style>
