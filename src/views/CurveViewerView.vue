@@ -1,10 +1,13 @@
 <script setup lang="ts">
+import P5Sketch from '@/components/P5Sketch.vue'
 import TwoColumns from '@/components/TwoColumns.vue'
 </script>
 
 <template>
   <TwoColumns>
-    <template #left> I got left behind </template>
+    <template #left>
+      <P5Sketch></P5Sketch>
+    </template>
     <template #right>
       <h1>Curve Viewer</h1>
       <p>
