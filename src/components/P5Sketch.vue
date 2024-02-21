@@ -1,6 +1,11 @@
-<script setup lang="ts">
+<script setup lang="ts" generic="T">
+import type { Sketch } from '@/core/Sketch'
 import p5 from 'p5'
 import { ref, onMounted, type Ref } from 'vue'
+
+const props = defineProps<{
+  sketch: Sketch<T>
+}>()
 
 const container: Ref<HTMLElement | null> = ref(null)
 
@@ -29,8 +34,9 @@ const closure = (p: p5) => {
 }
 
 onMounted(() => {
+  console.log('mounted')
   if (container.value) {
-    new p5(closure, container.value)
+    new p5(props.sketch.to_closure(), container.value)
   }
 })
 </script>
