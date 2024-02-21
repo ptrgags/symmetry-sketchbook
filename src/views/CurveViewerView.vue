@@ -49,7 +49,7 @@ function change_pattern(event: Event) {
       <P5Sketch :sketch="sketch"></P5Sketch>
     </template>
     <template #right>
-      <h1>Curve Viewer</h1>
+      <h1>Curve Symmetry</h1>
       <select @change="change_pattern" :value="selected_preset">
         <option v-for="key in Object.keys(ROSETTES)" :key="key" :value="key">{{ key }}</option>
       </select>
