@@ -1,35 +1,65 @@
-@import './base.css';
+:root {
+    --color-background-dark: #1d3c55;
+    --color-background: #224866;
 
-#app {
-  max-width: 1280px;
-  margin: 0 auto;
-  padding: 2rem;
-  font-weight: normal;
+    --color-text: #e7e7e7;
+
+    --color-accent-dark: #abc45c;
+    --color-accent: #c1df56;
+
+    --color-accent2: #9d25ee;
 }
 
-a,
-.green {
-  text-decoration: none;
-  color: hsla(160, 100%, 37%, 1);
-  transition: 0.4s;
-  padding: 3px;
+body {
+    padding: 0;
+    margin: 0;
+    color: var(--color-text);
+    background-color: var(--color-background-dark);
+    font-family: sans-serif;
 }
 
-@media (hover: hover) {
-  a:hover {
-    background-color: hsla(160, 100%, 37%, 0.2);
-  }
+h1,
+h2,
+h3,
+h4,
+h5,
+h6 {
+    text-align: center;
+    width: 100%;
 }
 
-@media (min-width: 1024px) {
-  body {
+a:link {
+    color: var(--color-accent);
+}
+
+a:visited {
+    color: var(--color-accent-dark);
+}
+
+a:hover {
+    color: var(--color-accent2);
+}
+
+a:active {
+    color: var(--color-accent);
+}
+
+.vertical {
     display: flex;
-    place-items: center;
-  }
+    flex-wrap: wrap;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+}
 
-  #app {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    padding: 0 2rem;
-  }
+/* Container where all the content is in a single column */
+.one-column {
+    width: 50%;
+    margin: 0 auto;
+}
+
+/* One of two columns */
+.two-column {
+    width: 40%;
+    display: inline-block;
 }
