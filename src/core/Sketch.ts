@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import p5 from 'p5'
 
 export abstract class Sketch<State> {
@@ -10,9 +11,10 @@ export abstract class Sketch<State> {
     this.state = state
   }
 
-  // p5 callbacks, but now they take a state parameter
-  abstract setup(p: p5): void
-  abstract draw(p: p5): void
+  // p5 callbacks, but I find underscores easier to read 🐍
+  setup(p: p5) {}
+  draw(p: p5) {}
+  mouse_released(p: p5) {}
 
   /**
    * p5.js expects the sketch to be a closure in a certain
@@ -25,6 +27,7 @@ export abstract class Sketch<State> {
 
       p.setup = () => this.setup(p)
       p.draw = () => this.draw(p)
+      p.mouseReleased = () => this.mouse_released(p)
     }
   }
 

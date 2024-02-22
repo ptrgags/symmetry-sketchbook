@@ -50,7 +50,9 @@ function change_pattern(event: Event) {
     </template>
     <template #right>
       <h1>Curve Symmetry</h1>
-      <select @change="change_pattern" :value="selected_preset">
+      <label for="preset-select">Select Preset:</label>
+      &nbsp;
+      <select id="preset-select" @change="change_pattern" :value="selected_preset">
         <option v-for="key in Object.keys(ROSETTES)" :key="key" :value="key">{{ key }}</option>
       </select>
       <p>

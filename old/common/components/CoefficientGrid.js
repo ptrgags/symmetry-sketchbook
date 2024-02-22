@@ -21,7 +21,7 @@ const sketch = (p) => {
     p.set_coefficients = (coefficients) => {
         const dimensions = p.state.dimensions;
         const new_coefficients = new Array(
-            dimensions.rows * dimensions.cols
+            dimensions.rows * dimensions.cols,
         ).fill([0, 0]);
 
         const length = Math.min(coefficients.length, new_coefficients.length);
@@ -72,7 +72,7 @@ const sketch = (p) => {
                     center_x,
                     center_y,
                     2.0 * pixels_per_unit_x,
-                    2.0 * pixels_per_unit_y
+                    2.0 * pixels_per_unit_y,
                 );
 
                 // Check if the amplitude is nonzero
@@ -109,7 +109,7 @@ const sketch = (p) => {
             selected_col * cell_width,
             selected_row * cell_height,
             cell_width,
-            cell_height
+            cell_height,
         );
     };
 
@@ -140,7 +140,7 @@ function parse_coefficients(csv) {
     const values = csv.split(",").map((x) => parseFloat(x));
     if (values.length % 2 === 1) {
         throw new Error(
-            "coefficients must have an even number of values, ie.e. amp1,phase1,amp2,phase2, etc."
+            "coefficients must have an even number of values, ie.e. amp1,phase1,amp2,phase2, etc.",
         );
     }
 
@@ -207,7 +207,7 @@ class CoefficientGrid extends HTMLElement {
                     phase,
                     index,
                 },
-            })
+            }),
         );
     }
 
@@ -216,7 +216,7 @@ class CoefficientGrid extends HTMLElement {
         this._sketch = new p5(sketch, container);
         this._sketch.state.coefficient_selected_callback = (
             index,
-            coefficient
+            coefficient,
         ) => {
             this.dispatch_select(index, coefficient);
         };
@@ -252,7 +252,7 @@ class CoefficientGrid extends HTMLElement {
                     cols: state.dimensions.cols,
                     coefficients: state.coefficients,
                 },
-            })
+            }),
         );
     }
 }
