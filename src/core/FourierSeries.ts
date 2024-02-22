@@ -1,6 +1,6 @@
 import { ComplexRect, ComplexPolar } from './Complex'
 
-interface FourierTerm {
+export interface FourierTerm {
   frequency: number
   coefficient: ComplexPolar
 }
@@ -29,8 +29,24 @@ export class FourierSeries {
   }
 
   /**
-   * To plot the drawing arm, we need not just the total sum,
-   * but all the partial sums.
+   * Compute the sum for a particular value of t.
+   * @param t The current time step
+   */
+  compute(t: number): ComplexRect {
+    let x = 0.0
+    let y = 0.0
+    for (const { frequency, coefficient } of this.terms) {
+      const { r: amp, theta: phase } = coefficient
+      x += amp * Math.cos(frequency * t - phase)
+      y += amp * Math.sin(frequency * t - phase)
+    }
+    return new ComplexRect(x, y)
+  }
+
+  /**
+   * Compute the partial sums. This is used for making the drawing machine
+   * arm
+   * @param t The time step to compute at
    */
   *partial_sums(t: number): Generator<ComplexRect, undefined, undefined> {
     yield new ComplexRect(0, 0)

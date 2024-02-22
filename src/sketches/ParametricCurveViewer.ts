@@ -74,6 +74,23 @@ export class ParametricCurveViewer extends Sketch<ParametricCurveState> {
     p.pop()
   }
 
+  recompute_curve() {
+    const pattern = this.state.pattern
+    if (!pattern) {
+      return
+    }
+
+    const n = this.curve.length
+    for (let frame = 0; frame < n; frame++) {
+      const t = (frame / PERIOD) * 2.0 * Math.PI
+      const z = pattern.compute(t)
+      this.curve[frame] = {
+        x: z.real,
+        y: z.imag
+      }
+    }
+  }
+
   restart_animation() {
     this.curve.length = 0
     this.start_frame = this.sketch?.frameCount ?? 0

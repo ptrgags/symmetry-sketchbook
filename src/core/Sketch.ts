@@ -14,7 +14,9 @@ export abstract class Sketch<State> {
   // p5 callbacks, but I find underscores easier to read 🐍
   setup(p: p5) {}
   draw(p: p5) {}
-  mouse_released(p: p5) {}
+  mouse_released(p: p5): boolean {
+    return true
+  }
 
   /**
    * p5.js expects the sketch to be a closure in a certain

@@ -91,14 +91,13 @@ export class TermGridSketch extends Sketch<TermGridState> {
     const selected_row = Math.floor(selected_index / cols)
     const selected_col = selected_index % cols
     p.stroke(255, 255, 0)
-    p.strokeWeight(2)
     p.noFill()
     p.rect(selected_col * cell_size, selected_row * cell_size, cell_size, cell_size)
 
     p.pop()
   }
 
-  mouse_released(p: p5) {
+  mouse_released(p: p5): boolean {
     const { cell_size, rows, cols, selected_index, coefficients } = this.state
 
     const col = Math.floor(p.mouseX / cell_size)
@@ -117,5 +116,7 @@ export class TermGridSketch extends Sketch<TermGridState> {
         )
       }
     }
+
+    return false
   }
 }
