@@ -13,6 +13,11 @@ import {
 } from '@/sketches/CoefficientPickerSketch'
 import { ComplexPolar, ComplexRect } from '@/core/Complex'
 
+// The frequencies in use will be [-MAX_FREQ, MAX_FREQ]
+const MAX_FREQ = 5
+const TERM_COUNT = 2 * MAX_FREQ + 1
+const CENTER_TERM = 5
+
 const symmetry_type = ref(SYMMETRY_TYPES[0])
 
 const viewer_state: Ref<ParametricCurveState> = ref({
@@ -24,15 +29,15 @@ const viewer = new ParametricCurveViewer(viewer_state.value)
 const term_grid_state: Ref<TermGridState> = ref({
   cell_size: 50,
   rows: 1,
-  cols: 11,
-  selected_index: 5,
-  coefficients: new Array(11).fill(new ComplexPolar(0, 0))
+  cols: TERM_COUNT,
+  selected_index: CENTER_TERM,
+  coefficients: new Array(TERM_COUNT).fill(new ComplexPolar(0, 0))
 })
-term_grid_state.value.coefficients[5] = new ComplexPolar(1, 0)
+term_grid_state.value.coefficients[CENTER_TERM] = new ComplexPolar(1, 0)
 const term_grid = new TermGridSketch(term_grid_state.value)
 
 const picker_state: Ref<CoefficientPickerState> = ref({
-  coefficient: new ComplexRect(1, 0)
+  coefficient: ComplexRect.ONE
 })
 const picker = new CoefficientPickerSketch(picker_state.value)
 
@@ -72,6 +77,19 @@ picker.events.addEventListener('change', (e) => {
 
   update_viewer()
 })
+
+function change_symmetry() {
+  const coefficients = term_grid_state.value.coefficients
+  for (let i = 0; i < TERM_COUNT; i++) {
+    coefficients[i] = ComplexPolar.ZERO
+  }
+  coefficients[CENTER_TERM] = ComplexPolar.ONE
+  term_grid_state.value.selected_index = CENTER_TERM
+
+  picker_state.value.coefficient = ComplexRect.ONE
+
+  update_viewer()
+}
 </script>
 
 <template>
@@ -79,8 +97,8 @@ picker.events.addEventListener('change', (e) => {
     <template #left>
       <h1>Curve Maker</h1>
       <label for="symmetry-type">Symmetry Type: </label>
-      <select id="symmetry-type" v-model="symmetry_type">
-        <option v-for="(symmetry, index) in SYMMETRY_TYPES" :key="index" :value="symmetry_type">
+      <select id="symmetry-type" v-model="symmetry_type" @change="change_symmetry">
+        <option v-for="(symmetry, index) in SYMMETRY_TYPES" :key="index" :value="symmetry">
           {{ symmetry.folds }}-fold symmetry of type {{ symmetry.type }}
         </option>
       </select>
