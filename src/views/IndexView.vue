@@ -14,9 +14,9 @@ import PageLink from '@/components/PageLink.vue'
     <!--<PageLink><RouterLink to="/curve_symmetry/orbital_motion">Orbital Motion</RouterLink></PageLink>
       <PageLink><RouterLink to="/curve_symmetry/curve_blender">Curve Blender</RouterLink></PageLink> -->
     <PageLink><RouterLink to="/curve_symmetry/curve_maker">Curve Maker</RouterLink></PageLink>
-    <!--<h3>Point Symmetry</h3>
-    <PageLink><RouterLink to="/point_symmetry/rosette_viewer">Rosette Viewer</RouterLink></PageLink>
-    <PageLink
+    <h3>Point Symmetry</h3>
+    <PageLink><RouterLink to="/point_symmetry">Rosette Viewer</RouterLink></PageLink>
+    <!--<PageLink
       ><RouterLink to="/point_symmetry/tie_dye_analogy">Tie-Dye Analogy</RouterLink></PageLink
     >
     <PageLink

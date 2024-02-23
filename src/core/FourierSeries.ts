@@ -5,7 +5,7 @@ export interface FourierTerm {
   coefficient: ComplexPolar
 }
 
-type FourierTuple = [freq: number, amp: number, phase: number]
+export type FourierTuple = [freq: number, amp: number, phase: number]
 
 /**
  * This class represents a finite sum of circular motions of the form
