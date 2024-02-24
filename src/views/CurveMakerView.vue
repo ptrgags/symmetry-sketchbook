@@ -2,8 +2,8 @@
 import TwoColumns from '@/components/TwoColumns.vue'
 import P5Sketch from '@/components/P5Sketch.vue'
 
-import { ref, type Ref } from 'vue'
-import { SYMMETRY_TYPES } from '@/core/CurveSymmetryType'
+import { ref, computed, type ComputedRef } from 'vue'
+import { CurveSymmetryType, SYMMETRY_TYPES } from '@/core/CurveSymmetryType'
 import { ParametricCurveViewer, type ParametricCurveState } from '@/sketches/ParametricCurveViewer'
 import { FourierSeries, type FourierTerm } from '@/core/FourierSeries'
 import { TermGridSketch, type TermGridState } from '@/sketches/TermGridSketch'
@@ -18,36 +18,53 @@ const MAX_FREQ = 5
 const TERM_COUNT = 2 * MAX_FREQ + 1
 const CENTER_TERM = 5
 
+function make_frequency_map(symmetry: CurveSymmetryType) {
+  return (row: number, col: number) => {}
+}
+
+// Vue state -----------------------
+
 const symmetry_type = ref(SYMMETRY_TYPES[0])
 
-const viewer_state: Ref<ParametricCurveState> = ref({
+const frequency_map: ComputedRef<(row: number, col: number) => number> = computed(() => {
+  return (row: number, col: number) => {
+    const k = col - CENTER_TERM
+    return symmetry_type.value.get_frequency(k)
+  }
+})
+
+// p5.js sketches --------------------------------
+const viewer_state: ParametricCurveState = {
   pattern: FourierSeries.from_tuples([[1, 1, 0]]),
   show_arm: false
-})
-const viewer = new ParametricCurveViewer(viewer_state.value)
+}
+const viewer = new ParametricCurveViewer(viewer_state)
 
-const term_grid_state: Ref<TermGridState> = ref({
+const term_grid_state: TermGridState = {
   cell_size: 50,
   rows: 1,
   cols: TERM_COUNT,
   selected_index: CENTER_TERM,
-  coefficients: new Array(TERM_COUNT).fill(new ComplexPolar(0, 0))
-})
-term_grid_state.value.coefficients[CENTER_TERM] = new ComplexPolar(1, 0)
-const term_grid = new TermGridSketch(term_grid_state.value)
+  coefficients: new Array(TERM_COUNT).fill(new ComplexPolar(0, 0)),
+  frequency_map: frequency_map.value
+}
+term_grid_state.coefficients[CENTER_TERM] = new ComplexPolar(1, 0)
+const term_grid = new TermGridSketch(term_grid_state)
 
-const picker_state: Ref<CoefficientPickerState> = ref({
+const picker_state: CoefficientPickerState = {
   coefficient: ComplexRect.ONE
-})
-const picker = new CoefficientPickerSketch(picker_state.value)
+}
+const picker = new CoefficientPickerSketch(picker_state)
+
+// Event handling ---------------------------
 
 term_grid.events.addEventListener('term-selected', (e) => {
   const z = (e as CustomEvent).detail as ComplexPolar
-  picker_state.value.coefficient = z.to_rect()
+  picker_state.coefficient = z.to_rect()
 })
 
 function update_viewer() {
-  const coefficients = term_grid_state.value.coefficients
+  const coefficients = term_grid_state.coefficients
 
   const terms: FourierTerm[] = []
   for (let i = 0; i < coefficients.length; i++) {
@@ -58,35 +75,34 @@ function update_viewer() {
       continue
     }
 
-    const k = i - 5
-    const n = symmetry_type.value.folds * k + symmetry_type.value.type
+    const n = frequency_map.value(0, i)
     terms.push({
       frequency: n,
       coefficient: coefficient
     })
   }
 
-  viewer_state.value.pattern = new FourierSeries(terms)
+  viewer_state.pattern = new FourierSeries(terms)
   viewer.recompute_curve()
 }
 
 picker.events.addEventListener('change', (e) => {
   const z = (e as CustomEvent).detail as ComplexRect
-  const grid_state = term_grid_state.value
-  grid_state.coefficients[grid_state.selected_index] = z.to_polar()
+  term_grid_state.coefficients[term_grid_state.selected_index] = z.to_polar()
 
   update_viewer()
 })
 
 function change_symmetry() {
-  const coefficients = term_grid_state.value.coefficients
+  const coefficients = term_grid_state.coefficients
   for (let i = 0; i < TERM_COUNT; i++) {
     coefficients[i] = ComplexPolar.ZERO
   }
   coefficients[CENTER_TERM] = ComplexPolar.ONE
-  term_grid_state.value.selected_index = CENTER_TERM
+  term_grid_state.selected_index = CENTER_TERM
+  term_grid_state.frequency_map = frequency_map.value
 
-  picker_state.value.coefficient = ComplexRect.ONE
+  picker_state.coefficient = ComplexRect.ONE
 
   update_viewer()
 }
@@ -99,7 +115,7 @@ function change_symmetry() {
       <label for="symmetry-type">Symmetry Type: </label>
       <select id="symmetry-type" v-model="symmetry_type" @change="change_symmetry">
         <option v-for="(symmetry, index) in SYMMETRY_TYPES" :key="index" :value="symmetry">
-          {{ symmetry.folds }}-fold symmetry of type {{ symmetry.type }}
+          {{ symmetry.folds }}-fold symmetry of type {{ symmetry.order }}
         </option>
       </select>
       <P5Sketch :sketch="term_grid"></P5Sketch>

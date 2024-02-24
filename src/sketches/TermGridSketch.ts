@@ -13,6 +13,9 @@ export interface TermGridState {
   selected_index: number
   // A coefficients. it must have rows * cols entries
   coefficients: ComplexPolar[]
+  // If specified, this callback is used to label the frequencies
+  // and animate the spinner speed
+  frequency_map?: (row: number, col: number) => number | [number, number]
 }
 
 export class TermGridSketch extends Sketch<TermGridState> {
@@ -45,6 +48,27 @@ export class TermGridSketch extends Sketch<TermGridState> {
     const center_y = (row + 0.5) * cell_size
     const center_x = (col + 0.5) * cell_size
 
+    // Label the term with the frequency
+    if (this.state.frequency_map) {
+      const frequencies = this.state.frequency_map(row, col)
+      let freq_str
+      if (Array.isArray(frequencies)) {
+        const [n, m] = frequencies
+        freq_str = `${n},${m}`
+      } else {
+        const n = frequencies
+        freq_str = `${n}`
+      }
+
+      p.noStroke()
+      p.fill(255)
+      p.textSize(cell_size / 4)
+      p.textAlign(p.RIGHT)
+      const margin = cell_size / 16
+      p.text(freq_str, (col + 1) * cell_size - margin, (row + 1) * cell_size - margin)
+    }
+
+    // Draw the unit circle
     p.stroke(255)
     p.noFill()
     p.circle(center_x, center_y, 2.0 * pixels_per_unit)
