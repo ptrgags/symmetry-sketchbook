@@ -9,15 +9,14 @@ attribute vec2 aTexCoord;
 varying vec2 uv;
 
 void main() {
-    vec4 position = vec4(aPosition, 1.0);
-    gl_Position = position;
+    gl_Position = vec4(aPosition, 1.0);
 
     uv = aTexCoord;
 }
 `
 
 export const ROSETTE_FUNC = `
-vec2 compute(vec2 z, float animation_direction) {
+vec2 compute(vec2 z) {
     vec2 z_polar = to_polar(z);
     vec2 sum = vec2(0.0);
     for (int i = 0; i < MAX_TERMS; i++) {
@@ -33,15 +32,10 @@ vec2 compute(vec2 z, float animation_direction) {
         // amplitude, phase
         vec2 coeff = coeffs[i];
         
-        // Animate the coefficients for a fun twist.
-        // (sometimes literally)
-        coeff.y += animation_direction * animation[i] * time;
-        
         float r = coeff.x * pow(z_polar.x, n + m);
         float theta = z_polar.y * (n - m) + coeff.y;
         
-        vec2 rect = to_rect(vec2(r, theta));
-        sum += blend_pairwise(float(i)) * rect;
+        sum += to_rect(vec2(r, theta));
     }
     return sum;
 }
@@ -76,7 +70,7 @@ vec2 compute(vec2 z, float animation_direction) {
 }
 `
 
-const FRAG_SHADER = (symmetry_func: string) => `
+const FRAG_SHADER_OLD = (symmetry_func: string) => `
 precision highp float;
 ${common.defines}
 ${common.uniforms}
@@ -101,6 +95,35 @@ void main() {
     vec4 image = tex_color;
     image = mix(image, ref_layer, ref_layer.a);
     gl_FragColor = image;
+}
+`
+
+const FRAG_SHADER = (symmetry_func: string) => `
+precision highp float;
+${common.defines}
+
+${common.uniforms}
+${common.uniforms_coefficients}
+
+${common.funcs_polar}
+${common.funcs_view}
+${common.funcs_palette}
+${symmetry_func}
+
+varying vec2 uv;
+
+void main() {
+    vec2 complex = to_complex(uv);
+    
+    vec3 color;
+    if (show_palette) {
+        color = palette(complex);
+    } else {
+        vec2 z = compute(complex);
+        color = palette(z);
+    }
+
+    gl_FragColor = vec4(color, 1.0);
 }
 `
 

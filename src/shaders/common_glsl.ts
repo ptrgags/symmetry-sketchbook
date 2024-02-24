@@ -11,13 +11,17 @@ common.defines = `
 // anyway, so I'm just going to list them in one big block.
 
 common.uniforms = `
+uniform bool show_palette;
+
 // current canvas aspect ratio (width / height);
 uniform float aspect;
 // Scale factor for zooming
 uniform float zoom;
 // current pan in uv coordinates
 uniform vec2 pan_uv;
+`
 
+common.uniforms_coefficients = `
 // n = powers[i].x = exponent of z
 // m = powers[i].y = exponent of conj(z)
 uniform vec2 powers[MAX_TERMS];
@@ -26,6 +30,12 @@ uniform vec2 powers[MAX_TERMS];
 // These are stored as (amplitude, phase). phase is
 // in radians.
 uniform vec2 coeffs[MAX_TERMS];
+// Even though MAX_TERMS terms are always provided, in practice only
+// the first N are used. This is helpful to know for blending through
+// the coefficients.
+uniform float num_terms;
+`
+/*
 // 1.0 to enable, 0.0 to disable
 uniform float show_ref_geometry;
 
@@ -39,10 +49,7 @@ uniform float time;
 // animation direction reversed. For waves, this produces
 // a standing wave effect.
 uniform bool enable_standing_waves;
-// Even though MAX_TERMS terms are always provided, in practice only
-// the first N are used. This is helpful to know for blending through
-// the coefficients.
-uniform float num_terms;
+
 // If true, instead of showing the sum of terms, show them one by one,
 // blending between each pair.
 uniform bool show_wave_components;
@@ -59,6 +66,7 @@ uniform sampler2D texture0;
 // [0, 1] if the mouse is outside the canvas.
 uniform vec2 mouse_uv;
 `
+*/
 
 common.funcs_view = `
 vec2 apply_aspect_fix(vec2 uv) {
@@ -106,6 +114,31 @@ vec2 to_texture(vec2 complex) {
 vec2 complex_to_clip(vec2 complex) {
     vec2 uv = to_uv(complex);
     return 2.0 * uv - 1.0;
+}
+`
+
+common.funcs_palette = `
+vec3 palette(vec2 complex_rect) {
+    vec2 z = to_polar(complex_rect);
+
+    // Let's get 3-fold rotation symmetry
+    // Map angle from [-PI, PI] -> [0, 1]
+    float angle_normalized = 0.5 + 0.5 * z.y / PI;
+    float cell = floor(3.0 * angle_normalized);
+
+    vec3 rgb = vec3(equal(cell - vec3(0.0, 1.0, 2.0), vec3(0.0)));
+    
+
+    float dist = abs(z.x - 1.0);
+    float unit_circle = smoothstep(0.051, 0.05, dist);
+
+
+    float r_parity = mod(floor(15.0 * z.x), 2.0);
+    float theta_parity = mod(floor(10.0 * z.y / PI), 2.0);
+
+    vec3 color = rgb;
+    color = mix(color, vec3(1.0), unit_circle);
+    return color;
 }
 `
 

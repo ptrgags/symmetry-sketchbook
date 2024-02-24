@@ -16,7 +16,8 @@ export class PolynomialSketch extends Sketch<PolynomialState> {
   }
 
   setup(p: p5) {
-    p.createCanvas(500, 700, p.WEBGL)
+    const canvas = p.createCanvas(500, 700, p.WEBGL)
+    Sketch.show_canvas(canvas.elt)
 
     this.shader.init(p)
     this.shader.set_coefficients(DEFAULT_COEFFICIENTS)
@@ -27,5 +28,6 @@ export class PolynomialSketch extends Sketch<PolynomialState> {
   draw(p: p5) {
     p.background(0, 40, 45)
     this.shader.draw()
+    this.shader.disable()
   }
 }

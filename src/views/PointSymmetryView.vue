@@ -4,7 +4,7 @@ import P5Sketch from '@/components/P5Sketch.vue'
 import { PolynomialSketch, type PolynomialState} from '@/sketches/PolynomialSketch'
 
 const state: PolynomialState = {
-    symmetry_mode: 'point'
+    symmetry_mode: 'rosette'
 }
 
 const sketch = new PolynomialSketch(state)

@@ -31,8 +31,8 @@ export class SymmetryShader extends Shader {
     this.coefficients_buffer = []
   }
 
-  init(sketch: p5, frag: string, vert: string) {
-    super.init(sketch, frag, vert)
+  init(sketch: p5, vert: string, frag: string) {
+    super.init(sketch, vert, frag)
     this.set_uniform('show_ref_geometry', 0.0)
   }
 
