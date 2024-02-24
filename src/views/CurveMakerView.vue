@@ -12,6 +12,7 @@ import {
   type CoefficientPickerState
 } from '@/sketches/CoefficientPickerSketch'
 import { ComplexPolar, ComplexRect } from '@/core/Complex'
+import type { GridIndices2D } from '@/core/GridIndices2D'
 
 // The frequencies in use will be [-MAX_FREQ, MAX_FREQ]
 const MAX_FREQ = 5
@@ -22,9 +23,9 @@ const CENTER_TERM = 5
 
 const symmetry_type = ref(SYMMETRY_TYPES[0])
 
-const frequency_map: ComputedRef<(row: number, col: number) => number> = computed(() => {
-  return (row: number, col: number) => {
-    const k = col - CENTER_TERM
+const frequency_map: ComputedRef<(indices: GridIndices2D) => number> = computed(() => {
+  return (indices: GridIndices2D) => {
+    const k = indices.col - CENTER_TERM
     return symmetry_type.value.get_frequency(k)
   }
 })
@@ -72,7 +73,7 @@ function update_viewer() {
       continue
     }
 
-    const n = frequency_map.value(0, i)
+    const n = frequency_map.value({ row: 0, col: i })
     terms.push({
       frequency: n,
       coefficient: coefficient

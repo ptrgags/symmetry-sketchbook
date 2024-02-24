@@ -121,15 +121,14 @@ common.funcs_palette = `
 vec3 palette(vec2 complex_rect) {
     vec2 z = to_polar(complex_rect);
 
-    // Let's get 3-fold rotation symmetry
+    // Let's get 3-color palette
     // Map angle from [-PI, PI] -> [0, 1]
     float angle_normalized = 0.5 + 0.5 * z.y / PI;
     float cell = floor(3.0 * angle_normalized);
-
     vec3 rgb = vec3(equal(cell - vec3(0.0, 1.0, 2.0), vec3(0.0)));
     
 
-    float dist = abs(z.x - 1.0);
+    float dist = z.x - 1.0;
     float unit_circle = smoothstep(0.051, 0.05, dist);
 
 
@@ -137,8 +136,8 @@ vec3 palette(vec2 complex_rect) {
     float theta_parity = mod(floor(10.0 * z.y / PI), 2.0);
 
     vec3 color = rgb;
-    color = mix(color, vec3(1.0), unit_circle);
-    return color;
+    color = mix(color, -dist * color, unit_circle);
+    return vec3(color);
 }
 `
 

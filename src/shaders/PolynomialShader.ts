@@ -121,6 +121,12 @@ void main() {
     } else {
         vec2 z = compute(complex);
         color = palette(z);
+
+        // For debugging
+        float unit_circle_dist = abs(length(complex) - 1.0);
+        float unit_circle_mask = smoothstep(0.02, 0.01, unit_circle_dist);
+
+        color = mix(color, vec3(1.0), unit_circle_mask);
     }
 
     gl_FragColor = vec4(color, 1.0);
