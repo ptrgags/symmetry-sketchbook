@@ -1,6 +1,8 @@
 import p5 from 'p5'
 import { Sketch } from '@/core/Sketch'
 import type { ComplexPolar } from '@/core/Complex'
+import type { GridIndices2D } from '@/core/GridIndices2D'
+import type { Frequency2D } from '@/core/Frequency2D'
 
 export interface TermGridState {
   // Cell size in pixels
@@ -15,8 +17,8 @@ export interface TermGridState {
   coefficients: ComplexPolar[]
   // If specified, this callback is used to label the frequencies
   // and animate the spinner speed
-  frequency_map?: (row: number, col: number) => number | [number, number]
-  editable_map?: (row: number, col: number) => boolean
+  frequency_map?: (indices: GridIndices2D) => number | Frequency2D
+  editable_map?: (indices: GridIndices2D) => boolean
 }
 
 export class TermGridSketch extends Sketch<TermGridState> {
@@ -28,21 +30,22 @@ export class TermGridSketch extends Sketch<TermGridState> {
     Sketch.show_canvas(canvas.elt)
   }
 
-  can_edit(row: number, col: number): boolean {
+  can_edit(indices: GridIndices2D): boolean {
     if (!this.state.editable_map) {
       return true
     }
 
-    return this.state.editable_map(row, col)
+    return this.state.editable_map(indices)
   }
 
-  draw_term(p: p5, row: number, col: number) {
+  draw_term(p: p5, indices: GridIndices2D) {
     const { cols, cell_size, coefficients } = this.state
 
     // The coordinate grids go from [-2, 2] to [2, 2]
     // so the width in the complex plane is 4.0
     const pixels_per_unit = cell_size / 4.0
 
+    const { row, col } = indices
     const index = row * cols + col
     const coefficient = coefficients[index]
 
@@ -55,26 +58,26 @@ export class TermGridSketch extends Sketch<TermGridState> {
     const center_y = (row + 0.5) * cell_size
     const center_x = (col + 0.5) * cell_size
 
-    const can_edit = this.can_edit(row, col)
+    const can_edit = this.can_edit(indices)
     const background_color = can_edit ? 0 : 191
     p.fill(background_color)
     p.noStroke()
     p.rect(col * cell_size, row * cell_size, cell_size, cell_size)
 
     if (this.state.frequency_map) {
-      const frequencies = this.state.frequency_map(row, col)
+      const frequencies = this.state.frequency_map(indices)
       let freq_str
       let spinner_frequency
-      if (Array.isArray(frequencies)) {
-        const [n, m] = frequencies
+      if (typeof frequencies === 'number') {
+        const n = frequencies
+        freq_str = `${n}`
+        spinner_frequency = n
+      } else {
+        const { n, m } = frequencies
         freq_str = `${n},${m}`
         // z^n conj(z)^m expands to r^(n + m)exp(i * theta * (n - m)),
         // the frequency is the n - m part
         spinner_frequency = n - m
-      } else {
-        const n = frequencies
-        freq_str = `${n}`
-        spinner_frequency = n
       }
 
       // draw a spinning line
@@ -133,7 +136,7 @@ export class TermGridSketch extends Sketch<TermGridState> {
 
     for (let i = 0; i < rows; i++) {
       for (let j = 0; j < cols; j++) {
-        this.draw_term(p, i, j)
+        this.draw_term(p, { row: i, col: j })
       }
     }
 
@@ -155,7 +158,7 @@ export class TermGridSketch extends Sketch<TermGridState> {
     const col = Math.floor(p.mouseX / cell_size)
     const row = Math.floor(p.mouseY / cell_size)
 
-    if (!this.can_edit(row, col)) {
+    if (!this.can_edit({ row, col })) {
       return false
     }
 
