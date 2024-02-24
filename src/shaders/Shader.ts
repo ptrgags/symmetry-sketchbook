@@ -61,7 +61,6 @@ export class Shader {
     check_shader(vert.trim(), frag.trim())
 
     this.shader = p.createShader(vert, frag)
-    this.set_uniform('show_palette', false)
     this.set_uniform('aspect', p.width / p.height)
     this.set_uniform('time', 0.0)
     this.set_uniform('zoom', 8.0)

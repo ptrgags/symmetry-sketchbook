@@ -34,6 +34,7 @@ export class SymmetryShader extends Shader {
   init(sketch: p5, vert: string, frag: string) {
     super.init(sketch, vert, frag)
     this.set_uniform('show_ref_geometry', 0.0)
+    this.set_uniform('show_palette', false)
   }
 
   set_coefficients(pattern: FourierSeries2D) {
