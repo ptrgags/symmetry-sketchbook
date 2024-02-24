@@ -21,9 +21,9 @@ import PageLink from '@/components/PageLink.vue'
     >
     <PageLink
       ><RouterLink to="/point_symmetry/rosette_blender">Rosette Blender</RouterLink></PageLink
-    >
+    >-->
     <PageLink><RouterLink to="/point_symmetry/rosette_maker">Rosette Maker</RouterLink></PageLink>
-    <h3>Frieze Symmetry</h3>
+    <!--<h3>Frieze Symmetry</h3>
     <PageLink><RouterLink to="/frieze_symmetry/frieze_viewer">Frieze Viewer</RouterLink></PageLink>
     <PageLink
       ><RouterLink to="/frieze_symmetry/frieze_blender">Frieze Blender</RouterLink></PageLink

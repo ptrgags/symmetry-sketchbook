@@ -10,14 +10,6 @@
 </template>
 
 <style>
-.horizontal {
-  display: flex;
-  flex-wrap: wrap;
-  flex-direction: row;
-  justify-content: center;
-  align-items: center;
-}
-
 .column {
   width: 40%;
   margin: 0 auto;

@@ -3,7 +3,7 @@ import TwoColumns from '@/components/TwoColumns.vue'
 import P5Sketch from '@/components/P5Sketch.vue'
 
 import { ref, computed, type ComputedRef } from 'vue'
-import { CurveSymmetryType, SYMMETRY_TYPES } from '@/core/CurveSymmetryType'
+import { SYMMETRY_TYPES } from '@/core/CurveSymmetryType'
 import { ParametricCurveViewer, type ParametricCurveState } from '@/sketches/ParametricCurveViewer'
 import { FourierSeries, type FourierTerm } from '@/core/FourierSeries'
 import { TermGridSketch, type TermGridState } from '@/sketches/TermGridSketch'
@@ -17,10 +17,6 @@ import { ComplexPolar, ComplexRect } from '@/core/Complex'
 const MAX_FREQ = 5
 const TERM_COUNT = 2 * MAX_FREQ + 1
 const CENTER_TERM = 5
-
-function make_frequency_map(symmetry: CurveSymmetryType) {
-  return (row: number, col: number) => {}
-}
 
 // Vue state -----------------------
 
@@ -58,6 +54,7 @@ const picker = new CoefficientPickerSketch(picker_state)
 
 // Event handling ---------------------------
 
+// When a new term is selected, pass that term to the picker
 term_grid.events.addEventListener('term-selected', (e) => {
   const z = (e as CustomEvent).detail as ComplexPolar
   picker_state.coefficient = z.to_rect()
@@ -110,17 +107,19 @@ function change_symmetry() {
 
 <template>
   <TwoColumns>
-    <template #left>
-      <h1>Curve Maker</h1>
-      <label for="symmetry-type">Symmetry Type: </label>
-      <select id="symmetry-type" v-model="symmetry_type" @change="change_symmetry">
-        <option v-for="(symmetry, index) in SYMMETRY_TYPES" :key="index" :value="symmetry">
-          {{ symmetry.folds }}-fold symmetry of type {{ symmetry.order }}
-        </option>
-      </select>
-      <P5Sketch :sketch="term_grid"></P5Sketch>
-      <P5Sketch :sketch="picker"></P5Sketch>
+    <template #left><P5Sketch :sketch="viewer"></P5Sketch></template>
+    <template #right>
+      <div class="vertical">
+        <h1>Curve Maker</h1>
+        <label for="symmetry-type">Symmetry Type: </label>
+        <select id="symmetry-type" v-model="symmetry_type" @change="change_symmetry">
+          <option v-for="(symmetry, index) in SYMMETRY_TYPES" :key="index" :value="symmetry">
+            {{ symmetry.folds }}-fold symmetry of type {{ symmetry.order }}
+          </option>
+        </select>
+        <P5Sketch :sketch="term_grid"></P5Sketch>
+        <P5Sketch :sketch="picker"></P5Sketch>
+      </div>
     </template>
-    <template #right><P5Sketch :sketch="viewer"></P5Sketch></template>
   </TwoColumns>
 </template>

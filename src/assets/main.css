@@ -44,22 +44,18 @@ a:active {
     color: var(--color-accent);
 }
 
+.horizontal {
+    display: flex;
+    flex-wrap: wrap;
+    flex-direction: row;
+    justify-content: center;
+    align-items: center;
+  }
+
 .vertical {
     display: flex;
     flex-wrap: wrap;
     flex-direction: row;
     justify-content: center;
     align-items: center;
-}
-
-/* Container where all the content is in a single column */
-.one-column {
-    width: 50%;
-    margin: 0 auto;
-}
-
-/* One of two columns */
-.two-column {
-    width: 40%;
-    display: inline-block;
 }

@@ -3,6 +3,7 @@ import IndexView from '@/views/IndexView.vue'
 import CurveViewerView from '@/views/CurveViewerView.vue'
 import CurveMakerView from '@/views/CurveMakerView.vue'
 import PointSymmetryView from '@/views/PointSymmetryView.vue'
+import RosetteMakerView from '@/views/RosetteMakerView.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -23,9 +24,14 @@ const router = createRouter({
       component: CurveMakerView
     },
     {
-        path: '/point_symmetry',
-        name: 'Point Symmetry',
-        component: PointSymmetryView
+      path: '/point_symmetry',
+      name: 'Point Symmetry',
+      component: PointSymmetryView
+    },
+    {
+      path: '/point_symmetry/rosette_maker',
+      name: 'Rosette Maker',
+      component: RosetteMakerView
     }
   ]
 })
