@@ -16,6 +16,7 @@ export interface TermGridState {
   // If specified, this callback is used to label the frequencies
   // and animate the spinner speed
   frequency_map?: (row: number, col: number) => number | [number, number]
+  enabled_map?: (row: number, col: number) => boolean
 }
 
 export class TermGridSketch extends Sketch<TermGridState> {
@@ -25,6 +26,14 @@ export class TermGridSketch extends Sketch<TermGridState> {
     p.background(0)
 
     Sketch.show_canvas(canvas.elt)
+  }
+
+  is_enabled(row: number, col: number): boolean {
+    if (!this.state.enabled_map) {
+      return true
+    }
+
+    return this.state.enabled_map(row, col)
   }
 
   draw_term(p: p5, row: number, col: number) {
@@ -43,10 +52,13 @@ export class TermGridSketch extends Sketch<TermGridState> {
       )
     }
 
-    p.push()
-
     const center_y = (row + 0.5) * cell_size
     const center_x = (col + 0.5) * cell_size
+
+    const background_color = this.is_enabled(row, col) ? 0 : 191
+    p.fill(background_color)
+    p.noStroke()
+    p.rect(col * cell_size, row * cell_size, cell_size, cell_size)
 
     // Label the term with the frequency
     if (this.state.frequency_map) {
@@ -95,8 +107,6 @@ export class TermGridSketch extends Sketch<TermGridState> {
       p.fill(127)
       p.circle(center_x, center_y, 8)
     }
-
-    p.pop()
   }
 
   draw(p: p5) {
@@ -126,6 +136,10 @@ export class TermGridSketch extends Sketch<TermGridState> {
 
     const col = Math.floor(p.mouseX / cell_size)
     const row = Math.floor(p.mouseY / cell_size)
+
+    if (!this.is_enabled(row, col)) {
+      return false
+    }
 
     if (0 <= col && col < cols && 0 <= row && row < rows) {
       const index = row * cols + col
