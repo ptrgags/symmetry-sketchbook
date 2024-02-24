@@ -16,7 +16,7 @@ export interface TermGridState {
   // If specified, this callback is used to label the frequencies
   // and animate the spinner speed
   frequency_map?: (row: number, col: number) => number | [number, number]
-  enabled_map?: (row: number, col: number) => boolean
+  editable_map?: (row: number, col: number) => boolean
 }
 
 export class TermGridSketch extends Sketch<TermGridState> {
@@ -28,12 +28,12 @@ export class TermGridSketch extends Sketch<TermGridState> {
     Sketch.show_canvas(canvas.elt)
   }
 
-  is_enabled(row: number, col: number): boolean {
-    if (!this.state.enabled_map) {
+  can_edit(row: number, col: number): boolean {
+    if (!this.state.editable_map) {
       return true
     }
 
-    return this.state.enabled_map(row, col)
+    return this.state.editable_map(row, col)
   }
 
   draw_term(p: p5, row: number, col: number) {
@@ -55,23 +55,37 @@ export class TermGridSketch extends Sketch<TermGridState> {
     const center_y = (row + 0.5) * cell_size
     const center_x = (col + 0.5) * cell_size
 
-    const background_color = this.is_enabled(row, col) ? 0 : 191
+    const can_edit = this.can_edit(row, col)
+    const background_color = can_edit ? 0 : 191
     p.fill(background_color)
     p.noStroke()
     p.rect(col * cell_size, row * cell_size, cell_size, cell_size)
 
-    // Label the term with the frequency
     if (this.state.frequency_map) {
       const frequencies = this.state.frequency_map(row, col)
       let freq_str
+      let spinner_frequency
       if (Array.isArray(frequencies)) {
         const [n, m] = frequencies
         freq_str = `${n},${m}`
+        // z^n conj(z)^m expands to r^(n + m)exp(i * theta * (n - m)),
+        // the frequency is the n - m part
+        spinner_frequency = n - m
       } else {
         const n = frequencies
         freq_str = `${n}`
+        spinner_frequency = n
       }
 
+      // draw a spinning line
+      const t = 0.01 * p.frameCount
+      const spin_x = 0.5 * cell_size * p.cos(spinner_frequency * t)
+      const spin_y = 0.5 * cell_size * -p.sin(spinner_frequency * t)
+      p.noFill()
+      p.stroke(255)
+      p.line(center_x, center_y, center_x + spin_x, center_y + spin_y)
+
+      // Label the term with the frequency
       p.noStroke()
       p.fill(255)
       p.textSize(cell_size / 4)
@@ -88,6 +102,9 @@ export class TermGridSketch extends Sketch<TermGridState> {
     // Check if the amplitude is nonzero
     const coefficient_nonzero = coefficient && coefficient.r !== 0
 
+    const ORANGE = p.color(255, 127, 0)
+    const DARK_GREY = p.color(127)
+
     if (coefficient_nonzero) {
       const { r: amplitude, theta: phase } = coefficient
       const real = amplitude * p.cos(phase)
@@ -95,16 +112,17 @@ export class TermGridSketch extends Sketch<TermGridState> {
       const x = center_x + real * pixels_per_unit
       const y = center_y + imag * pixels_per_unit
 
-      p.stroke(255, 127, 0)
+      const point_color = can_edit ? ORANGE : DARK_GREY
+      p.stroke(point_color)
       p.noFill()
       p.line(center_x, center_y, x, y)
 
       p.noStroke()
-      p.fill(255, 127, 0)
+      p.fill(point_color)
       p.circle(x, y, 8)
     } else {
       p.noStroke()
-      p.fill(127)
+      p.fill(DARK_GREY)
       p.circle(center_x, center_y, 8)
     }
   }
@@ -137,7 +155,7 @@ export class TermGridSketch extends Sketch<TermGridState> {
     const col = Math.floor(p.mouseX / cell_size)
     const row = Math.floor(p.mouseY / cell_size)
 
-    if (!this.is_enabled(row, col)) {
+    if (!this.can_edit(row, col)) {
       return false
     }
 

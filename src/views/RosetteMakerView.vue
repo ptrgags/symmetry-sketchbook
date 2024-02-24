@@ -73,7 +73,7 @@ const term_grid_state: TermGridState = {
   selected_index: CENTER_TERM,
   coefficients: new Array(TERM_COUNT).fill(new ComplexPolar(0, 0)),
   frequency_map: indices_to_freq,
-  enabled_map: mirror.is_enabled
+  editable_map: mirror.is_enabled
 }
 term_grid_state.coefficients[CENTER_TERM] = new ComplexPolar(1, 0)
 const term_grid = new TermGridSketch(term_grid_state)
