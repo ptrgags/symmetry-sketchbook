@@ -19,6 +19,10 @@ uniform float aspect;
 uniform float zoom;
 // current pan in uv coordinates
 uniform vec2 pan_uv;
+
+// Mouse position across the canvas. Might be outside
+// [0, 1] if the mouse is outside the canvas.
+uniform vec2 mouse_uv;
 `
 
 common.uniforms_coefficients = `
@@ -62,9 +66,7 @@ uniform mat3 inv_lattice;
 // Texture from p5.js
 uniform sampler2D texture0;
 
-// Mouse position across the canvas. Might be outside
-// [0, 1] if the mouse is outside the canvas.
-uniform vec2 mouse_uv;
+
 `
 */
 
@@ -135,8 +137,15 @@ vec3 palette(vec2 complex_rect) {
     float r_parity = mod(floor(15.0 * z.x), 2.0);
     float theta_parity = mod(floor(10.0 * z.y / PI), 2.0);
 
+    vec2 mouse_z = to_complex(mouse_uv);
+    float mouse_dist = length(mouse_z - complex_rect);
+    // deadmou5 enters the chat?
+    float mouse_mask = smoothstep(0.11, 0.1, mouse_dist);
+    
+
     vec3 color = rgb;
     color = mix(color, -dist * color, unit_circle);
+    color = mix(color, vec3(1.0, 1.0, 0.0), mouse_mask);
     return vec3(color);
 }
 `

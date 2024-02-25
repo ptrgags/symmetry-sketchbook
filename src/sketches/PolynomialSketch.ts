@@ -32,6 +32,13 @@ export class PolynomialSketch extends Sketch<PolynomialState> {
     this.shader.disable()
   }
 
+  mouse_moved(p: p5) {
+    const mouse_uv: [number, number] = [p.mouseX / p.width, 1.0 - p.mouseY / p.height]
+    this.shader.set_mouse_uv(mouse_uv)
+
+    return false
+  }
+
   recompute() {
     this.shader.set_coefficients(this.state.pattern)
     this.shader.disable()

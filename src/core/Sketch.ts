@@ -17,6 +17,9 @@ export abstract class Sketch<State> {
   mouse_released(p: p5): boolean {
     return true
   }
+  mouse_moved(p: p5): boolean {
+    return true
+  }
 
   /**
    * p5.js expects the sketch to be a closure in a certain
@@ -30,6 +33,7 @@ export abstract class Sketch<State> {
       p.setup = () => this.setup(p)
       p.draw = () => this.draw(p)
       p.mouseReleased = () => this.mouse_released(p)
+      p.mouseMoved = () => this.mouse_moved(p)
     }
   }
 
