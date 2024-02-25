@@ -29,7 +29,7 @@ const symmetry: ComputedRef<PointSymmetry> = computed(() => {
   return symmetry_info.value.symmetry
 })
 
-// p5.j2 sketches -------------------
+// p5.js sketches -------------------
 
 const viewer_state: PolynomialState = {
   symmetry_mode: 'rosette',
@@ -43,7 +43,7 @@ const term_grid_state: TermGridState = {
   cols: GRID_SIZE,
   selected_index: CENTER_TERM,
   coefficients: new Array(TERM_COUNT).fill(ComplexPolar.ZERO),
-  frequency_map: (indices) => symmetry.value.indices_to_freq(indices),
+  frequency_map: (indices) => symmetry.value.frequency_map(indices),
   editable_map: (indices) => symmetry.value.is_enabled(indices)
 }
 const term_grid = new TermGridSketch(term_grid_state)
@@ -72,7 +72,7 @@ function update_viewer() {
         continue
       }
 
-      const frequencies = symmetry.value.indices_to_freq({ row: i, col: j })
+      const frequencies = symmetry.value.frequency_map({ row: i, col: j })
       terms.push({
         frequencies,
         coefficient
@@ -105,7 +105,7 @@ function change_symmetry() {
   coefficients.fill(ComplexPolar.ZERO)
 
   term_grid_state.selected_index = CENTER_TERM
-  term_grid_state.frequency_map = (indices) => symmetry.value.indices_to_freq(indices)
+  term_grid_state.frequency_map = (indices) => symmetry.value.frequency_map(indices)
   term_grid_state.editable_map = (indices) => symmetry.value.is_enabled(indices)
 
   picker_state.coefficient = ComplexRect.ZERO
