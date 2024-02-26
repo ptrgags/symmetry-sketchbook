@@ -41,6 +41,8 @@ uniform float num_terms;
 
 // the k in k-fold rotations. Needed for the palette
 uniform float rotation_order;
+// For the monochrome color palettes;
+uniform vec3 monochrome;
 `
 /*
 // 1.0 to enable, 0.0 to disable
@@ -132,8 +134,7 @@ vec3 palette(vec2 complex_rect) {
 
     float sector = floor(rotation_order * angle_normalized);
     float sector_brightness = sector / (rotation_order - 1.0);
-    const vec3 LIGHT_PURPLE = vec3(213, 153, 247) / 255.0;
-    vec3 sector_color = LIGHT_PURPLE * sector_brightness;
+    vec3 sector_color = monochrome * sector_brightness;
 
     float sector_v = fract(rotation_order * angle_normalized);
     
@@ -154,7 +155,7 @@ vec3 palette(vec2 complex_rect) {
     
     vec3 color = sector_color;
     color = mix(color, vec3(1.0), unit_circle);
-    color = mix(color, vec3(0.0), pow(1.0 - dist_from_pole, 4.0));
+    color = mix(color, vec3(0.0), pow(1.0 - dist_from_pole, 8.0));
     //color = mix(color, vec3(1.0, 1.0, 0.0), mouse_mask);
     return vec3(color);
 }

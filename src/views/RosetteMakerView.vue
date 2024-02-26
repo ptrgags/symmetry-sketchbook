@@ -113,6 +113,12 @@ function change_symmetry() {
 
   update_viewer()
 }
+
+function set_monochrome(e: Event) {
+  const color_picker = e.target as HTMLInputElement
+  const color = color_picker.value
+  viewer.monochrome = color
+}
 </script>
 
 <template>
@@ -123,9 +129,13 @@ function change_symmetry() {
     <template #right>
       <div class="vertical">
         <h1>Rosette Maker</h1>
-        <input id="toggle-palette" type="checkbox" @change="toggle_palette" />
-        <label for="toggle-palette">Show color palette</label>
-        <br />
+        <div>
+          <input id="toggle-palette" type="checkbox" @change="toggle_palette" />
+          <label for="toggle-palette">Show color palette</label>
+          <br />
+          <input id="monochrome" type="color" value="#9661ff" @change="set_monochrome" />
+          <label for="monochrome">Palette color</label>
+        </div>
         <label for="symmetry-type">Symmetry Type: </label>
         <select id="symmetry-type" v-model="symmetry_info" @change="change_symmetry">
           <option v-for="entry in SYMMETRY_OPTIONS" :key="entry.id" :value="entry">

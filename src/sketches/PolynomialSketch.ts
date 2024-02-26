@@ -9,6 +9,14 @@ export interface PolynomialState {
   rotation_order: number
 }
 
+function color_to_vec3(color_str: string): number[] {
+  // parse #rrggbb -> [0, 255]^3 -> [0.0, 1.0]^3
+  const parts = [0, 1, 2].map((x) => color_str.substring(1 + 2 * x, 1 + 2 * (x + 1)))
+  const rgb_u8 = parts.map((str) => parseInt(str, 16))
+  const rgb_f32 = rgb_u8.map((val) => val / 255.0)
+  return rgb_f32
+}
+
 export class PolynomialSketch extends Sketch<PolynomialState> {
   shader: PolynomialShader
 
@@ -24,6 +32,7 @@ export class PolynomialSketch extends Sketch<PolynomialState> {
     this.shader.init(p)
     this.shader.set_coefficients(this.state.pattern)
     this.shader.set_uniform('rotation_order', this.state.rotation_order)
+    this.shader.set_uniform('monochrome', color_to_vec3('#9661ff'))
     this.shader.set_animation([])
     this.shader.disable()
   }
@@ -48,5 +57,9 @@ export class PolynomialSketch extends Sketch<PolynomialState> {
 
   set show_palette(value: boolean) {
     this.shader.set_uniform('show_palette', value)
+  }
+
+  set monochrome(value: string) {
+    this.shader.set_uniform('monochrome', color_to_vec3(value))
   }
 }
