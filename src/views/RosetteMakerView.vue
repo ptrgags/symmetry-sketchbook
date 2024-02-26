@@ -133,7 +133,7 @@ function set_monochrome(e: Event) {
           <input id="toggle-palette" type="checkbox" @change="toggle_palette" />
           <label for="toggle-palette">Show color palette</label>
           <br />
-          <input id="monochrome" type="color" value="#9661ff" @change="set_monochrome" />
+          <input id="monochrome" type="color" value="#9661ff" @input="set_monochrome" />
           <label for="monochrome">Palette color</label>
         </div>
         <label for="symmetry-type">Symmetry Type: </label>
