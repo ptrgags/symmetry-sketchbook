@@ -6,6 +6,7 @@ import p5 from 'p5'
 export interface PolynomialState {
   symmetry_mode: 'rosette' | 'frieze'
   pattern: FourierSeries2D
+  rotation_order: number
 }
 
 export class PolynomialSketch extends Sketch<PolynomialState> {
@@ -22,6 +23,7 @@ export class PolynomialSketch extends Sketch<PolynomialState> {
 
     this.shader.init(p)
     this.shader.set_coefficients(this.state.pattern)
+    this.shader.set_uniform('rotation_order', this.state.rotation_order)
     this.shader.set_animation([])
     this.shader.disable()
   }

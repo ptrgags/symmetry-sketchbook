@@ -365,6 +365,21 @@ export interface PointSymmetryInfo {
 export function dropdown_options(grid_size: number): PointSymmetryInfo[] {
   return [
     {
+      id: 'rot5',
+      label: '5-fold rotations',
+      symmetry: new Rotation(grid_size, 5)
+    },
+    {
+      id: 'rot5_turn1',
+      label: '5-fold color-turning (type 1)',
+      symmetry: new Rotation(grid_size, 5, 1)
+    },
+    {
+      id: 'rot5_turn2',
+      label: '5-fold color-turning (type 2)',
+      symmetry: new Rotation(grid_size, 5, 2)
+    },
+    {
       id: 'rot3',
       label: '3-fold rotations',
       symmetry: new Rotation(grid_size, 3)

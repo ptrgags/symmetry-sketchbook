@@ -38,6 +38,9 @@ uniform vec2 coeffs[MAX_TERMS];
 // the first N are used. This is helpful to know for blending through
 // the coefficients.
 uniform float num_terms;
+
+// the k in k-fold rotations. Needed for the palette
+uniform float rotation_order;
 `
 /*
 // 1.0 to enable, 0.0 to disable
@@ -123,29 +126,36 @@ common.funcs_palette = `
 vec3 palette(vec2 complex_rect) {
     vec2 z = to_polar(complex_rect);
 
-    // Let's get 3-color palette
-    // Map angle from [-PI, PI] -> [0, 1]
+    // get a normalized angle in [0, 1] starting from the +x axis
     float angle_normalized = 0.5 + 0.5 * z.y / PI;
-    float cell = floor(3.0 * angle_normalized);
-    vec3 rgb = vec3(equal(cell - vec3(0.0, 1.0, 2.0), vec3(0.0)));
-    
+    angle_normalized = fract(angle_normalized - 0.5);
 
-    float dist = z.x - 1.0;
-    float unit_circle = smoothstep(0.051, 0.05, dist);
+    float sector = floor(rotation_order * angle_normalized);
+    float sector_brightness = sector / (rotation_order - 1.0);
+    const vec3 LIGHT_PURPLE = vec3(213, 153, 247) / 255.0;
+    vec3 sector_color = LIGHT_PURPLE * sector_brightness;
+
+    float sector_v = fract(rotation_order * angle_normalized);
+    
+    float dist_from_pole = min(z.x, 1.0 / z.x);
+    float unit_circle = smoothstep(0.9, 0.91, dist_from_pole);
 
 
     float r_parity = mod(floor(15.0 * z.x), 2.0);
     float theta_parity = mod(floor(10.0 * z.y / PI), 2.0);
 
+    /*
+    // Color points that land near the mouse
     vec2 mouse_z = to_complex(mouse_uv);
     float mouse_dist = length(mouse_z - complex_rect);
     // deadmou5 enters the chat?
     float mouse_mask = smoothstep(0.11, 0.1, mouse_dist);
+    */
     
-
-    vec3 color = rgb;
-    color = mix(color, -dist * color, unit_circle);
-    color = mix(color, vec3(1.0, 1.0, 0.0), mouse_mask);
+    vec3 color = sector_color;
+    color = mix(color, vec3(1.0), unit_circle);
+    color = mix(color, vec3(0.0), pow(1.0 - dist_from_pole, 4.0));
+    //color = mix(color, vec3(1.0, 1.0, 0.0), mouse_mask);
     return vec3(color);
 }
 `

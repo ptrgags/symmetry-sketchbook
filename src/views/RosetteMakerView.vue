@@ -33,7 +33,8 @@ const symmetry: ComputedRef<PointSymmetry> = computed(() => {
 
 const viewer_state: PolynomialState = {
   symmetry_mode: 'rosette',
-  pattern: FourierSeries2D.from_tuples([])
+  pattern: FourierSeries2D.from_tuples([]),
+  rotation_order: 5
 }
 const viewer = new PolynomialSketch(viewer_state)
 

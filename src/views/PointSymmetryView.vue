@@ -6,7 +6,8 @@ import { FourierSeries2D } from '@/core/FourierSeries2D'
 
 const state: PolynomialState = {
   symmetry_mode: 'rosette',
-  pattern: FourierSeries2D.from_tuples([[1, 0, 1, 0]])
+  pattern: FourierSeries2D.from_tuples([[1, 0, 1, 0]]),
+  rotation_order: 8
 }
 
 const sketch = new PolynomialSketch(state)
