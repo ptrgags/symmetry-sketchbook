@@ -116,7 +116,7 @@ export class CoefficientPickerSketch extends Sketch<CoefficientPickerState> {
     p.line(CENTER_PX, CENTER_PX, mx, my)
   }
 
-  mouse_released(p: p5): boolean {
+  emit_mouse_event(p: p5, event_name: string) {
     const x = p.mouseX
     const y = p.mouseY
     if (x < 0 || x >= p.width || y < 0 || y >= p.height) {
@@ -131,8 +131,17 @@ export class CoefficientPickerSketch extends Sketch<CoefficientPickerState> {
     const z_snapped = snap_complex(z)
     this.state.coefficient = z_snapped
 
-    this.events.dispatchEvent(new CustomEvent('change', { detail: z_snapped }))
+    this.events.dispatchEvent(new CustomEvent(event_name, { detail: z_snapped }))
+  }
 
+  mouse_released(p: p5): boolean {
+    this.emit_mouse_event(p, 'change')
+
+    return false
+  }
+
+  mouse_dragged(p: p5): boolean {
+    this.emit_mouse_event(p, 'input')
     return false
   }
 }

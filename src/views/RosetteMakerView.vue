@@ -85,7 +85,7 @@ function update_viewer() {
   viewer.recompute()
 }
 
-picker.events.addEventListener('change', (e) => {
+function update_coefficient(e: Event) {
   const z = (e as CustomEvent).detail as ComplexRect
   symmetry.value.update_coefficients(
     term_grid_state.coefficients,
@@ -94,7 +94,10 @@ picker.events.addEventListener('change', (e) => {
   )
 
   update_viewer()
-})
+}
+
+picker.events.addEventListener('change', update_coefficient)
+picker.events.addEventListener('input', update_coefficient)
 
 function toggle_palette(e: Event) {
   const checkbox = e.target as HTMLInputElement
