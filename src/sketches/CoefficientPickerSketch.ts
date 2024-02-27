@@ -80,9 +80,11 @@ export interface CoefficientPickerState {
 }
 
 export class CoefficientPickerSketch extends Sketch<CoefficientPickerState> {
+  canvas?: HTMLElement
   setup(p: p5) {
     const canvas = p.createCanvas(WIDTH_PX, WIDTH_PX)
 
+    this.canvas = canvas.elt as HTMLElement
     Sketch.show_canvas(canvas.elt)
   }
 
@@ -117,6 +119,10 @@ export class CoefficientPickerSketch extends Sketch<CoefficientPickerState> {
   }
 
   mouse_released(p: p5): boolean {
+    if (!this.canvas || !Sketch.is_visible(this.canvas)) {
+      return true
+    }
+
     const x = p.mouseX
     const y = p.mouseY
     if (x < 0 || x >= p.width || y < 0 || y >= p.height) {

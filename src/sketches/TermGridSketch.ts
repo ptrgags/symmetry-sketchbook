@@ -22,11 +22,13 @@ export interface TermGridState {
 }
 
 export class TermGridSketch extends Sketch<TermGridState> {
+  canvas?: HTMLElement
   setup(p: p5) {
     const { cell_size, rows, cols } = this.state
     const canvas = p.createCanvas(cols * cell_size, rows * cell_size)
     p.background(0)
 
+    this.canvas = canvas.elt as HTMLElement
     Sketch.show_canvas(canvas.elt)
   }
 
@@ -153,6 +155,10 @@ export class TermGridSketch extends Sketch<TermGridState> {
   }
 
   mouse_released(p: p5): boolean {
+    if (!this.canvas || !Sketch.is_visible(this.canvas)) {
+      return true
+    }
+
     const { cell_size, rows, cols, selected_index, coefficients } = this.state
 
     const col = Math.floor(p.mouseX / cell_size)

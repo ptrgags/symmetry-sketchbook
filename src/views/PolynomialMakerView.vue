@@ -13,6 +13,7 @@ import {
 import { PolynomialSketch, type PolynomialState } from '@/sketches/PolynomialSketch'
 import { TermGridSketch, type TermGridState } from '@/sketches/TermGridSketch'
 import { ref, type Ref, computed, type ComputedRef } from 'vue'
+import PointSymmetryEditor from '@/components/PointSymmetryEditor.vue'
 
 // The frequencies will be [-MAX_FREQ, MAX_FREQ] in each direction
 const MAX_FREQ = 3
@@ -143,6 +144,7 @@ function set_monochrome(e: Event) {
       <h1>{{ title }}</h1>
       <TabLayout>
         <TabContent title="Choose Symmetry">
+          <PointSymmetryEditor />
           <select id="symmetry-type" v-model="symmetry_info" @change="change_symmetry">
             <option v-for="entry in SYMMETRY_OPTIONS" :key="entry.id" :value="entry">
               {{ entry.label }}

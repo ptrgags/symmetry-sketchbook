@@ -57,4 +57,25 @@ export abstract class Sketch<State> {
     canvas.style.visibility = ''
     canvas.removeAttribute('data-hidden')
   }
+
+  /**
+   * On some pages, I put the sketch inside a tab that may
+   * use v-show (which sets display: none). Since that's an
+   * ancestor of the sketch's canvas, checking this requires
+   * travelling up the tree
+   *
+   * @param canvas The canvas used for rendering
+   */
+  static is_visible(canvas: HTMLElement) {
+    let node: HTMLElement | null = canvas
+    while (node !== null) {
+      if (getComputedStyle(node).display === 'none') {
+        return false
+      }
+
+      node = node.parentElement
+    }
+
+    return true
+  }
 }
