@@ -23,6 +23,14 @@ const SYMMETRY_OPTIONS = dropdown_options(GRID_SIZE)
 
 // Vue state
 
+const props = defineProps<{
+  symmetry_mode: 'rosette' | 'frieze'
+}>()
+
+const title: ComputedRef<String> = computed(() => {
+  return props.symmetry_mode === 'frieze' ? 'Frieze Maker' : 'Rosette Maker'
+})
+
 const symmetry_info: Ref<PointSymmetryInfo> = ref(SYMMETRY_OPTIONS[0])
 
 const symmetry: ComputedRef<PointSymmetry> = computed(() => {
@@ -32,7 +40,7 @@ const symmetry: ComputedRef<PointSymmetry> = computed(() => {
 // p5.js sketches -------------------
 
 const viewer_state: PolynomialState = {
-  symmetry_mode: 'rosette',
+  symmetry_mode: props.symmetry_mode,
   pattern: FourierSeries2D.from_tuples([]),
   rotation_order: 5
 }
@@ -127,8 +135,8 @@ function set_monochrome(e: Event) {
       <P5Sketch :sketch="viewer"></P5Sketch>
     </template>
     <template #right>
+      <h1>{{ title }}</h1>
       <div class="vertical">
-        <h1>Rosette Maker</h1>
         <div>
           <input id="toggle-palette" type="checkbox" @change="toggle_palette" />
           <label for="toggle-palette">Show color palette</label>
