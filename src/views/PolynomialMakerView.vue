@@ -17,7 +17,10 @@ const MAX_FREQ = 3
 const GRID_SIZE = 2 * MAX_FREQ + 1
 const TERM_COUNT = GRID_SIZE * GRID_SIZE
 const CENTER_1D = MAX_FREQ
-const CENTER_TERM = CENTER_1D * GRID_SIZE + CENTER_1D
+// The center term is sometimes not editable, or it only affects the constant
+// term. But selecting the one above it will produce visible results in most
+// if not all cases.
+const DEFAULT_TERM = (CENTER_1D - 1) * GRID_SIZE + CENTER_1D
 
 const SYMMETRY_OPTIONS = dropdown_options(GRID_SIZE)
 
@@ -50,7 +53,7 @@ const term_grid_state: TermGridState = {
   cell_size: 40,
   rows: GRID_SIZE,
   cols: GRID_SIZE,
-  selected_index: CENTER_TERM,
+  selected_index: DEFAULT_TERM,
   coefficients: new Array(TERM_COUNT).fill(ComplexPolar.ZERO),
   frequency_map: (indices) => symmetry.value.frequency_map(indices),
   editable_map: (indices) => symmetry.value.is_enabled(indices)
@@ -113,7 +116,7 @@ function change_symmetry() {
   const coefficients = term_grid_state.coefficients
   coefficients.fill(ComplexPolar.ZERO)
 
-  term_grid_state.selected_index = CENTER_TERM
+  term_grid_state.selected_index = DEFAULT_TERM
   term_grid_state.frequency_map = (indices) => symmetry.value.frequency_map(indices)
   term_grid_state.editable_map = (indices) => symmetry.value.is_enabled(indices)
 
