@@ -1,6 +1,8 @@
 <script setup lang="ts">
 import P5Sketch from '@/components/P5Sketch.vue'
 import TwoColumns from '@/components/TwoColumns.vue'
+import TabLayout from '@/components/TabLayout.vue'
+import TabContent from '@/components/TabContent.vue'
 import { ComplexPolar, ComplexRect } from '@/core/Complex'
 import { FourierSeries2D, type FourierTerm2D } from '@/core/FourierSeries2D'
 import { PointSymmetry, type PointSymmetryInfo, dropdown_options } from '@/core/PointSymmetry'
@@ -139,23 +141,25 @@ function set_monochrome(e: Event) {
     </template>
     <template #right>
       <h1>{{ title }}</h1>
-      <div class="vertical">
-        <div>
+      <TabLayout>
+        <TabContent title="Choose Symmetry">
+          <select id="symmetry-type" v-model="symmetry_info" @change="change_symmetry">
+            <option v-for="entry in SYMMETRY_OPTIONS" :key="entry.id" :value="entry">
+              {{ entry.label }}
+            </option>
+          </select>
+        </TabContent>
+        <TabContent title="Edit Pattern">
+          <P5Sketch :sketch="term_grid"></P5Sketch> <P5Sketch :sketch="picker"></P5Sketch>
+        </TabContent>
+        <TabContent title="Display Settings">
           <input id="toggle-palette" type="checkbox" @change="toggle_palette" />
           <label for="toggle-palette">Show color palette</label>
           <br />
           <input id="monochrome" type="color" value="#9661ff" @change="set_monochrome" />
           <label for="monochrome">Palette color</label>
-        </div>
-        <label for="symmetry-type">Symmetry Type: </label>
-        <select id="symmetry-type" v-model="symmetry_info" @change="change_symmetry">
-          <option v-for="entry in SYMMETRY_OPTIONS" :key="entry.id" :value="entry">
-            {{ entry.label }}
-          </option>
-        </select>
-        <P5Sketch :sketch="term_grid"></P5Sketch>
-        <P5Sketch :sketch="picker"></P5Sketch>
-      </div>
+        </TabContent>
+      </TabLayout>
     </template>
   </TwoColumns>
 </template>
