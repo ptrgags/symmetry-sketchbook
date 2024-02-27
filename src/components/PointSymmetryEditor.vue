@@ -9,7 +9,6 @@ import {
   type PointSymmetryRule,
   has_reflection
 } from '../core/PointSymmetry'
-import { to_tuple3, type UpToThree } from '@/core/ts_util'
 
 interface GroupOption {
   id: string
@@ -168,11 +167,11 @@ const second_color_turn = defineModel<ColorTurnValue>('second_color_turn')
 const third_color_turn = defineModel<ColorTurnValue>('third_color_turn')
 
 defineProps<{
-  value?: UpToThree<PointSymmetryRule>
+  value?: PointSymmetryRule[]
 }>()
 
 const emit = defineEmits<{
-  (e: 'update:modelValue', value: UpToThree<PointSymmetryRule>): void
+  (e: 'update:modelValue', value: PointSymmetryRule[]): void
 }>()
 
 function make_rule(
@@ -264,7 +263,7 @@ watch(
       rules.push(third_rule)
     }
 
-    emit('update:modelValue', to_tuple3(rules))
+    emit('update:modelValue', rules)
   }
 )
 </script>

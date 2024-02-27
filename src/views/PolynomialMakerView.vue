@@ -5,12 +5,7 @@ import TabLayout from '@/components/TabLayout.vue'
 import TabContent from '@/components/TabContent.vue'
 import { ComplexPolar, ComplexRect } from '@/core/Complex'
 import { FourierSeries2D, type FourierTerm2D } from '@/core/FourierSeries2D'
-import {
-  PointSymmetry,
-  type PointSymmetryRule,
-  type PointSymmetryInfo,
-  dropdown_options
-} from '@/core/PointSymmetry'
+import { type PointSymmetryRule, SymmetryRules, NO_SYMMETRY } from '@/core/PointSymmetry'
 import {
   type CoefficientPickerState,
   CoefficientPickerSketch
@@ -19,7 +14,6 @@ import { PolynomialSketch, type PolynomialState } from '@/sketches/PolynomialSke
 import { TermGridSketch, type TermGridState } from '@/sketches/TermGridSketch'
 import { ref, type Ref, computed, type ComputedRef } from 'vue'
 import PointSymmetryEditor from '@/components/PointSymmetryEditor.vue'
-import type { UpToThree } from '@/core/ts_util'
 
 // The frequencies will be [-MAX_FREQ, MAX_FREQ] in each direction
 const MAX_FREQ = 3
@@ -31,8 +25,6 @@ const CENTER_1D = MAX_FREQ
 // if not all cases.
 const DEFAULT_TERM = (CENTER_1D - 1) * GRID_SIZE + CENTER_1D
 
-const SYMMETRY_OPTIONS = dropdown_options(GRID_SIZE)
-
 // Vue state
 
 const props = defineProps<{
@@ -43,13 +35,7 @@ const title: ComputedRef<String> = computed(() => {
   return props.symmetry_mode === 'frieze' ? 'Frieze Maker' : 'Rosette Maker'
 })
 
-const symmetry_info: Ref<PointSymmetryInfo> = ref(SYMMETRY_OPTIONS[0])
-
-const symmetry: ComputedRef<PointSymmetry> = computed(() => {
-  return symmetry_info.value.symmetry
-})
-
-const symmetry_rule = defineModel<UpToThree<PointSymmetryRule>>('symmetry_rule')
+const symmetry = ref<SymmetryRules>(new SymmetryRules(GRID_SIZE, [NO_SYMMETRY]))
 
 // p5.js sketches -------------------
 
@@ -123,7 +109,9 @@ function toggle_palette(e: Event) {
   viewer.show_palette = checkbox.checked
 }
 
-function change_symmetry() {
+function change_symmetry(rules: PointSymmetryRule[]) {
+  symmetry.value = new SymmetryRules(GRID_SIZE, rules)
+
   const coefficients = term_grid_state.coefficients
   coefficients.fill(ComplexPolar.ZERO)
 
@@ -152,15 +140,7 @@ function set_monochrome(e: Event) {
       <h1>{{ title }}</h1>
       <TabLayout>
         <TabContent title="Choose Symmetry">
-          <PointSymmetryEditor v-model="symmetry_rule" />
-          {{ symmetry_rule }}
-          <!--
-          <select id="symmetry-type" v-model="symmetry_info" @change="change_symmetry">
-            <option v-for="entry in SYMMETRY_OPTIONS" :key="entry.id" :value="entry">
-              {{ entry.label }}
-            </option>
-          </select>
-        -->
+          <PointSymmetryEditor @update:model-value="change_symmetry" />
         </TabContent>
         <TabContent title="Edit Pattern">
           <P5Sketch :sketch="term_grid"></P5Sketch> <P5Sketch :sketch="picker"></P5Sketch>

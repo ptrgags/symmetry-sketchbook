@@ -57,15 +57,15 @@ export class TermGridSketch extends Sketch<TermGridState> {
       )
     }
 
+    if (!this.can_edit(indices)) {
+      p.fill(64)
+      p.noStroke()
+      p.rect(col * cell_size, row * cell_size, cell_size, cell_size)
+      return
+    }
+
     const center_y = (row + 0.5) * cell_size
     const center_x = (col + 0.5) * cell_size
-
-    const can_edit = this.can_edit(indices)
-    const background_color = can_edit ? 0 : 191
-    p.fill(background_color)
-    p.noStroke()
-    p.rect(col * cell_size, row * cell_size, cell_size, cell_size)
-
     if (this.state.frequency_map) {
       const frequencies = this.state.frequency_map(indices)
       let freq_str
@@ -117,13 +117,12 @@ export class TermGridSketch extends Sketch<TermGridState> {
       const x = center_x + real * pixels_per_unit
       const y = center_y + imag * pixels_per_unit
 
-      const point_color = can_edit ? ORANGE : DARK_GREY
-      p.stroke(point_color)
+      p.stroke(ORANGE)
       p.noFill()
       p.line(center_x, center_y, x, y)
 
       p.noStroke()
-      p.fill(point_color)
+      p.fill(ORANGE)
       p.circle(x, y, 8)
     } else {
       p.noStroke()

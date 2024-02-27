@@ -1,4 +1,4 @@
-import type { ComplexPolar } from './Complex'
+import { ComplexPolar } from './Complex'
 import { swap, negate, type Frequency2D } from './Frequency2D'
 import { to_indices_2d, type GridIndices2D, to_index_1d } from './GridIndices2D'
 import { mod } from './math'
@@ -51,6 +51,15 @@ export interface PointSymmetryRule {
   input_inversion: boolean
   output_rotations: number
   output_reflection: boolean
+}
+
+export const NO_SYMMETRY: PointSymmetryRule = {
+  rotation_folds: 1,
+  input_rotations: 0,
+  input_reflection: false,
+  input_inversion: false,
+  output_rotations: 0,
+  output_reflection: false
 }
 
 function indices_to_diagonals(
@@ -353,6 +362,154 @@ export class Rotation extends PointSymmetry {
 
   update_coefficients(coefficients: ComplexPolar[], index: number, term: ComplexPolar): void {
     coefficients[index] = term
+  }
+}
+
+type PartnerType = 'identity' | 'flip_col' | 'flip_row' | 'flip_both'
+type PartnerFunc = (indices: GridIndices2D, grid_size: number) => GridIndices2D
+
+const PARTNER_FUNCTIONS: { [key in PartnerType]: PartnerFunc } = {
+  identity: (indices: GridIndices2D) => indices,
+  flip_col: ({ row, col }: GridIndices2D, grid_size: number) => {
+    return { row, col: grid_size - 1 - col }
+  },
+  // Negate the signed row. This corresponds to a_nm -> a_(-m)(-n)
+  // (swap + negate)
+  flip_row: ({ row, col }: GridIndices2D, grid_size: number) => {
+    return { row: grid_size - 1 - row, col }
+  },
+  // flip both row and column
+  flip_both: ({ row, col }: GridIndices2D, grid_size: number) => {
+    return { row: grid_size - 1 - row, col: grid_size - 1 - col }
+  }
+}
+
+function get_partner_type(rule: PointSymmetryRule): PartnerType {
+  // Using !== as XOR
+  const swap = rule.input_reflection !== rule.output_reflection
+  const invert = rule.input_inversion
+
+  if (invert && swap) {
+    return 'flip_row'
+  }
+
+  if (invert) {
+    return 'flip_both'
+  }
+
+  if (swap) {
+    return 'flip_col'
+  }
+
+  return 'identity'
+}
+
+function validate_rules(rules: PointSymmetryRule[]) {
+  if (rules.length === 0) {
+    throw new Error('There must be at least one rule')
+  }
+
+  const visited_types: Set<string> = new Set()
+  for (const rule of rules) {
+    const partner_type = get_partner_type(rule)
+    if (visited_types.has(partner_type)) {
+      throw new Error(`Can't have multiple rules with the same pairing: ${partner_type}`)
+    }
+  }
+}
+
+function get_rotation_power(rule: PointSymmetryRule, frequency_diff: number): number {
+  const l = rule.input_rotations
+  const input_sign = Math.pow(-1, Number(rule.input_reflection) + Number(rule.input_inversion))
+  const output_sign = Math.pow(-1, Number(rule.output_reflection))
+  const u = rule.output_rotations
+
+  return input_sign * l * frequency_diff - output_sign * u
+}
+
+export class SymmetryRules extends PointSymmetry {
+  self_rule?: PointSymmetryRule
+  partner_rules: PointSymmetryRule[] = []
+  constructor(grid_size: number, rules: PointSymmetryRule[]) {
+    super(grid_size)
+
+    validate_rules(rules)
+
+    for (const rule of rules) {
+      const partner_type = get_partner_type(rule)
+
+      if (partner_type === 'identity') {
+        this.self_rule = rule
+      } else {
+        this.partner_rules.push(rule)
+      }
+    }
+  }
+
+  get first_rule(): PointSymmetryRule {
+    return this.self_rule ?? this.partner_rules[0]
+  }
+
+  is_enabled(indices: GridIndices2D): boolean {
+    const signed_indices = this.to_signed(indices)
+    const { diff, sum } = indices_to_diagonals(signed_indices, this.first_rule)
+    const parity = mod(diff, 2)
+    if (parity === 1 && sum == 0) {
+      return false
+    }
+    return true
+  }
+
+  frequency_map(indices: GridIndices2D): Frequency2D {
+    const signed_indices = this.to_signed(indices)
+    const diagonals = indices_to_diagonals(signed_indices, this.first_rule)
+    return diagonals_to_frequencies(diagonals)
+  }
+
+  update_coefficients(coefficients: ComplexPolar[], index: number, term: ComplexPolar): void {
+    // Always set a_nm
+    coefficients[index] = term
+
+    const indices = to_indices_2d(index, this.grid_size)
+
+    /*
+    if (this.self_rule) {
+      // for a constraint like a_nm = rotate_k^P mirror^Q a_nm,
+      // this can only be true if rotate is a 2-fold rotation, so this is
+      // equivalent to saying a_nm = (-1)^P mirror^Q a_nm
+
+      const flipped = this.self_rule.output_reflection ? term.conj : term
+
+      const signed_indices = this.to_signed(indices)
+      const diagonals = indices_to_diagonals(signed_indices, this.self_rule)
+      const rotation_factor = get_rotation_factor(this.self_rule, diagonals.diff)
+      const rotated = mod(rotation_factor, 2) === 1 ? 
+    }*/
+
+    // For "partner rules", a_nm has a partner coefficient a_(n')(m')
+    // somewhere else in the grid. They will be related as:
+    // a_(n')(m') = C * a_nm
+    // with a scalar C that depends on the symmetry rule
+    for (const rule of this.partner_rules) {
+      // Find the index of the partner in the grid
+      const partner_type = get_partner_type(rule)
+      const partner_func = PARTNER_FUNCTIONS[partner_type]
+      const partner_indices = partner_func(indices, this.grid_size)
+      const partner_index = to_index_1d(partner_indices, this.grid_size)
+
+      // If we have an output reflection and set a' = conj(a)
+      const flipped = rule.output_reflection ? term.conj : term
+
+      // Get the rotation factor, and do a' *= R
+      const partner_signed = this.to_signed(partner_indices)
+      const diagonals = indices_to_diagonals(partner_signed, rule)
+      const rotation_power = get_rotation_power(rule, diagonals.diff)
+      const rotation_factor = ComplexPolar.root_of_unity(rule.rotation_folds, rotation_power)
+      const rotated = flipped.mult(rotation_factor)
+
+      // Set a' = C * a
+      coefficients[partner_index] = rotated
+    }
   }
 }
 
