@@ -44,13 +44,13 @@ function diagonals_to_frequencies(diagonals: Diagonals): Frequency2D {
   return { n, m }
 }
 
-class PointSymmetryRule {
-  rotation_folds: number = 1
-  input_rotations: number = 0
-  input_reflection: boolean = false
-  input_inversion: boolean = false
-  output_rotations: number = 0
-  output_reflection: boolean = false
+export interface PointSymmetryRule {
+  rotation_folds: number
+  input_rotations: number
+  input_reflection: boolean
+  input_inversion: boolean
+  output_rotations: number
+  output_reflection: boolean
 }
 
 function indices_to_diagonals(
@@ -410,4 +410,60 @@ export function dropdown_options(grid_size: number): PointSymmetryInfo[] {
       symmetry: new Inversion(grid_size)
     }
   ]
+}
+
+export enum InputSymmetryType {
+  Identity,
+  Rotation,
+  Mirror,
+  ComplexInversion,
+  CircleInversion,
+  RotoInversion
+}
+
+export function to_string(symmetry: InputSymmetryType): string {
+  switch (symmetry) {
+    case InputSymmetryType.Identity:
+      return 'Identity'
+    case InputSymmetryType.Rotation:
+      return 'Rotation'
+    case InputSymmetryType.Mirror:
+      return 'Mirror'
+    case InputSymmetryType.ComplexInversion:
+      return 'Complex-inversion'
+    case InputSymmetryType.CircleInversion:
+      return 'Circle Inversion'
+    case InputSymmetryType.RotoInversion:
+      return 'Roto-inversion'
+    default:
+      return ''
+  }
+}
+
+export function has_reflection(symmetry: InputSymmetryType): boolean {
+  switch (symmetry) {
+    case InputSymmetryType.Mirror:
+    case InputSymmetryType.CircleInversion:
+    case InputSymmetryType.RotoInversion:
+      return true
+  }
+
+  return false
+}
+
+export function has_inversion(symmetry: InputSymmetryType): boolean {
+  switch (symmetry) {
+    case InputSymmetryType.ComplexInversion:
+    case InputSymmetryType.CircleInversion:
+    case InputSymmetryType.RotoInversion:
+      return true
+  }
+
+  return false
+}
+
+export enum OutputSymmetryType {
+  Identity,
+  Rotation,
+  Mirror
 }
