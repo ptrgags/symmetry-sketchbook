@@ -12,7 +12,7 @@ import {
 } from '@/sketches/CoefficientPickerSketch'
 import { PolynomialSketch, type PolynomialState } from '@/sketches/PolynomialSketch'
 import { TermGridSketch, type TermGridState } from '@/sketches/TermGridSketch'
-import { ref, type Ref, computed, type ComputedRef } from 'vue'
+import { ref, computed } from 'vue'
 import PointSymmetryEditor from '@/components/PointSymmetryEditor.vue'
 
 // The frequencies will be [-MAX_FREQ, MAX_FREQ] in each direction
@@ -31,7 +31,7 @@ const props = defineProps<{
   symmetry_mode: 'rosette' | 'frieze'
 }>()
 
-const title: ComputedRef<String> = computed(() => {
+const title = computed<string>(() => {
   return props.symmetry_mode === 'frieze' ? 'Frieze Maker' : 'Rosette Maker'
 })
 

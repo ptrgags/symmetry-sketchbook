@@ -64,6 +64,10 @@ export class PolynomialSketch extends Sketch<PolynomialState> {
   }
 
   set rotation_order(value: number) {
-    this.shader.set_uniform('rotation_order', value)
+    // When the rotation order is 1, we only have mirrors and inversions.
+    // This looks better with more sectors, so set it to 4
+    const order = value >= 2 ? value : 4
+
+    this.shader.set_uniform('rotation_order', order)
   }
 }
