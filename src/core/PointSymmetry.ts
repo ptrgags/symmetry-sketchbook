@@ -1,6 +1,6 @@
 import { ComplexPolar } from './Complex'
 import { swap, negate, type Frequency2D } from './Frequency2D'
-import { to_indices_2d, type GridIndices2D, to_index_1d } from './GridIndices2D'
+import { to_indices_2d, type GridIndices2D, to_index_1d, GridMath2D } from './GridIndices2D'
 import { mod } from './math'
 
 /**
@@ -369,19 +369,10 @@ type PartnerType = 'identity' | 'flip_col' | 'flip_row' | 'flip_both'
 type PartnerFunc = (indices: GridIndices2D, grid_size: number) => GridIndices2D
 
 const PARTNER_FUNCTIONS: { [key in PartnerType]: PartnerFunc } = {
-  identity: (indices: GridIndices2D) => indices,
-  flip_col: ({ row, col }: GridIndices2D, grid_size: number) => {
-    return { row, col: grid_size - 1 - col }
-  },
-  // Negate the signed row. This corresponds to a_nm -> a_(-m)(-n)
-  // (swap + negate)
-  flip_row: ({ row, col }: GridIndices2D, grid_size: number) => {
-    return { row: grid_size - 1 - row, col }
-  },
-  // flip both row and column
-  flip_both: ({ row, col }: GridIndices2D, grid_size: number) => {
-    return { row: grid_size - 1 - row, col: grid_size - 1 - col }
-  }
+  identity: GridMath2D.identity,
+  flip_col: GridMath2D.flip_col,
+  flip_row: GridMath2D.flip_row,
+  flip_both: GridMath2D.flip_both
 }
 
 function get_partner_type(rule: PointSymmetryRule): PartnerType {
