@@ -42,13 +42,13 @@ vec2 compute(vec2 z) {
 `
 
 export const FRIEZE_FUNC = `
-vec2 compute(vec2 z, float animation_direction) {    
+vec2 compute(vec2 z) {    
     vec2 sum = vec2(0.0);
     for (int i = 0; i < MAX_TERMS; i++) {
         // Frieze symmetry is taken by composing the
-        // rosette symmetry polynomial f(z) with Phi(z) = e^iz
+        // rosette symmetry polynomial f(z) with Phi(z) = e^z
         // to form f(Phi(z)) which expands to
-        // a_nm.r * exp(-z.y * (n + m)) * expi(z.x * (n - m) + a_nm.theta)
+        // a_nm.r * exp(z.x * (n + m)) * exp(i * z.y * (n - m) + a_nm.theta)
         
         vec2 nm = powers[i];
         float n = nm.x;
@@ -56,45 +56,13 @@ vec2 compute(vec2 z, float animation_direction) {
         
         // amplitude, phase
         vec2 a_nm = coeffs[i];
-        // Animate the phase
-        a_nm.y += animation_direction * animation[i] * time;
         
-        float r =  a_nm.x * exp(-z.y * (n + m));
-        float theta = z.x * (n - m) + a_nm.y;
+        float r =  a_nm.x * exp(z.x * (n + m));
+        float theta = z.y * (n - m) + a_nm.y;
         
-        vec2 rect = to_rect(vec2(r, theta));
-        sum += blend_pairwise(float(i)) * rect;
-        
+        sum += to_rect(vec2(r, theta));
     }
     return sum;
-}
-`
-
-const FRAG_SHADER_OLD = (symmetry_func: string) => `
-precision highp float;
-${common.defines}
-${common.uniforms}
-
-varying vec2 uv;
-
-${common.funcs_polar}
-${common.funcs_view}
-${common.funcs_animation}
-${common.funcs_ref_geometry}
-
-${symmetry_func}
-${common.funcs_standing_waves}
-
-void main() {
-    vec2 complex = to_complex(uv);
-    vec2 z = standing_waves(complex);
-
-    vec4 tex_color = texture2D(texture0, to_texture(z));
-    vec4 ref_layer = ref_geometry(z);
-    
-    vec4 image = tex_color;
-    image = mix(image, ref_layer, ref_layer.a);
-    gl_FragColor = image;
 }
 `
 

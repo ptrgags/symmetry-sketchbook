@@ -22,11 +22,13 @@ export interface TermGridState {
 }
 
 export class TermGridSketch extends Sketch<TermGridState> {
+  canvas?: HTMLElement
   setup(p: p5) {
     const { cell_size, rows, cols } = this.state
     const canvas = p.createCanvas(cols * cell_size, rows * cell_size)
     p.background(0)
 
+    this.canvas = canvas.elt as HTMLElement
     Sketch.show_canvas(canvas.elt)
   }
 
@@ -55,15 +57,15 @@ export class TermGridSketch extends Sketch<TermGridState> {
       )
     }
 
+    if (!this.can_edit(indices)) {
+      p.fill(64)
+      p.noStroke()
+      p.rect(col * cell_size, row * cell_size, cell_size, cell_size)
+      return
+    }
+
     const center_y = (row + 0.5) * cell_size
     const center_x = (col + 0.5) * cell_size
-
-    const can_edit = this.can_edit(indices)
-    const background_color = can_edit ? 0 : 191
-    p.fill(background_color)
-    p.noStroke()
-    p.rect(col * cell_size, row * cell_size, cell_size, cell_size)
-
     if (this.state.frequency_map) {
       const frequencies = this.state.frequency_map(indices)
       let freq_str
@@ -115,13 +117,12 @@ export class TermGridSketch extends Sketch<TermGridState> {
       const x = center_x + real * pixels_per_unit
       const y = center_y + imag * pixels_per_unit
 
-      const point_color = can_edit ? ORANGE : DARK_GREY
-      p.stroke(point_color)
+      p.stroke(ORANGE)
       p.noFill()
       p.line(center_x, center_y, x, y)
 
       p.noStroke()
-      p.fill(point_color)
+      p.fill(ORANGE)
       p.circle(x, y, 8)
     } else {
       p.noStroke()
@@ -153,6 +154,10 @@ export class TermGridSketch extends Sketch<TermGridState> {
   }
 
   mouse_released(p: p5): boolean {
+    if (!this.canvas || !Sketch.is_visible(this.canvas)) {
+      return true
+    }
+
     const { cell_size, rows, cols, selected_index, coefficients } = this.state
 
     const col = Math.floor(p.mouseX / cell_size)

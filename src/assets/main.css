@@ -1,21 +1,22 @@
 :root {
-    --color-background-dark: #1d3c55;
-    --color-background: #224866;
+  --color-background-dark: #1d3c55;
+  --color-background: #224866;
+  --color-background-light: #366b94;
 
-    --color-text: #e7e7e7;
+  --color-text: #e7e7e7;
 
-    --color-accent-dark: #abc45c;
-    --color-accent: #c1df56;
+  --color-accent-dark: #abc45c;
+  --color-accent: #c1df56;
 
-    --color-accent2: #9d25ee;
+  --color-accent2: #9d25ee;
 }
 
 body {
-    padding: 0;
-    margin: 0;
-    color: var(--color-text);
-    background-color: var(--color-background-dark);
-    font-family: sans-serif;
+  padding: 0;
+  margin: 0;
+  color: var(--color-text);
+  background-color: var(--color-background-dark);
+  font-family: sans-serif;
 }
 
 h1,
@@ -24,38 +25,41 @@ h3,
 h4,
 h5,
 h6 {
-    text-align: center;
-    width: 100%;
+  text-align: center;
+  width: 100%;
 }
 
 a:link {
-    color: var(--color-accent);
+  color: var(--color-accent);
 }
 
 a:visited {
-    color: var(--color-accent-dark);
+  color: var(--color-accent-dark);
 }
 
 a:hover {
-    color: var(--color-accent2);
+  color: var(--color-accent2);
 }
 
 a:active {
-    color: var(--color-accent);
+  color: var(--color-accent);
 }
 
 .horizontal {
-    display: flex;
-    flex-wrap: wrap;
-    flex-direction: row;
-    justify-content: center;
-    align-items: center;
-  }
+  display: flex;
+  flex-wrap: wrap;
+  flex-direction: row;
+  justify-content: center;
+}
 
 .vertical {
-    display: flex;
-    flex-wrap: wrap;
-    flex-direction: row;
-    justify-content: center;
-    align-items: center;
+  display: flex;
+  flex-wrap: wrap;
+  flex-direction: row;
+  justify-content: center;
+}
+
+.form-row {
+  width: 100%;
+  margin: 4px 0;
 }

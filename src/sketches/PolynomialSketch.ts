@@ -62,4 +62,8 @@ export class PolynomialSketch extends Sketch<PolynomialState> {
   set monochrome(value: string) {
     this.shader.set_uniform('monochrome', color_to_vec3(value))
   }
+
+  set rotation_order(value: number) {
+    this.shader.set_uniform('rotation_order', value)
+  }
 }

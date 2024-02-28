@@ -15,7 +15,6 @@ export function check_shader(vert: string, frag: string) {
   if (!gl.getShaderParameter(vert_shader, gl.COMPILE_STATUS)) {
     console.error('Vertex shader failed to compile:')
     console.error(gl.getShaderInfoLog(vert_shader))
-    console.info(vert)
   }
 
   const frag_shader = gl.createShader(gl.FRAGMENT_SHADER)
@@ -28,7 +27,6 @@ export function check_shader(vert: string, frag: string) {
   if (!gl.getShaderParameter(frag_shader, gl.COMPILE_STATUS)) {
     console.error('Fragment shader failed to compile:')
     console.error(gl.getShaderInfoLog(frag_shader))
-    console.info(frag)
   }
 
   const program = gl.createProgram()

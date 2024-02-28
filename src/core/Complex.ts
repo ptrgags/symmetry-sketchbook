@@ -97,6 +97,12 @@ export class ComplexPolar {
     this.theta = theta
   }
 
+  // Complex conjugate:
+  // conj(re^(i * theta)) = re^(-i * theta)
+  get conj(): ComplexPolar {
+    return new ComplexPolar(this.r, -this.theta)
+  }
+
   scale(factor: number): ComplexPolar {
     return new ComplexPolar(factor * this.r, this.theta)
   }
@@ -105,8 +111,12 @@ export class ComplexPolar {
     return new ComplexPolar(this.r, this.theta + angle)
   }
 
+  mult(other: ComplexPolar): ComplexPolar {
+    return new ComplexPolar(this.r * other.r, this.theta + other.theta)
+  }
+
   /**
-   * To raise a complex number to a power, raise the rulus
+   * To raise a complex number to a power, raise the modulus
    * to the power, but multiply the angle instead.
    */
   pow(n: number): ComplexPolar {
@@ -120,6 +130,11 @@ export class ComplexPolar {
     const x = r * Math.cos(theta)
     const y = r * Math.sin(theta)
     return new ComplexRect(x, y)
+  }
+
+  static root_of_unity(k: number, n: number): ComplexPolar {
+    const theta = (n * 2.0 * Math.PI) / k
+    return new ComplexPolar(1.0, theta)
   }
 
   static readonly ZERO: ComplexPolar = new ComplexPolar(0, 0)

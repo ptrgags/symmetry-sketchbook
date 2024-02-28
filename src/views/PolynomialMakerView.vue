@@ -1,9 +1,11 @@
 <script setup lang="ts">
 import P5Sketch from '@/components/P5Sketch.vue'
 import TwoColumns from '@/components/TwoColumns.vue'
+import TabLayout from '@/components/TabLayout.vue'
+import TabContent from '@/components/TabContent.vue'
 import { ComplexPolar, ComplexRect } from '@/core/Complex'
 import { FourierSeries2D, type FourierTerm2D } from '@/core/FourierSeries2D'
-import { PointSymmetry, type PointSymmetryInfo, dropdown_options } from '@/core/PointSymmetry'
+import { type PointSymmetryRule, SymmetryRules, NO_SYMMETRY } from '@/core/PointSymmetry'
 import {
   type CoefficientPickerState,
   CoefficientPickerSketch
@@ -11,28 +13,34 @@ import {
 import { PolynomialSketch, type PolynomialState } from '@/sketches/PolynomialSketch'
 import { TermGridSketch, type TermGridState } from '@/sketches/TermGridSketch'
 import { ref, type Ref, computed, type ComputedRef } from 'vue'
+import PointSymmetryEditor from '@/components/PointSymmetryEditor.vue'
 
 // The frequencies will be [-MAX_FREQ, MAX_FREQ] in each direction
 const MAX_FREQ = 3
 const GRID_SIZE = 2 * MAX_FREQ + 1
 const TERM_COUNT = GRID_SIZE * GRID_SIZE
 const CENTER_1D = MAX_FREQ
-const CENTER_TERM = CENTER_1D * GRID_SIZE + CENTER_1D
-
-const SYMMETRY_OPTIONS = dropdown_options(GRID_SIZE)
+// The center term is sometimes not editable, or it only affects the constant
+// term. But selecting the one above it will produce visible results in most
+// if not all cases.
+const DEFAULT_TERM = (CENTER_1D - 1) * GRID_SIZE + CENTER_1D
 
 // Vue state
 
-const symmetry_info: Ref<PointSymmetryInfo> = ref(SYMMETRY_OPTIONS[0])
+const props = defineProps<{
+  symmetry_mode: 'rosette' | 'frieze'
+}>()
 
-const symmetry: ComputedRef<PointSymmetry> = computed(() => {
-  return symmetry_info.value.symmetry
+const title: ComputedRef<String> = computed(() => {
+  return props.symmetry_mode === 'frieze' ? 'Frieze Maker' : 'Rosette Maker'
 })
+
+const symmetry = ref<SymmetryRules>(new SymmetryRules(GRID_SIZE, [NO_SYMMETRY]))
 
 // p5.js sketches -------------------
 
 const viewer_state: PolynomialState = {
-  symmetry_mode: 'rosette',
+  symmetry_mode: props.symmetry_mode,
   pattern: FourierSeries2D.from_tuples([]),
   rotation_order: 5
 }
@@ -42,7 +50,7 @@ const term_grid_state: TermGridState = {
   cell_size: 40,
   rows: GRID_SIZE,
   cols: GRID_SIZE,
-  selected_index: CENTER_TERM,
+  selected_index: DEFAULT_TERM,
   coefficients: new Array(TERM_COUNT).fill(ComplexPolar.ZERO),
   frequency_map: (indices) => symmetry.value.frequency_map(indices),
   editable_map: (indices) => symmetry.value.is_enabled(indices)
@@ -104,13 +112,17 @@ function toggle_palette(e: Event) {
   viewer.show_palette = checkbox.checked
 }
 
-function change_symmetry() {
+function change_symmetry(rules: PointSymmetryRule[]) {
+  symmetry.value = new SymmetryRules(GRID_SIZE, rules)
+
   const coefficients = term_grid_state.coefficients
   coefficients.fill(ComplexPolar.ZERO)
 
-  term_grid_state.selected_index = CENTER_TERM
+  term_grid_state.selected_index = DEFAULT_TERM
   term_grid_state.frequency_map = (indices) => symmetry.value.frequency_map(indices)
   term_grid_state.editable_map = (indices) => symmetry.value.is_enabled(indices)
+
+  viewer.rotation_order = rules[0].rotation_folds ?? 1
 
   picker_state.coefficient = ComplexRect.ZERO
 
@@ -130,24 +142,22 @@ function set_monochrome(e: Event) {
       <P5Sketch :sketch="viewer"></P5Sketch>
     </template>
     <template #right>
-      <div class="vertical">
-        <h1>Rosette Maker</h1>
-        <div>
+      <h1>{{ title }}</h1>
+      <TabLayout>
+        <TabContent title="Choose Symmetry">
+          <PointSymmetryEditor @update:model-value="change_symmetry" />
+        </TabContent>
+        <TabContent title="Edit Pattern">
+          <P5Sketch :sketch="term_grid"></P5Sketch> <P5Sketch :sketch="picker"></P5Sketch>
+        </TabContent>
+        <TabContent title="Display Settings">
           <input id="toggle-palette" type="checkbox" @change="toggle_palette" />
           <label for="toggle-palette">Show color palette</label>
           <br />
           <input id="monochrome" type="color" value="#9661ff" @input="set_monochrome" />
           <label for="monochrome">Palette color</label>
-        </div>
-        <label for="symmetry-type">Symmetry Type: </label>
-        <select id="symmetry-type" v-model="symmetry_info" @change="change_symmetry">
-          <option v-for="entry in SYMMETRY_OPTIONS" :key="entry.id" :value="entry">
-            {{ entry.label }}
-          </option>
-        </select>
-        <P5Sketch :sketch="term_grid"></P5Sketch>
-        <P5Sketch :sketch="picker"></P5Sketch>
-      </div>
+        </TabContent>
+      </TabLayout>
     </template>
   </TwoColumns>
 </template>
