@@ -119,6 +119,8 @@ function change_symmetry(rules: PointSymmetryRule[]) {
   term_grid_state.frequency_map = (indices) => symmetry.value.frequency_map(indices)
   term_grid_state.editable_map = (indices) => symmetry.value.is_enabled(indices)
 
+  viewer.rotation_order = rules[0].rotation_folds ?? 1
+
   picker_state.coefficient = ComplexRect.ZERO
 
   update_viewer()
