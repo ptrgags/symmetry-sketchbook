@@ -9,14 +9,6 @@ export interface PolynomialState {
   rotation_order: number
 }
 
-function color_to_vec3(color_str: string): number[] {
-  // parse #rrggbb -> [0, 255]^3 -> [0.0, 1.0]^3
-  const parts = [0, 1, 2].map((x) => color_str.substring(1 + 2 * x, 1 + 2 * (x + 1)))
-  const rgb_u8 = parts.map((str) => parseInt(str, 16))
-  const rgb_f32 = rgb_u8.map((val) => val / 255.0)
-  return rgb_f32
-}
-
 export class PolynomialSketch extends Sketch<PolynomialState> {
   shader: PolynomialShader
 
@@ -32,8 +24,14 @@ export class PolynomialSketch extends Sketch<PolynomialState> {
     this.shader.init(p)
     this.shader.set_coefficients(this.state.pattern)
     this.shader.set_uniform('rotation_order', this.state.rotation_order)
-    this.shader.set_uniform('monochrome', color_to_vec3('#9661ff'))
-    this.shader.set_uniform('cosine_colors', [1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0])
+    this.set_color('primary', [0.5, 0.0, 1.0])
+    this.set_color('secondary', [0.5, 1.0, 0.0])
+    this.set_color('far', [0.0, 0.0, 0.0])
+
+    this.set_color('pulse', [1, 1, 0])
+    this.set_color('axes', [1, 1, 1])
+    this.set_color('grid', [0.8, 0.8, 0.8])
+
     this.shader.set_animation([])
     this.shader.disable()
   }
@@ -60,29 +58,12 @@ export class PolynomialSketch extends Sketch<PolynomialState> {
     this.shader.set_uniform('show_palette', value)
   }
 
-  set primary_color(value: string) {
-    this.shader.set_uniform('primary_color', color_to_vec3(value))
-  }
-
-  set secondary_color(value: string) {
-    this.shader.set_uniform('secondary_color', color_to_vec3(value))
-  }
-
-  set pulse_color(value: string) {
-    this.shader.set_uniform('pulse_color', color_to_vec3(value))
-  }
-
-  set grid_color(value: string) {
-    this.shader.set_uniform('grid_color', color_to_vec3(value))
+  set_color(prefix: string, value: number[]) {
+    this.shader.set_uniform(`${prefix}_color`, value)
   }
 
   set_xyrt_flags(prefix: string, value: boolean[]) {
     this.shader.set_uniform(`${prefix}_xyrt`, value.map(Number))
-  }
-
-  set cosine_palette(value: string[]) {
-    const components = value.flatMap(color_to_vec3)
-    this.shader.set_uniform('cosine_colors', components)
   }
 
   set rotation_order(value: number) {

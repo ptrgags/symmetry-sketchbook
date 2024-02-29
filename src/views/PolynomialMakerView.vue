@@ -15,6 +15,7 @@ import { TermGridSketch, type TermGridState } from '@/sketches/TermGridSketch'
 import { ref, computed } from 'vue'
 import PointSymmetryEditor from '@/components/PointSymmetryEditor.vue'
 import XYRTFlags from '@/components/XYRTFlags.vue'
+import ColorPicker from '@/components/ColorPicker.vue'
 
 // The frequencies will be [-MAX_FREQ, MAX_FREQ] in each direction
 const MAX_FREQ = 3
@@ -129,32 +130,6 @@ function change_symmetry(rules: PointSymmetryRule[]) {
 
   update_viewer()
 }
-
-function set_monochrome(e: Event) {
-  const color_picker = e.target as HTMLInputElement
-  const color = color_picker.value
-  viewer.monochrome = color
-}
-
-const color1 = ref<string>('#ff0000')
-const color2 = ref<string>('#00ff00')
-const color3 = ref<string>('#0000ff')
-
-function set_color1(e: Event) {
-  const color_picker = e.target as HTMLInputElement
-  color1.value = color_picker.value
-  viewer.cosine_palette = [color1.value, color3.value, color2.value]
-}
-function set_color2(e: Event) {
-  const color_picker = e.target as HTMLInputElement
-  color2.value = color_picker.value
-  viewer.cosine_palette = [color1.value, color3.value, color2.value]
-}
-function set_color3(e: Event) {
-  const color_picker = e.target as HTMLInputElement
-  color3.value = color_picker.value
-  viewer.cosine_palette = [color1.value, color3.value, color2.value]
-}
 </script>
 
 <template>
@@ -191,18 +166,24 @@ function set_color3(e: Event) {
               <option value="invert-secondary-circle">Inverted primary + secondary (circle)</option>
             </select>
           </div>
-          <div class="form-row">
-            <input id="primary-color" type="color" value="#9661ff" />
-            <label for="primary-color"> Primary Color</label>
-          </div>
-          <div class="form-row">
-            <input id="secondary-color" type="color" value="#9661ff" />
-            <label for="secondary-color"> Secondary Color</label>
-          </div>
-          <div class="form-row">
-            <input id="far-color" type="color" value="#0000ff" />
-            <label for="far-color"> Far Away Color</label>
-          </div>
+          <ColorPicker
+            id="primary-color"
+            :model-value="[0.5, 0.0, 1.0]"
+            @update:model-value="(value) => viewer.set_color('primary', value)"
+            >Primary Color</ColorPicker
+          >
+          <ColorPicker
+            id="secondary-color"
+            :model-value="[0.5, 1.0, 0.0]"
+            @update:model-value="(value) => viewer.set_color('secondary', value)"
+            >Secondary Color</ColorPicker
+          >
+          <ColorPicker
+            id="far-color"
+            :model-value="[0.0, 0.0, 0.0]"
+            @update:model-value="(value) => viewer.set_color('far', value)"
+            >Far Away Color</ColorPicker
+          >
 
           <h3>Axes</h3>
           <XYRTFlags
@@ -223,10 +204,12 @@ function set_color3(e: Event) {
             id="pulse-xyrt"
             @update:model-value="(value) => viewer.set_xyrt_flags('pulse', value)"
           />
-          <div class="form-row">
-            <input id="pulse-color" type="color" value="#0000ff" />
-            <label for="pulse-color"> Color</label>
-          </div>
+          <ColorPicker
+            id="pulse-color"
+            :model-value="[1, 1, 0]"
+            @update:model-value="(value) => viewer.set_color('pulse', value)"
+            >Color</ColorPicker
+          >
           <div class="form-row">
             <label for="pulse-thickness">Thickness: </label>
             <input
@@ -244,11 +227,13 @@ function set_color3(e: Event) {
             id="grid-xyrt"
             @update:model-value="(value) => viewer.set_xyrt_flags('grid', value)"
           />
+          <ColorPicker
+            id="grid-color"
+            :model-value="[1, 1, 1]"
+            @update:model-value="(value) => viewer.set_color('grid', value)"
+            >Color</ColorPicker
+          >
           <div class="form-row">
-            <div class="form-row">
-              <input id="grid-color" type="color" value="#0000ff" />
-              <label for="grid-color"> Color</label>
-            </div>
             <label for="grid-thickness">Thickness: </label>
             <input
               id="grid-thickness"

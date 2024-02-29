@@ -12,7 +12,6 @@ const props = withDefaults(
 )
 
 const [x_val, y_val, r_val, theta_val] = props.modelValue
-
 const x = ref(x_val)
 const y = ref(y_val)
 const r = ref(r_val)
