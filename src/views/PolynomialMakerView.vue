@@ -14,6 +14,7 @@ import { PolynomialSketch, type PolynomialState } from '@/sketches/PolynomialSke
 import { TermGridSketch, type TermGridState } from '@/sketches/TermGridSketch'
 import { ref, computed } from 'vue'
 import PointSymmetryEditor from '@/components/PointSymmetryEditor.vue'
+import DirectionXYRT from '@/components/DirectionXYRT.vue'
 
 // The frequencies will be [-MAX_FREQ, MAX_FREQ] in each direction
 const MAX_FREQ = 3
@@ -204,16 +205,10 @@ function set_color3(e: Event) {
           </div>
 
           <h3>Axes</h3>
-          <div class="form-row">
-            <input id="x-axis" type="checkbox" />
-            <label for="x-axis">x</label>
-            <input id="y-axis" type="checkbox" />
-            <label for="y-axis">y</label>
-            <input id="r-axis" type="checkbox" />
-            <label for="r-axis">r</label>
-            <input id="theta-axis" type="checkbox" />
-            <label for="theta-axis">theta</label>
-          </div>
+          <DirectionXYRT
+            id="axes-xyrt"
+            @update:model-value="(value) => viewer.set_enabled_flags('axes', value)"
+          />
           <div class="form-row">
             <input id="ref-color" type="color" value="#0000ff" />
             <label for="ref-color"> Color</label>
@@ -224,16 +219,10 @@ function set_color3(e: Event) {
           </div>
 
           <h3>Pulses</h3>
-          <div class="form-row">
-            <input id="pulse-x" type="checkbox" />
-            <label for="pulse-x">x</label>
-            <input id="pulse-y" type="checkbox" />
-            <label for="pulse-y">y</label>
-            <input id="pulse-r" type="checkbox" />
-            <label for="pulse-r">r</label>
-            <input id="pulse-theta" type="checkbox" />
-            <label for="pulse-theta">theta</label>
-          </div>
+          <DirectionXYRT
+            id="pulse-xyrt"
+            @update:model-value="(value) => viewer.set_enabled_flags('pulse', value)"
+          />
           <div class="form-row">
             <input id="pulse-color" type="color" value="#0000ff" />
             <label for="pulse-color"> Color</label>
@@ -251,16 +240,10 @@ function set_color3(e: Event) {
           </div>
 
           <h3>Grid Lines</h3>
-          <div class="form-row">
-            <input id="grid-x" type="checkbox" />
-            <label for="grid-x">x</label>
-            <input id="grid-y" type="checkbox" />
-            <label for="grid-y">y</label>
-            <input id="grid-r" type="checkbox" />
-            <label for="grid-r">r</label>
-            <input id="grid-theta" type="checkbox" />
-            <label for="grid-theta">theta</label>
-          </div>
+          <DirectionXYRT
+            id="grid-xyrt"
+            @update:model-value="(value) => viewer.set_enabled_flags('grid', value)"
+          />
           <div class="form-row">
             <div class="form-row">
               <input id="grid-color" type="color" value="#0000ff" />

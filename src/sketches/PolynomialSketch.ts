@@ -65,7 +65,7 @@ export class PolynomialSketch extends Sketch<PolynomialState> {
   }
 
   set secondary_color(value: string) {
-    this.shader.set_uniform('primary_color', color_to_vec3(value))
+    this.shader.set_uniform('secondary_color', color_to_vec3(value))
   }
 
   set pulse_color(value: string) {
@@ -74,6 +74,10 @@ export class PolynomialSketch extends Sketch<PolynomialState> {
 
   set grid_color(value: string) {
     this.shader.set_uniform('grid_color', color_to_vec3(value))
+  }
+
+  set_enabled_flags(prefix: string, value: boolean[]) {
+    this.shader.set_uniform(`${prefix}_enabled`, value.map(Number))
   }
 
   set cosine_palette(value: string[]) {

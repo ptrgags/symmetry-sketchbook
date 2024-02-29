@@ -15,35 +15,6 @@ if (slots.default) {
   selected_title.value = tab_titles.value[0]
 }
 
-/*
-onMounted(() => {
-  if (!slots.default) {
-    return
-  }
-
-  tab_titles.value = slots.default().map((tab) => tab.props?.title ?? '[Untitled]')
-  selected_title.value = tab_titles.value[0]
-
-  provide('selected_title', selected_title)
-})
-*/
-
-/*
-function show_content() {
-  if (!slots.default) {
-    return
-  }
-
-  for (const [index, child] of slots.default().entries()) {
-    if (!child.props) {
-      continue
-    }
-    const show = index === selected_index.value
-    console.log(show)
-  }
-}
-*/
-
 function get_tab_class(title: string): string[] {
   if (title === selected_title.value) {
     return ['tab', 'selected']
