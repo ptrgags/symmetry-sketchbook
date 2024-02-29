@@ -127,6 +127,11 @@ vec2 complex_to_clip(vec2 complex) {
 `
 
 common.funcs_geom = `
+float circle(float r, float radius, float half_thickness) {
+    float dist = abs(r - radius);
+    return smoothstep(half_thickness + 0.01, half_thickness, dist);
+}
+
 float dist_from_pole(float r) {
     return min(r, 1.0 / r);
 }
@@ -171,7 +176,7 @@ vec3 palette(vec2 complex_rect) {
     float r_parity = mod(floor(15.0 * z.x), 2.0);
     float theta_parity = mod(floor(10.0 * z.y / PI), 2.0);
 
-    float circle = unit_circle(z.x, 0.1);
+    float circ = unit_circle(z.x, 0.1);
     float x_grid = grid_lines(complex_rect.x, 0.1);
     float y_grid = grid_lines(complex_rect.y, 0.1);
     float r_grid = grid_lines(z.x, 0.1);
@@ -181,14 +186,18 @@ vec3 palette(vec2 complex_rect) {
 
     vec3 ref_color = cosine_colors[1];
 
+    //float mouse_r = length(to_complex(mouse_uv));
+    //float mouse_circle = circle(z.r, mouse_r, 0.1);
+
     vec3 color = sector_color;
-    color = mix(color, ref_color, x_grid);
-    color = mix(color, ref_color, y_grid);
-    color = mix(color, ref_color, r_grid);
-    color = mix(color, ref_color, theta_grid);
-    color = mix(color, ref_color, circle);
-    color = mix(color, ref_color, x_axis);
-    color = mix(color, ref_color, y_axis);
+    //color = mix(color, ref_color, x_grid);
+    //color = mix(color, ref_color, y_grid);
+    //color = mix(color, ref_color, r_grid);
+    //color = mix(color, ref_color, theta_grid);
+    //color = mix(color, ref_color, circ);
+    //color = mix(color, ref_color, x_axis);
+    //color = mix(color, ref_color, y_axis);
+    //color = mix(color, ref_color, mouse_circle);
     color = mix(color, color * cosine_colors[2], pow(1.0 - dist, 8.0));
     return vec3(color);
 }
