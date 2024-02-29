@@ -1,14 +1,14 @@
 <script setup lang="ts">
 import { toggle } from '@/core/ui_util'
-import { computed, ref, watch, type Ref } from 'vue'
-import { type ColorTurnValue, type ColorTurnEditorConstraint } from './ColorTurnEditor.vue'
-import ColorTurnEditor from './ColorTurnEditor.vue'
 import {
   InputSymmetryType,
-  has_inversion,
-  type PointSymmetryRule,
-  has_reflection
-} from '../core/PointSymmetry'
+  has_reflection,
+  has_inversion
+} from '@/core/point_symmetry/InputSymmetryType'
+import { computed, ref, watch } from 'vue'
+import { type ColorTurnValue, type ColorTurnEditorConstraint } from './ColorTurnEditor.vue'
+import ColorTurnEditor from './ColorTurnEditor.vue'
+import { type PointSymmetryRule } from '../core/PointSymmetry'
 
 interface GroupOption {
   id: string

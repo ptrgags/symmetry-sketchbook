@@ -1,6 +1,14 @@
 import { ComplexPolar } from './Complex'
-import { swap, negate, type Frequency2D } from './Frequency2D'
-import { type GridIndices2D, GridMath2D } from './GridIndices2D'
+import { type Frequency2D } from './Frequency2D'
+import {
+  type GridIndices2D,
+  to_indices_2d,
+  to_index_1d,
+  identity,
+  flip_col,
+  flip_both,
+  flip_row
+} from './GridIndices2D'
 import { mod } from './math'
 
 /**
@@ -197,10 +205,10 @@ type PartnerType = 'identity' | 'flip_col' | 'flip_row' | 'flip_both'
 type PartnerFunc = (indices: GridIndices2D, grid_size: number) => GridIndices2D
 
 const PARTNER_FUNCTIONS: { [key in PartnerType]: PartnerFunc } = {
-  identity: GridMath2D.identity,
-  flip_col: GridMath2D.flip_col,
-  flip_row: GridMath2D.flip_row,
-  flip_both: GridMath2D.flip_both
+  identity,
+  flip_col,
+  flip_row,
+  flip_both
 }
 
 function get_partner_type(rule: PointSymmetryRule): PartnerType {
@@ -323,7 +331,7 @@ export class PointSymmetry {
     // Always set a_nm
     coefficients[index] = term
 
-    const indices = GridMath2D.to_indices_2d(index, this.grid_size)
+    const indices = to_indices_2d(index, this.grid_size)
 
     /*
     if (this.self_rule) {
@@ -348,7 +356,7 @@ export class PointSymmetry {
       const partner_type = get_partner_type(rule)
       const partner_func = PARTNER_FUNCTIONS[partner_type]
       const partner_indices = partner_func(indices, this.grid_size)
-      const partner_index = GridMath2D.to_index_1d(partner_indices, this.grid_size)
+      const partner_index = to_index_1d(partner_indices, this.grid_size)
 
       // If we have an output reflection and set a' = conj(a)
       const flipped = rule.output_reflection ? term.conj : term
@@ -370,60 +378,4 @@ export interface PointSymmetryInfo {
   id: string
   label: string
   symmetry: PointSymmetry
-}
-
-export enum InputSymmetryType {
-  Identity,
-  Rotation,
-  Mirror,
-  ComplexInversion,
-  CircleInversion,
-  RotoInversion
-}
-
-export function to_string(symmetry: InputSymmetryType): string {
-  switch (symmetry) {
-    case InputSymmetryType.Identity:
-      return 'Identity'
-    case InputSymmetryType.Rotation:
-      return 'Rotation'
-    case InputSymmetryType.Mirror:
-      return 'Mirror'
-    case InputSymmetryType.ComplexInversion:
-      return 'Complex-inversion'
-    case InputSymmetryType.CircleInversion:
-      return 'Circle Inversion'
-    case InputSymmetryType.RotoInversion:
-      return 'Roto-inversion'
-    default:
-      return ''
-  }
-}
-
-export function has_reflection(symmetry: InputSymmetryType): boolean {
-  switch (symmetry) {
-    case InputSymmetryType.Mirror:
-    case InputSymmetryType.CircleInversion:
-    case InputSymmetryType.RotoInversion:
-      return true
-  }
-
-  return false
-}
-
-export function has_inversion(symmetry: InputSymmetryType): boolean {
-  switch (symmetry) {
-    case InputSymmetryType.ComplexInversion:
-    case InputSymmetryType.CircleInversion:
-    case InputSymmetryType.RotoInversion:
-      return true
-  }
-
-  return false
-}
-
-export enum OutputSymmetryType {
-  Identity,
-  Rotation,
-  Mirror
 }

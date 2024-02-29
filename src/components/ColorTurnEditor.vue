@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { type InputSymmetryType, to_string } from '@/core/PointSymmetry'
+import { type InputSymmetryType, to_string } from '@/core/point_symmetry/InputSymmetryType'
 import { toggle } from '@/core/ui_util'
 import { ref, watch } from 'vue'
 
