@@ -26,6 +26,16 @@ export function to_string(symmetry: InputSymmetryType): string {
   }
 }
 
+export function has_rotation(symmetry: InputSymmetryType): boolean {
+  switch (symmetry) {
+    case InputSymmetryType.Rotation:
+    case InputSymmetryType.RotoInversion:
+      return true
+  }
+
+  return false
+}
+
 export function has_reflection(symmetry: InputSymmetryType): boolean {
   switch (symmetry) {
     case InputSymmetryType.Mirror:

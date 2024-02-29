@@ -5,7 +5,8 @@ import TabLayout from '@/components/TabLayout.vue'
 import TabContent from '@/components/TabContent.vue'
 import { ComplexPolar, ComplexRect } from '@/core/Complex'
 import { FourierSeries2D, type FourierTerm2D } from '@/core/FourierSeries2D'
-import { type PointSymmetryRule, PointSymmetry, NO_SYMMETRY } from '@/core/PointSymmetry'
+import { PointSymmetry } from '@/core/PointSymmetry'
+import { type PointSymmetryRule, IDENTITY } from '@/core/point_symmetry/PointSymmetryRule'
 import {
   type CoefficientPickerState,
   CoefficientPickerSketch
@@ -37,7 +38,7 @@ const title = computed<string>(() => {
   return props.symmetry_mode === 'frieze' ? 'Frieze Maker' : 'Rosette Maker'
 })
 
-const symmetry = ref(new PointSymmetry(GRID_SIZE, [NO_SYMMETRY]))
+const symmetry = ref(new PointSymmetry(GRID_SIZE, [IDENTITY]))
 
 // p5.js sketches -------------------
 

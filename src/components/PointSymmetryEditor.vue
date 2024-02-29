@@ -3,12 +3,13 @@ import { toggle } from '@/core/ui_util'
 import {
   InputSymmetryType,
   has_reflection,
-  has_inversion
+  has_inversion,
+  has_rotation
 } from '@/core/point_symmetry/InputSymmetryType'
+import { type PointSymmetryRule } from '@/core/point_symmetry/PointSymmetryRule'
 import { computed, ref, watch } from 'vue'
 import { type ColorTurnValue, type ColorTurnEditorConstraint } from './ColorTurnEditor.vue'
 import ColorTurnEditor from './ColorTurnEditor.vue'
-import { type PointSymmetryRule } from '../core/PointSymmetry'
 
 interface GroupOption {
   id: string
@@ -181,12 +182,12 @@ function make_rule(
   output_reflection: boolean
 ): PointSymmetryRule {
   const input_symmetry = constraint.input_symmetry
+  const input_rotation = has_rotation(input_symmetry)
   const input_reflection = has_reflection(input_symmetry)
   const input_inversion = has_inversion(input_symmetry)
   return {
     rotation_folds,
-    // hard-coding to 1 because most of the times it doesn't matter
-    input_rotations: 1,
+    input_rotation,
     input_reflection,
     input_inversion,
     output_rotations,

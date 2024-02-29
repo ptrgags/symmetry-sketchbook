@@ -10,70 +10,13 @@ import {
   flip_row
 } from './GridIndices2D'
 import { mod } from './math'
+import { diff_sum_to_frequencies, type DiffSum } from './point_symmetry/DiffSum'
+import { get_rotation_power, type PointSymmetryRule } from './point_symmetry/PointSymmetryRule'
 
-/**
- * The symmetry constraints don't directly work on the frequencies
- * n, m of frequency space, but rather the diagonals
- * (diff, sum) = (n - m, n + m). This is because when you expand
- *
- * z^n conj(z)^m
- *
- * you get:
- *
- * r^(n + m) exp(i * theta * (n - m))
- *
- * So it's helpful to convert to this space.
- */
-interface Diagonals {
-  diff: number
-  sum: number
-}
-
-function frequencies_to_diagonals(frequencies: Frequency2D): Diagonals {
-  const { n, m } = frequencies
-  const diff = n - m
-  const sum = n + m
-  return { diff, sum }
-}
-
-function diagonals_to_frequencies(diagonals: Diagonals): Frequency2D {
-  const { diff, sum } = diagonals
-
-  //   (diff + sum) / 2
-  // = (n - m + n + m) / 2
-  // = (2n) / 2
-  // = n
-  const n = (diff + sum) / 2
-  //   (sum - diff) / 2
-  // = (n + m - n + m) / 2
-  // = (2m) / 2
-  // = m
-  const m = (sum - diff) / 2
-  return { n, m }
-}
-
-export interface PointSymmetryRule {
-  rotation_folds: number
-  input_rotations: number
-  input_reflection: boolean
-  input_inversion: boolean
-  output_rotations: number
-  output_reflection: boolean
-}
-
-export const NO_SYMMETRY: PointSymmetryRule = {
-  rotation_folds: 1,
-  input_rotations: 0,
-  input_reflection: false,
-  input_inversion: false,
-  output_rotations: 0,
-  output_reflection: false
-}
-
-function indices_to_diagonals(
+function indices_to_diff_sum(
   signed_indices: GridIndices2D,
   symmetry_rule: PointSymmetryRule
-): Diagonals {
+): DiffSum {
   const { row, col } = signed_indices
 
   // Derivation:
@@ -125,7 +68,7 @@ function indices_to_diagonals(
   // Desmos graph visualization of the above
   // https://www.desmos.com/calculator/bet7emamug
   const k = symmetry_rule.rotation_folds
-  const l = symmetry_rule.input_rotations
+  const l = Number(symmetry_rule.input_rotation)
   const input_sign = Math.pow(
     -1,
     Number(symmetry_rule.input_reflection) + Number(symmetry_rule.input_inversion)
@@ -245,15 +188,6 @@ function validate_rules(rules: PointSymmetryRule[]) {
   }
 }
 
-function get_rotation_power(rule: PointSymmetryRule, frequency_diff: number): number {
-  const l = rule.input_rotations
-  const input_sign = Math.pow(-1, Number(rule.input_reflection) + Number(rule.input_inversion))
-  const output_sign = Math.pow(-1, Number(rule.output_reflection))
-  const u = rule.output_rotations
-
-  return input_sign * l * frequency_diff - output_sign * u
-}
-
 export class PointSymmetry {
   grid_size: number
   center_1d: number
@@ -313,7 +247,7 @@ export class PointSymmetry {
 
   is_enabled(indices: GridIndices2D): boolean {
     const signed_indices = this.to_signed(indices)
-    const { diff, sum } = indices_to_diagonals(signed_indices, this.first_rule)
+    const { diff, sum } = indices_to_diff_sum(signed_indices, this.first_rule)
     const parity = mod(diff, 2)
     if (parity === 1 && sum == 0) {
       return false
@@ -323,8 +257,8 @@ export class PointSymmetry {
 
   frequency_map(indices: GridIndices2D): Frequency2D {
     const signed_indices = this.to_signed(indices)
-    const diagonals = indices_to_diagonals(signed_indices, this.first_rule)
-    return diagonals_to_frequencies(diagonals)
+    const diff_sum = indices_to_diff_sum(signed_indices, this.first_rule)
+    return diff_sum_to_frequencies(diff_sum)
   }
 
   update_coefficients(coefficients: ComplexPolar[], index: number, term: ComplexPolar): void {
@@ -363,7 +297,7 @@ export class PointSymmetry {
 
       // Get the rotation factor, and do a' *= R
       const partner_signed = this.to_signed(partner_indices)
-      const diagonals = indices_to_diagonals(partner_signed, rule)
+      const diagonals = indices_to_diff_sum(partner_signed, rule)
       const rotation_power = get_rotation_power(rule, diagonals.diff)
       const rotation_factor = ComplexPolar.root_of_unity(rule.rotation_folds, rotation_power)
       const rotated = flipped.mult(rotation_factor)
