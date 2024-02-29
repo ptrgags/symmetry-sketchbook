@@ -190,10 +190,12 @@ function change_symmetry(rules: PointSymmetryRule[]) {
             id="axes-xyrt"
             @update:model-value="(value) => viewer.set_xyrt_flags('axes', value)"
           />
-          <div class="form-row">
-            <input id="ref-color" type="color" value="#0000ff" />
-            <label for="ref-color"> Color</label>
-          </div>
+          <ColorPicker
+            id="pulse-color"
+            :model-value="[1, 1, 1]"
+            @update:model-value="(value) => viewer.set_color('axes', value)"
+            >Color</ColorPicker
+          >
           <div class="form-row">
             <label for="ref-thickness">Thickness: </label>
             <input id="ref-thickness" type="range" min="0.001" max="0.5" step="0.001" value="0.1" />
