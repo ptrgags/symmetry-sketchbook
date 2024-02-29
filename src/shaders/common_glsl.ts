@@ -23,6 +23,9 @@ uniform vec2 pan_uv;
 // Mouse position across the canvas. Might be outside
 // [0, 1] if the mouse is outside the canvas.
 uniform vec2 mouse_uv;
+
+// Elapsed time since the page load in seconds.
+uniform float time;
 `
 
 common.uniforms_coefficients = `
@@ -54,8 +57,7 @@ uniform float show_ref_geometry;
 // we have a phase delta, which turns the coefficient into:
 // (r, theta + phase_delta * time))
 uniform float animation[MAX_TERMS];
-// Elapsed time since the page load in seconds.
-uniform float time;
+
 // If true, the polynomial will be run a second time with the
 // animation direction reversed. For waves, this produces
 // a standing wave effect.
@@ -186,6 +188,19 @@ vec3 palette(vec2 complex_rect) {
 
     vec3 ref_color = cosine_colors[1];
 
+    float unsigned_pulse = mod(2.0 * time, 10.0);
+    float signed_pulse = 2.0 * unsigned_pulse - 10.0;
+
+    float x_pulse = line(complex_rect - vec2(signed_pulse, 0.0), vec2(1.0, 0.0), 0.1);
+    float y_pulse = line(complex_rect - vec2(0.0, signed_pulse), vec2(0.0, 1.0), 0.1);
+    float r_pulse = circle(z.r, unsigned_pulse, 0.1);
+
+    float theta_pulse = line(
+        vec2(angle_normalized - fract(0.5 * time), 0.0), 
+        vec2(1.0, 0.0), 
+        0.01 / z.x
+    );
+
     //float mouse_r = length(to_complex(mouse_uv));
     //float mouse_circle = circle(z.r, mouse_r, 0.1);
 
@@ -197,7 +212,10 @@ vec3 palette(vec2 complex_rect) {
     //color = mix(color, ref_color, circ);
     //color = mix(color, ref_color, x_axis);
     //color = mix(color, ref_color, y_axis);
-    //color = mix(color, ref_color, mouse_circle);
+    color = mix(color, ref_color, x_pulse);
+    color = mix(color, ref_color, y_pulse);
+    color = mix(color, ref_color, r_pulse);
+    color = mix(color, ref_color, theta_pulse);
     color = mix(color, color * cosine_colors[2], pow(1.0 - dist, 8.0));
     return vec3(color);
 }
