@@ -43,6 +43,8 @@ uniform float num_terms;
 uniform float rotation_order;
 // For the monochrome color palettes;
 uniform vec3 monochrome;
+
+uniform vec3 cosine_colors[3];
 `
 /*
 // 1.0 to enable, 0.0 to disable
@@ -125,6 +127,50 @@ vec2 complex_to_clip(vec2 complex) {
 `
 
 common.funcs_palette = `
+vec3 cosine_palette(float t) {
+    // The palette will be a vec3-valued cosine of the form:
+    // f(t) = offset + amp * cos(2pi * n * t - phase)
+
+    // Three colors (a, b, c) such that:
+    // f(0) = a
+    // f(1/2) = b
+    // f(1/4) = c
+    vec3 a = cosine_colors[0];
+    vec3 b = cosine_colors[1];
+    vec3 c = cosine_colors[2];
+
+    // taking n = odd, combine the a and b equations and solve for the offset.
+    vec3 offset = (a + b) / 2.0;
+
+    // taking n = 1 (kinda arbitrarily...) and doing some trig, we have:
+    //
+    // b = offset - amp * cos(phase)
+    // c = offset + amp * sin(phase)
+    // 
+    // solving each equation for A trig(phase), we can add the square of both
+    // so the trig functions cancel (cos^2 + sin^2 = 1) and we're left with:
+    // 
+    // amp^2 = (offset - b)^2 + (c - offset)^2
+    // which, when expanding and taking the square root gives us this mess:
+    vec3 amplitude = sqrt(
+        2.0 * offset * offset +
+        b * b +
+        c * c +
+        2.0 * offset * (b + c)
+    );
+
+    // If c is below the center line of the cosine wave, flip the amplitude
+    amplitude = sign(c - offset) * amplitude;
+
+    vec3 phase = acos((a - offset) / amplitude);
+
+    // Use n = 1 because we want a small spatial frequency for the palette.
+    float n = 1.0;
+
+    return offset + amplitude * cos(2.0 * PI * n * t - phase);
+
+}
+
 vec3 palette(vec2 complex_rect) {
     vec2 z = to_polar(complex_rect);
 
@@ -133,8 +179,9 @@ vec3 palette(vec2 complex_rect) {
     angle_normalized = fract(angle_normalized - 0.5);
 
     float sector = floor(rotation_order * angle_normalized);
-    float sector_brightness = sector / (rotation_order - 1.0);
-    vec3 sector_color = monochrome * sector_brightness;
+    float sector_brightness = sector / (rotation_order);
+    //vec3 sector_color = monochrome * sector_brightness;
+    vec3 sector_color = cosine_palette(sector_brightness + 0.5);
 
     float sector_v = fract(rotation_order * angle_normalized);
     

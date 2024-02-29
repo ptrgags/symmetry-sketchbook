@@ -134,6 +134,26 @@ function set_monochrome(e: Event) {
   const color = color_picker.value
   viewer.monochrome = color
 }
+
+const color1 = ref<string>('#ff0000')
+const color2 = ref<string>('#00ff00')
+const color3 = ref<string>('#0000ff')
+
+function set_color1(e: Event) {
+  const color_picker = e.target as HTMLInputElement
+  color1.value = color_picker.value
+  viewer.cosine_palette = [color1.value, color3.value, color2.value]
+}
+function set_color2(e: Event) {
+  const color_picker = e.target as HTMLInputElement
+  color2.value = color_picker.value
+  viewer.cosine_palette = [color1.value, color3.value, color2.value]
+}
+function set_color3(e: Event) {
+  const color_picker = e.target as HTMLInputElement
+  color3.value = color_picker.value
+  viewer.cosine_palette = [color1.value, color3.value, color2.value]
+}
 </script>
 
 <template>
@@ -156,6 +176,13 @@ function set_monochrome(e: Event) {
           <br />
           <input id="monochrome" type="color" value="#9661ff" @input="set_monochrome" />
           <label for="monochrome">Palette color</label>
+
+          <input id="color1" type="color" value="#ff0000" @input="set_color1" />
+          <label for="color1">Palette color</label>
+          <input id="color2" type="color" value="#00ff00" @input="set_color2" />
+          <label for="color2">Palette color</label>
+          <input id="color3" type="color" value="#0000ff" @input="set_color3" />
+          <label for="color3">Palette color</label>
         </TabContent>
       </TabLayout>
     </template>

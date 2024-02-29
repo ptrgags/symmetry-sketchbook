@@ -33,6 +33,7 @@ export class PolynomialSketch extends Sketch<PolynomialState> {
     this.shader.set_coefficients(this.state.pattern)
     this.shader.set_uniform('rotation_order', this.state.rotation_order)
     this.shader.set_uniform('monochrome', color_to_vec3('#9661ff'))
+    this.shader.set_uniform('cosine_colors', [1.0, 0.0, 0.0, 0.0, 1.0, 0.0, 0.0, 0.0, 1.0])
     this.shader.set_animation([])
     this.shader.disable()
   }
@@ -61,6 +62,11 @@ export class PolynomialSketch extends Sketch<PolynomialState> {
 
   set monochrome(value: string) {
     this.shader.set_uniform('monochrome', color_to_vec3(value))
+  }
+
+  set cosine_palette(value: string[]) {
+    const components = value.flatMap(color_to_vec3)
+    this.shader.set_uniform('cosine_colors', components)
   }
 
   set rotation_order(value: number) {
