@@ -76,8 +76,8 @@ export class PolynomialSketch extends Sketch<PolynomialState> {
     this.shader.set_uniform('grid_color', color_to_vec3(value))
   }
 
-  set_enabled_flags(prefix: string, value: boolean[]) {
-    this.shader.set_uniform(`${prefix}_enabled`, value.map(Number))
+  set_xyrt_flags(prefix: string, value: boolean[]) {
+    this.shader.set_uniform(`${prefix}_xyrt`, value.map(Number))
   }
 
   set cosine_palette(value: string[]) {

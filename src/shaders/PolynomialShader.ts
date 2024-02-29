@@ -72,6 +72,7 @@ ${common.defines}
 
 ${common.uniforms}
 ${common.uniforms_coefficients}
+${common.uniforms_palette}
 
 ${common.funcs_polar}
 ${common.funcs_view}

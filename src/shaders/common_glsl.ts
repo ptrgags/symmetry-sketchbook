@@ -79,6 +79,12 @@ uniform sampler2D texture0;
 `
 */
 
+common.uniforms_palette = `
+uniform vec4 grid_xyrt;
+uniform vec4 pulse_xyrt;
+uniform vec4 axes_xyrt;
+`
+
 common.funcs_view = `
 vec2 apply_aspect_fix(vec2 uv) {
     return uv * vec2(aspect, 1.0);
@@ -178,7 +184,7 @@ vec3 palette(vec2 complex_rect) {
     float r_parity = mod(floor(15.0 * z.x), 2.0);
     float theta_parity = mod(floor(10.0 * z.y / PI), 2.0);
 
-    float circ = unit_circle(z.x, 0.1);
+    float theta_axis = unit_circle(z.x, 0.1);
     float x_grid = grid_lines(complex_rect.x, 0.1);
     float y_grid = grid_lines(complex_rect.y, 0.1);
     float r_grid = grid_lines(z.x, 0.1);
@@ -205,17 +211,25 @@ vec3 palette(vec2 complex_rect) {
     //float mouse_circle = circle(z.r, mouse_r, 0.1);
 
     vec3 color = sector_color;
-    //color = mix(color, ref_color, x_grid);
-    //color = mix(color, ref_color, y_grid);
-    //color = mix(color, ref_color, r_grid);
-    //color = mix(color, ref_color, theta_grid);
-    //color = mix(color, ref_color, circ);
-    //color = mix(color, ref_color, x_axis);
-    //color = mix(color, ref_color, y_axis);
-    color = mix(color, ref_color, x_pulse);
-    color = mix(color, ref_color, y_pulse);
-    color = mix(color, ref_color, r_pulse);
-    color = mix(color, ref_color, theta_pulse);
+    // Grid lines
+    color = mix(color, ref_color, grid_xyrt.x * x_grid);
+    color = mix(color, ref_color, grid_xyrt.y * y_grid);
+    color = mix(color, ref_color, grid_xyrt.z * r_grid);
+    color = mix(color, ref_color, grid_xyrt.w * theta_grid);
+    
+    // Axes
+    color = mix(color, ref_color, axes_xyrt.x * x_axis);
+    color = mix(color, ref_color, axes_xyrt.y * y_axis);
+    // TODO: r axis
+    color = mix(color, ref_color, axes_xyrt.w * theta_axis);
+
+    // Pulses
+    color = mix(color, ref_color, pulse_xyrt.x * x_pulse);
+    color = mix(color, ref_color, pulse_xyrt.y * y_pulse);
+    color = mix(color, ref_color, pulse_xyrt.z * r_pulse);
+    color = mix(color, ref_color, pulse_xyrt.w * theta_pulse);
+
+    // Gradient away from the unit circle
     color = mix(color, color * cosine_colors[2], pow(1.0 - dist, 8.0));
     return vec3(color);
 }

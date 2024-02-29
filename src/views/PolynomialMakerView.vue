@@ -14,7 +14,7 @@ import { PolynomialSketch, type PolynomialState } from '@/sketches/PolynomialSke
 import { TermGridSketch, type TermGridState } from '@/sketches/TermGridSketch'
 import { ref, computed } from 'vue'
 import PointSymmetryEditor from '@/components/PointSymmetryEditor.vue'
-import DirectionXYRT from '@/components/DirectionXYRT.vue'
+import XYRTFlags from '@/components/XYRTFlags.vue'
 
 // The frequencies will be [-MAX_FREQ, MAX_FREQ] in each direction
 const MAX_FREQ = 3
@@ -205,9 +205,9 @@ function set_color3(e: Event) {
           </div>
 
           <h3>Axes</h3>
-          <DirectionXYRT
+          <XYRTFlags
             id="axes-xyrt"
-            @update:model-value="(value) => viewer.set_enabled_flags('axes', value)"
+            @update:model-value="(value) => viewer.set_xyrt_flags('axes', value)"
           />
           <div class="form-row">
             <input id="ref-color" type="color" value="#0000ff" />
@@ -219,9 +219,9 @@ function set_color3(e: Event) {
           </div>
 
           <h3>Pulses</h3>
-          <DirectionXYRT
+          <XYRTFlags
             id="pulse-xyrt"
-            @update:model-value="(value) => viewer.set_enabled_flags('pulse', value)"
+            @update:model-value="(value) => viewer.set_xyrt_flags('pulse', value)"
           />
           <div class="form-row">
             <input id="pulse-color" type="color" value="#0000ff" />
@@ -240,9 +240,9 @@ function set_color3(e: Event) {
           </div>
 
           <h3>Grid Lines</h3>
-          <DirectionXYRT
+          <XYRTFlags
             id="grid-xyrt"
-            @update:model-value="(value) => viewer.set_enabled_flags('grid', value)"
+            @update:model-value="(value) => viewer.set_xyrt_flags('grid', value)"
           />
           <div class="form-row">
             <div class="form-row">
