@@ -104,14 +104,6 @@ export class Shader {
     }
   }
 
-  /*
-  set_texture(texture) {
-    this.enable()
-    texture.set_wrapping()
-    this.shader.setUniform('texture0', texture.texture)
-  }
-  */
-
   set_mouse_uv(mouse_uv: [number, number]) {
     // Sometimes mouse events are triggered too early
     if (!this.initialized) {

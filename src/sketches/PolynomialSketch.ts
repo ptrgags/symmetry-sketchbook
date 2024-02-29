@@ -60,8 +60,20 @@ export class PolynomialSketch extends Sketch<PolynomialState> {
     this.shader.set_uniform('show_palette', value)
   }
 
-  set monochrome(value: string) {
-    this.shader.set_uniform('monochrome', color_to_vec3(value))
+  set primary_color(value: string) {
+    this.shader.set_uniform('primary_color', color_to_vec3(value))
+  }
+
+  set secondary_color(value: string) {
+    this.shader.set_uniform('primary_color', color_to_vec3(value))
+  }
+
+  set pulse_color(value: string) {
+    this.shader.set_uniform('pulse_color', color_to_vec3(value))
+  }
+
+  set grid_color(value: string) {
+    this.shader.set_uniform('grid_color', color_to_vec3(value))
   }
 
   set cosine_palette(value: string[]) {

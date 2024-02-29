@@ -171,18 +171,111 @@ function set_color3(e: Event) {
           <P5Sketch :sketch="term_grid"></P5Sketch> <P5Sketch :sketch="picker"></P5Sketch>
         </TabContent>
         <TabContent title="Display Settings">
-          <input id="toggle-palette" type="checkbox" @change="toggle_palette" />
-          <label for="toggle-palette">Show color palette</label>
-          <br />
-          <input id="monochrome" type="color" value="#9661ff" @input="set_monochrome" />
-          <label for="monochrome">Palette color</label>
+          <h3>Color Palette</h3>
+          <div class="form-row">
+            <input id="toggle-palette" type="checkbox" @change="toggle_palette" />
+            <label for="toggle-palette"> Show color palette</label>
+          </div>
+          <div class="form-row">
+            <label for="palette-type">Palette Type: </label>
+            <select id="palette-type" value="primary">
+              <option value="primary">Primary Only</option>
+              <option value="secondary-half">Primary + secondary (halves)</option>
+              <option value="secondary-alternate">Primary + secondary (alternating)</option>
+              <option value="secondary-circle">Primary + secondary (inside circle)</option>
+              <option value="invert-primary">Inverted primary</option>
+              <option value="invert-secondary-alternate">
+                Inverted primary + secondary (alternating)
+              </option>
+              <option value="invert-secondary-circle">Inverted primary + secondary (circle)</option>
+            </select>
+          </div>
+          <div class="form-row">
+            <input id="primary-color" type="color" value="#9661ff" />
+            <label for="primary-color"> Primary Color</label>
+          </div>
+          <div class="form-row">
+            <input id="secondary-color" type="color" value="#9661ff" />
+            <label for="secondary-color"> Secondary Color</label>
+          </div>
+          <div class="form-row">
+            <input id="far-color" type="color" value="#0000ff" />
+            <label for="far-color"> Far Away Color</label>
+          </div>
 
-          <input id="color1" type="color" value="#ff0000" @input="set_color1" />
-          <label for="color1">Palette color</label>
-          <input id="color2" type="color" value="#00ff00" @input="set_color2" />
-          <label for="color2">Palette color</label>
-          <input id="color3" type="color" value="#0000ff" @input="set_color3" />
-          <label for="color3">Palette color</label>
+          <h3>Axes</h3>
+          <div class="form-row">
+            <input id="x-axis" type="checkbox" />
+            <label for="x-axis">x</label>
+            <input id="y-axis" type="checkbox" />
+            <label for="y-axis">y</label>
+            <input id="r-axis" type="checkbox" />
+            <label for="r-axis">r</label>
+            <input id="theta-axis" type="checkbox" />
+            <label for="theta-axis">theta</label>
+          </div>
+          <div class="form-row">
+            <input id="ref-color" type="color" value="#0000ff" />
+            <label for="ref-color"> Color</label>
+          </div>
+          <div class="form-row">
+            <label for="ref-thickness">Thickness: </label>
+            <input id="ref-thickness" type="range" min="0.001" max="0.5" step="0.001" value="0.1" />
+          </div>
+
+          <h3>Pulses</h3>
+          <div class="form-row">
+            <input id="pulse-x" type="checkbox" />
+            <label for="pulse-x">x</label>
+            <input id="pulse-y" type="checkbox" />
+            <label for="pulse-y">y</label>
+            <input id="pulse-r" type="checkbox" />
+            <label for="pulse-r">r</label>
+            <input id="pulse-theta" type="checkbox" />
+            <label for="pulse-theta">theta</label>
+          </div>
+          <div class="form-row">
+            <input id="pulse-color" type="color" value="#0000ff" />
+            <label for="pulse-color"> Color</label>
+          </div>
+          <div class="form-row">
+            <label for="pulse-thickness">Thickness: </label>
+            <input
+              id="pulse-thickness"
+              type="range"
+              min="0.001"
+              max="0.5"
+              step="0.001"
+              value="0.1"
+            />
+          </div>
+
+          <h3>Grid Lines</h3>
+          <div class="form-row">
+            <input id="grid-x" type="checkbox" />
+            <label for="grid-x">x</label>
+            <input id="grid-y" type="checkbox" />
+            <label for="grid-y">y</label>
+            <input id="grid-r" type="checkbox" />
+            <label for="grid-r">r</label>
+            <input id="grid-theta" type="checkbox" />
+            <label for="grid-theta">theta</label>
+          </div>
+          <div class="form-row">
+            <div class="form-row">
+              <input id="grid-color" type="color" value="#0000ff" />
+              <label for="grid-color"> Color</label>
+            </div>
+            <label for="grid-thickness">Thickness: </label>
+            <input
+              id="grid-thickness"
+              type="range"
+              min="0.001"
+              max="0.5"
+              step="0.001"
+              value="0.1"
+            />
+          </div>
         </TabContent>
       </TabLayout>
     </template>
