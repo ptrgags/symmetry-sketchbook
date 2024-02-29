@@ -141,10 +141,9 @@ float line(vec2 z_rect, vec2 normal, float half_thickness) {
     return smoothstep(half_thickness + 0.01, half_thickness, dist);
 }
 
-float grid(vec2 z_rect, float half_thickness) {
-    vec2 from_center = 2.0 * abs(fract(z_rect) - 0.5);
-    vec2 from_edges = smoothstep(1.0 - half_thickness, 1.0 - half_thickness + 0.01, from_center);
-    return max(from_edges.x, from_edges.y);
+float grid_lines(float x, float half_thickness) {
+    float from_center = 2.0 * abs(fract(x) - 0.5);
+    return smoothstep(1.0 - half_thickness, 1.0 - half_thickness + 0.01, from_center);
 }
 `
 
@@ -173,14 +172,20 @@ vec3 palette(vec2 complex_rect) {
     float theta_parity = mod(floor(10.0 * z.y / PI), 2.0);
 
     float circle = unit_circle(z.x, 0.1);
+    float x_grid = grid_lines(complex_rect.x, 0.1);
+    float y_grid = grid_lines(complex_rect.y, 0.1);
+    float r_grid = grid_lines(z.x, 0.1);
+    float theta_grid = grid_lines(2.0 * rotation_order * angle_normalized, 0.1 / z.x);
     float x_axis = line(complex_rect, vec2(0.0, 1.0), 0.1);
     float y_axis = line(complex_rect, vec2(1.0, 0.0), 0.1);
-    float unit_grid = grid(complex_rect, 0.05);
 
     vec3 ref_color = cosine_colors[1];
 
     vec3 color = sector_color;
-    color = mix(color, ref_color, unit_grid);
+    color = mix(color, ref_color, x_grid);
+    color = mix(color, ref_color, y_grid);
+    color = mix(color, ref_color, r_grid);
+    color = mix(color, ref_color, theta_grid);
     color = mix(color, ref_color, circle);
     color = mix(color, ref_color, x_axis);
     color = mix(color, ref_color, y_axis);
