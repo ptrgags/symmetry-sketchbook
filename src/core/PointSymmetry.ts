@@ -1,6 +1,6 @@
 import { ComplexPolar } from './Complex'
 import { swap, negate, type Frequency2D } from './Frequency2D'
-import { to_indices_2d, type GridIndices2D, to_index_1d, GridMath2D } from './GridIndices2D'
+import { type GridIndices2D, GridMath2D } from './GridIndices2D'
 import { mod } from './math'
 
 /**
@@ -193,178 +193,6 @@ function indices_to_diagonals(
   return { diff, sum }
 }
 
-export abstract class PointSymmetry {
-  // Grid size. This must be an odd number
-  grid_size: number
-  center_1d: number
-
-  constructor(grid_size: number) {
-    this.grid_size = grid_size
-    this.center_1d = Math.floor(this.grid_size / 2)
-  }
-
-  /**
-   * Map from unsigned (row, col) where each is in [0, GRID_SIZE] to signed
-   * values [-floor(grid_size / 2), floor(grid_size / 2)]
-   *
-   * @param indices The unsigned indices
-   * @returns
-   */
-  to_signed(unsigned_indices: GridIndices2D): GridIndices2D {
-    const { row, col } = unsigned_indices
-    const flipped_row = this.grid_size - 1 - row
-    return {
-      col: col - this.center_1d,
-      row: flipped_row - this.center_1d
-    }
-  }
-
-  /**
-   * Inverse of inverse_frequency_map
-   * @param frequencies The frequencies (n, m)
-   * @returns The corresponding grid indices (row, col)
-   */
-  to_unsigned(signed_indices: GridIndices2D): GridIndices2D {
-    const { row, col } = signed_indices
-    const flipped_row = row + this.center_1d
-    return {
-      row: this.grid_size - 1 - flipped_row,
-      col: col + this.center_1d
-    }
-  }
-
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  is_enabled(indices: GridIndices2D): boolean {
-    return true
-  }
-
-  frequency_map(indices: GridIndices2D): Frequency2D {
-    const { row, col } = this.to_signed(indices)
-    return {
-      n: col,
-      m: row
-    }
-  }
-
-  inverse_frequency_map(frequencies: Frequency2D) {
-    const { n, m } = frequencies
-    return this.to_unsigned({ row: m, col: n })
-  }
-
-  abstract update_coefficients(
-    coefficients: ComplexPolar[],
-    index: number,
-    term: ComplexPolar
-  ): void
-}
-
-export class Identity extends PointSymmetry {
-  update_coefficients(coefficients: ComplexPolar[], index: number, term: ComplexPolar): void {
-    coefficients[index] = term
-  }
-}
-
-/**
- * Mirror symmetry over the x-axis, i.e.
- *
- * f(conj(z)) = f(z)
- *
- * This requires a_mn = a_nm
- */
-export class MirrorX extends PointSymmetry {
-  update_coefficients(coefficients: ComplexPolar[], index: number, term: ComplexPolar) {
-    // Set a_nm
-    coefficients[index] = term
-
-    // For mirror symmetry over the real axis, we need
-    // a_mn = a_nm
-    const indices = to_indices_2d(index, this.grid_size)
-    const frequencies = this.frequency_map(indices)
-    const swapped_frequencies = swap(frequencies)
-    const partner_indices = this.inverse_frequency_map(swapped_frequencies)
-    const partner_index = to_index_1d(partner_indices, this.grid_size)
-    coefficients[partner_index] = term
-  }
-}
-
-/**
- * Complex inversion symmetry, i.e.
- *
- * f(1/z) = f(z)
- *
- * This is a circle inversion + reflection over the x-axis,
- * but in practice this means
- */
-export class Reciprocal extends PointSymmetry {
-  update_coefficients(coefficients: ComplexPolar[], index: number, term: ComplexPolar) {
-    // Set a_nm
-    coefficients[index] = term
-
-    // For complex inversion, we have
-    // a_(-n)(-m) = a_nm
-    const indices = to_indices_2d(index, this.grid_size)
-    const frequencies = this.frequency_map(indices)
-    const swapped_frequencies = negate(frequencies)
-    const partner_indices = this.inverse_frequency_map(swapped_frequencies)
-    const partner_index = to_index_1d(partner_indices, this.grid_size)
-    coefficients[partner_index] = term
-  }
-}
-
-export class Inversion extends PointSymmetry {
-  update_coefficients(coefficients: ComplexPolar[], index: number, term: ComplexPolar) {
-    // Set a_nm
-    coefficients[index] = term
-
-    // For mirror symmetry over the real axis, we need
-    // a_(-m)(-n) = a_nm
-    const indices = to_indices_2d(index, this.grid_size)
-    const frequencies = this.frequency_map(indices)
-    const swapped_frequencies = swap(negate(frequencies))
-    const partner_indices = this.inverse_frequency_map(swapped_frequencies)
-    const partner_index = to_index_1d(partner_indices, this.grid_size)
-    coefficients[partner_index] = term
-  }
-}
-
-export class Rotation extends PointSymmetry {
-  private rule: PointSymmetryRule
-  constructor(grid_size: number, rotation_folds: number, output_rotations: number = 0) {
-    super(grid_size)
-    this.rule = {
-      rotation_folds,
-      input_rotations: 1,
-      input_reflection: false,
-      input_inversion: false,
-      output_rotations,
-      output_reflection: false
-    }
-  }
-
-  is_enabled(indices: GridIndices2D): boolean {
-    const signed_indices = this.to_signed(indices)
-    const { diff, sum } = indices_to_diagonals(signed_indices, this.rule)
-    const parity = mod(diff, 2)
-    if (parity === 1 && sum == 0) {
-      return false
-    }
-    return true
-  }
-
-  frequency_map(indices: GridIndices2D): Frequency2D {
-    const signed_indices = this.to_signed(indices)
-    const diagonals = indices_to_diagonals(signed_indices, this.rule)
-    return diagonals_to_frequencies(diagonals)
-  }
-
-  // Inverse frequency map not needed since update_coefficients only updates
-  // one term
-
-  update_coefficients(coefficients: ComplexPolar[], index: number, term: ComplexPolar): void {
-    coefficients[index] = term
-  }
-}
-
 type PartnerType = 'identity' | 'flip_col' | 'flip_row' | 'flip_both'
 type PartnerFunc = (indices: GridIndices2D, grid_size: number) => GridIndices2D
 
@@ -418,11 +246,15 @@ function get_rotation_power(rule: PointSymmetryRule, frequency_diff: number): nu
   return input_sign * l * frequency_diff - output_sign * u
 }
 
-export class SymmetryRules extends PointSymmetry {
+export class PointSymmetry {
+  grid_size: number
+  center_1d: number
   self_rule?: PointSymmetryRule
   partner_rules: PointSymmetryRule[] = []
+
   constructor(grid_size: number, rules: PointSymmetryRule[]) {
-    super(grid_size)
+    this.grid_size = grid_size
+    this.center_1d = Math.floor(this.grid_size / 2)
 
     validate_rules(rules)
 
@@ -439,6 +271,36 @@ export class SymmetryRules extends PointSymmetry {
 
   get first_rule(): PointSymmetryRule {
     return this.self_rule ?? this.partner_rules[0]
+  }
+
+  /**
+   * Map from unsigned (row, col) where each is in [0, GRID_SIZE] to signed
+   * values [-floor(grid_size / 2), floor(grid_size / 2)]
+   *
+   * @param indices The unsigned indices
+   * @returns
+   */
+  to_signed(unsigned_indices: GridIndices2D): GridIndices2D {
+    const { row, col } = unsigned_indices
+    const flipped_row = this.grid_size - 1 - row
+    return {
+      col: col - this.center_1d,
+      row: flipped_row - this.center_1d
+    }
+  }
+
+  /**
+   * Inverse of to_signed
+   * @param frequencies The frequencies (n, m)
+   * @returns The corresponding grid indices (row, col)
+   */
+  to_unsigned(signed_indices: GridIndices2D): GridIndices2D {
+    const { row, col } = signed_indices
+    const flipped_row = row + this.center_1d
+    return {
+      row: this.grid_size - 1 - flipped_row,
+      col: col + this.center_1d
+    }
   }
 
   is_enabled(indices: GridIndices2D): boolean {
@@ -461,7 +323,7 @@ export class SymmetryRules extends PointSymmetry {
     // Always set a_nm
     coefficients[index] = term
 
-    const indices = to_indices_2d(index, this.grid_size)
+    const indices = GridMath2D.to_indices_2d(index, this.grid_size)
 
     /*
     if (this.self_rule) {
@@ -486,7 +348,7 @@ export class SymmetryRules extends PointSymmetry {
       const partner_type = get_partner_type(rule)
       const partner_func = PARTNER_FUNCTIONS[partner_type]
       const partner_indices = partner_func(indices, this.grid_size)
-      const partner_index = to_index_1d(partner_indices, this.grid_size)
+      const partner_index = GridMath2D.to_index_1d(partner_indices, this.grid_size)
 
       // If we have an output reflection and set a' = conj(a)
       const flipped = rule.output_reflection ? term.conj : term
@@ -508,56 +370,6 @@ export interface PointSymmetryInfo {
   id: string
   label: string
   symmetry: PointSymmetry
-}
-
-export function dropdown_options(grid_size: number): PointSymmetryInfo[] {
-  return [
-    {
-      id: 'rot5',
-      label: '5-fold rotations',
-      symmetry: new Rotation(grid_size, 5)
-    },
-    {
-      id: 'rot5_turn1',
-      label: '5-fold color-turning (type 1)',
-      symmetry: new Rotation(grid_size, 5, 1)
-    },
-    {
-      id: 'rot5_turn2',
-      label: '5-fold color-turning (type 2)',
-      symmetry: new Rotation(grid_size, 5, 2)
-    },
-    {
-      id: 'rot3',
-      label: '3-fold rotations',
-      symmetry: new Rotation(grid_size, 3)
-    },
-    {
-      id: 'rot3_turn1',
-      label: '3-fold color-turning',
-      symmetry: new Rotation(grid_size, 3, 1)
-    },
-    {
-      id: 'identity',
-      label: 'No symmetry',
-      symmetry: new Identity(grid_size)
-    },
-    {
-      id: 'mirror_x',
-      label: 'Mirror (x-axis)',
-      symmetry: new MirrorX(grid_size)
-    },
-    {
-      id: 'reciprocal',
-      label: 'Complex inversion',
-      symmetry: new Reciprocal(grid_size)
-    },
-    {
-      id: 'inversion',
-      label: 'Circle inversion',
-      symmetry: new Inversion(grid_size)
-    }
-  ]
 }
 
 export enum InputSymmetryType {

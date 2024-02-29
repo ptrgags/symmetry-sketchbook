@@ -5,7 +5,7 @@ import TabLayout from '@/components/TabLayout.vue'
 import TabContent from '@/components/TabContent.vue'
 import { ComplexPolar, ComplexRect } from '@/core/Complex'
 import { FourierSeries2D, type FourierTerm2D } from '@/core/FourierSeries2D'
-import { type PointSymmetryRule, SymmetryRules, NO_SYMMETRY } from '@/core/PointSymmetry'
+import { type PointSymmetryRule, PointSymmetry, NO_SYMMETRY } from '@/core/PointSymmetry'
 import {
   type CoefficientPickerState,
   CoefficientPickerSketch
@@ -35,7 +35,7 @@ const title = computed<string>(() => {
   return props.symmetry_mode === 'frieze' ? 'Frieze Maker' : 'Rosette Maker'
 })
 
-const symmetry = ref<SymmetryRules>(new SymmetryRules(GRID_SIZE, [NO_SYMMETRY]))
+const symmetry = ref(new PointSymmetry(GRID_SIZE, [NO_SYMMETRY]))
 
 // p5.js sketches -------------------
 
@@ -113,7 +113,7 @@ function toggle_palette(e: Event) {
 }
 
 function change_symmetry(rules: PointSymmetryRule[]) {
-  symmetry.value = new SymmetryRules(GRID_SIZE, rules)
+  symmetry.value = new PointSymmetry(GRID_SIZE, rules)
 
   const coefficients = term_grid_state.coefficients
   coefficients.fill(ComplexPolar.ZERO)
