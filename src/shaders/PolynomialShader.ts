@@ -75,6 +75,7 @@ ${common.uniforms_coefficients}
 
 ${common.funcs_polar}
 ${common.funcs_view}
+${common.funcs_geom}
 ${common.funcs_palette}
 ${symmetry_func}
 

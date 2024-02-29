@@ -126,51 +126,29 @@ vec2 complex_to_clip(vec2 complex) {
 }
 `
 
-common.funcs_palette = `
-vec3 cosine_palette(float t) {
-    // The palette will be a vec3-valued cosine of the form:
-    // f(t) = offset + amp * cos(2pi * n * t - phase)
-
-    // Three colors (a, b, c) such that:
-    // f(0) = a
-    // f(1/2) = b
-    // f(1/4) = c
-    vec3 a = cosine_colors[0];
-    vec3 b = cosine_colors[1];
-    vec3 c = cosine_colors[2];
-
-    // taking n = odd, combine the a and b equations and solve for the offset.
-    vec3 offset = (a + b) / 2.0;
-
-    // taking n = 1 (kinda arbitrarily...) and doing some trig, we have:
-    //
-    // b = offset - amp * cos(phase)
-    // c = offset + amp * sin(phase)
-    // 
-    // solving each equation for A trig(phase), we can add the square of both
-    // so the trig functions cancel (cos^2 + sin^2 = 1) and we're left with:
-    // 
-    // amp^2 = (offset - b)^2 + (c - offset)^2
-    // which, when expanding and taking the square root gives us this mess:
-    vec3 amplitude = sqrt(
-        2.0 * offset * offset +
-        b * b +
-        c * c +
-        2.0 * offset * (b + c)
-    );
-
-    // If c is below the center line of the cosine wave, flip the amplitude
-    amplitude = sign(c - offset) * amplitude;
-
-    vec3 phase = acos((a - offset) / amplitude);
-
-    // Use n = 1 because we want a small spatial frequency for the palette.
-    float n = 1.0;
-
-    return offset + amplitude * cos(2.0 * PI * n * t - phase);
-
+common.funcs_geom = `
+float dist_from_pole(float r) {
+    return min(r, 1.0 / r);
 }
 
+float unit_circle(float r, float half_thickness) {
+    float dist = dist_from_pole(r);
+    return smoothstep(1.0 - half_thickness, 1.0 - half_thickness + 0.01, dist);
+}
+
+float line(vec2 z_rect, vec2 normal, float half_thickness) {
+    float dist = abs(dot(z_rect, normal));
+    return smoothstep(half_thickness + 0.01, half_thickness, dist);
+}
+
+float grid(vec2 z_rect, float half_thickness) {
+    vec2 from_center = 2.0 * abs(fract(z_rect) - 0.5);
+    vec2 from_edges = smoothstep(1.0 - half_thickness, 1.0 - half_thickness + 0.01, from_center);
+    return max(from_edges.x, from_edges.y);
+}
+`
+
+common.funcs_palette = `
 vec3 palette(vec2 complex_rect) {
     vec2 z = to_polar(complex_rect);
 
@@ -179,31 +157,34 @@ vec3 palette(vec2 complex_rect) {
     angle_normalized = fract(angle_normalized - 0.5);
 
     float sector = floor(rotation_order * angle_normalized);
-    float sector_brightness = sector / (rotation_order);
-    //vec3 sector_color = monochrome * sector_brightness;
-    vec3 sector_color = cosine_palette(sector_brightness + 0.5);
+    float sector_brightness = mix(0.25, 0.75, sector / (rotation_order - 1.0));
+    vec3 primary_color = monochrome * sector_brightness;
+    vec3 secondary_color = cosine_colors[0] * sector_brightness;
+    float inside_circle = 1.0 - step(1.0, z.x);
+    vec3 sector_color = mix(primary_color, secondary_color, inside_circle);
+    //vec3 sector_color = mix(primary_color, secondary_color, mod(sector, 2.0));
+
+    sector_color = mix(sector_color, 1.0 - sector_color, float(complex_rect.y > 0.0));
 
     float sector_v = fract(rotation_order * angle_normalized);
-    
-    float dist_from_pole = min(z.x, 1.0 / z.x);
-    float unit_circle = smoothstep(0.9, 0.91, dist_from_pole);
 
-
+    float dist = dist_from_pole(z.x);
     float r_parity = mod(floor(15.0 * z.x), 2.0);
     float theta_parity = mod(floor(10.0 * z.y / PI), 2.0);
 
-    /*
-    // Color points that land near the mouse
-    vec2 mouse_z = to_complex(mouse_uv);
-    float mouse_dist = length(mouse_z - complex_rect);
-    // deadmou5 enters the chat?
-    float mouse_mask = smoothstep(0.11, 0.1, mouse_dist);
-    */
-    
+    float circle = unit_circle(z.x, 0.1);
+    float x_axis = line(complex_rect, vec2(0.0, 1.0), 0.1);
+    float y_axis = line(complex_rect, vec2(1.0, 0.0), 0.1);
+    float unit_grid = grid(complex_rect, 0.05);
+
+    vec3 ref_color = cosine_colors[1];
+
     vec3 color = sector_color;
-    color = mix(color, vec3(1.0), unit_circle);
-    color = mix(color, vec3(0.0), pow(1.0 - dist_from_pole, 8.0));
-    //color = mix(color, vec3(1.0, 1.0, 0.0), mouse_mask);
+    color = mix(color, ref_color, unit_grid);
+    color = mix(color, ref_color, circle);
+    color = mix(color, ref_color, x_axis);
+    color = mix(color, ref_color, y_axis);
+    color = mix(color, color * cosine_colors[2], pow(1.0 - dist, 8.0));
     return vec3(color);
 }
 `
