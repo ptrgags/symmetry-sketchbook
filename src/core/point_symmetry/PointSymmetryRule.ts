@@ -1,4 +1,6 @@
+import { ComplexPolar, ComplexRect } from '../Complex'
 import type { GridIndices2D } from '../GridIndices2D'
+import { mod } from '../math'
 import { diff_row_to_sum, type DiffSum } from './DiffSum'
 import type { PartnerType } from './PartnerType'
 
@@ -173,4 +175,81 @@ export function indices_to_diff_sum(
   // little
   const sum = diff_row_to_sum(diff, row)
   return { diff, sum }
+}
+
+export function enforce_self_partner_constraint(
+  rule: PointSymmetryRule,
+  frequency_diff: number,
+  term: ComplexPolar
+) {
+  if (get_partner_type(rule) !== 'identity') {
+    throw new Error('rule is not a self-partner constraint!')
+  }
+
+  // the rule is now of the form
+  //
+  // a_nm = rotate_k^P mirror? a_nm
+  //
+  // This is one of the following:
+  //
+  // a_nm = a_nm                   -> pass through term unchanged
+  // a_nm = rotate_k^P a_nm        -> Check that P == 0 (mod k)
+  // a_nm = mirror a_nm            -> force a_nm to be real (special case of
+  //                                  next rule)
+  // a_nm = rotate_k^P mirror a_nm -> force a_nm to be constrained to a line
+
+  const folds = rule.rotation_folds
+  const rotation_power = get_rotation_power(rule, frequency_diff)
+
+  // mirror constraints are
+  //
+  // a_nm = rotate_k^P mirror a_nm
+  //
+  // since mirror means flip over the x-axis (direction vector 1)
+  // in general this means flip over the line pointing in the direction
+  // rotate_k^P.
+  //
+  // so to enforce this constraint, project a_nm onto rotate_k^P, which
+  // constrains the coefficient to a line
+  if (rule.output_reflection) {
+    const line_direction = ComplexPolar.root_of_unity(folds, rotation_power)
+
+    const term_rect = term.to_rect()
+    const direction_rect = line_direction.to_rect()
+    const length = term_rect.dot(direction_rect)
+    return line_direction.scale(length)
+  }
+
+  // Rotation constraints should be handled by the term grid,
+  // but it doesn't hurt to check!
+  //
+  // a_nm = rotate_k^P a_nm is only possible if rotate_k^P = 1
+  // which only happens if P == 0 (mod k)
+  const rotation_count = mod(rotation_power, folds)
+  if ((rule.input_rotation || rule.output_rotations > 0) && rotation_count !== 0) {
+    console.warn('Term invalid for rotation constraint. Setting to 0')
+    return ComplexPolar.ZERO
+  }
+
+  // If we reached here, the constraint is a_nm = a_nm which is always true
+  return term
+}
+
+export function get_partner_term(
+  rule: PointSymmetryRule,
+  frequency_diff: number,
+  term: ComplexPolar
+): ComplexPolar {
+  if (get_partner_type(rule) === 'identity') {
+    throw new Error('Trying to compute partner coefficient for a self-partner rule')
+  }
+
+  // We want to compute rotate_k^P * mirror? depending on the rule
+  const flipped = rule.output_reflection ? term.conj : term
+
+  const rotation_power = get_rotation_power(rule, frequency_diff)
+  const rotation_factor = ComplexPolar.root_of_unity(rule.rotation_folds, rotation_power)
+  const rotated = flipped.mult(rotation_factor)
+
+  return rotated
 }

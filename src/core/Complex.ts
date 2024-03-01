@@ -69,6 +69,19 @@ export class ComplexRect {
     return new ComplexRect(x, y)
   }
 
+  /**
+   * Compute the dot product of two complex numbers:
+   *
+   * a dot b = Re(a conj(b)) = (ax * bx + ay * by)
+   * @param other Another vector
+   * @returns The dot product
+   */
+  dot(other: ComplexRect): number {
+    const x = this.real * other.real
+    const y = this.imag * other.imag
+    return x + y
+  }
+
   to_polar(): ComplexPolar {
     return new ComplexPolar(this.r, this.theta)
   }

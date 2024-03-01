@@ -1,5 +1,11 @@
 import { describe, test, expect } from 'vitest'
-import { IDENTITY, PointSymmetryRule, get_freq_diff, get_rotation_power } from './PointSymmetryRule'
+import {
+  IDENTITY,
+  PointSymmetryRule,
+  get_freq_diff,
+  get_partner_type,
+  get_rotation_power
+} from './PointSymmetryRule'
 
 function ignore_signed_zero(x: number): number {
   if (x === 0) {
@@ -43,6 +49,53 @@ describe('PointSymmetryRule', () => {
   const OUTPUT_REFLECTION = {
     output_reflection: true
   }
+
+  describe('get_partner_type', () => {
+    test('identity', () => {
+      expect(get_partner_type(IDENTITY)).toBe('identity')
+
+      const rotation = { ...IDENTITY, ...INPUT_ROTATION }
+      expect(get_partner_type(rotation)).toBe('identity')
+
+      const output_rotation = { ...IDENTITY, ...INPUT_ROTATION, ...OUTPUT_ROTATION }
+      expect(get_partner_type(output_rotation)).toBe('identity')
+
+      const even_flips = { ...IDENTITY, ...INPUT_REFLECTION, ...OUTPUT_REFLECTION }
+      expect(get_partner_type(even_flips)).toBe('identity')
+    })
+
+    test('flip_col', () => {
+      const reflection = { ...IDENTITY, ...INPUT_REFLECTION }
+      expect(get_partner_type(reflection)).toBe('flip_col')
+
+      const output_reflection = { ...IDENTITY, ...INPUT_ROTATION, ...OUTPUT_REFLECTION }
+      expect(get_partner_type(output_reflection)).toBe('flip_col')
+    })
+
+    test('flip_row', () => {
+      const circle_inversion = { ...IDENTITY, ...INPUT_INVERSION, ...INPUT_REFLECTION }
+      expect(get_partner_type(circle_inversion)).toBe('flip_row')
+
+      const roto_inversion = {
+        ...IDENTITY,
+        ...INPUT_ROTATION,
+        ...INPUT_INVERSION,
+        ...INPUT_REFLECTION
+      }
+      expect(get_partner_type(roto_inversion)).toBe('flip_row')
+
+      const with_output = { ...circle_inversion, ...OUTPUT_ROTATION }
+      expect(get_partner_type(with_output)).toBe('flip_row')
+    })
+
+    test('flip_both', () => {
+      const inversion = { ...IDENTITY, ...INPUT_INVERSION }
+      expect(get_partner_type(inversion)).toBe('flip_both')
+
+      const roto_complex_inversion = { ...IDENTITY, ...INPUT_ROTATION, ...INPUT_INVERSION }
+      expect(get_partner_type(roto_complex_inversion)).toBe('flip_both')
+    })
+  })
 
   describe('get_rotation_power', () => {
     const INPUT_DIFFS = [-3, -2, -1, 0, 1, 2, 3]

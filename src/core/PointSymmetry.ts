@@ -2,11 +2,13 @@ import { ComplexPolar } from './Complex'
 import { type Frequency2D } from './Frequency2D'
 import { type GridIndices2D, to_indices_2d, to_index_1d } from './GridIndices2D'
 import { mod } from './math'
-import { diff_sum_to_frequencies, type DiffSum } from './point_symmetry/DiffSum'
-import { PARTNER_FUNCTIONS } from './point_symmetry/PartnerType'
+import { diff_sum_to_frequencies } from './point_symmetry/DiffSum'
+import { get_partner_indices } from './point_symmetry/PartnerType'
 import {
+  enforce_self_partner_constraint,
+  get_freq_diff,
+  get_partner_term,
   get_partner_type,
-  get_rotation_power,
   indices_to_diff_sum,
   type PointSymmetryRule
 } from './point_symmetry/PointSymmetryRule'
@@ -98,55 +100,48 @@ export class PointSymmetry {
     return diff_sum_to_frequencies(diff_sum)
   }
 
-  update_coefficients(coefficients: ComplexPolar[], index: number, term: ComplexPolar): void {
-    // Always set a_nm
-    coefficients[index] = term
-
+  update_coefficients(
+    coefficients: ComplexPolar[],
+    index: number,
+    original_term: ComplexPolar
+  ): void {
     const indices = to_indices_2d(index, this.grid_size)
+    const signed_indices = this.to_signed(indices)
 
-    /*
+    let first_term = original_term
     if (this.self_rule) {
-      // for a constraint like a_nm = rotate_k^P mirror^Q a_nm,
-      // this can only be true if rotate is a 2-fold rotation, so this is
-      // equivalent to saying a_nm = (-1)^P mirror^Q a_nm
+      const frequency_diff = get_freq_diff(this.self_rule, signed_indices.col)
+      first_term = enforce_self_partner_constraint(this.self_rule, frequency_diff, original_term)
+    }
 
-      const flipped = this.self_rule.output_reflection ? term.conj : term
-
-      const signed_indices = this.to_signed(indices)
-      const diagonals = indices_to_diagonals(signed_indices, this.self_rule)
-      const rotation_factor = get_rotation_factor(this.self_rule, diagonals.diff)
-      const rotated = mod(rotation_factor, 2) === 1 ? 
-    }*/
+    type TermUpdate = [GridIndices2D, ComplexPolar]
+    const terms_to_update: TermUpdate[] = [[indices, first_term]]
 
     // For "partner rules", a_nm has a partner coefficient a_(n')(m')
     // somewhere else in the grid. They will be related as:
     // a_(n')(m') = C * a_nm
     // with a scalar C that depends on the symmetry rule
     for (const rule of this.partner_rules) {
-      // Find the index of the partner in the grid
       const partner_type = get_partner_type(rule)
-      const partner_func = PARTNER_FUNCTIONS[partner_type]
-      const partner_indices = partner_func(indices, this.grid_size)
-      const partner_index = to_index_1d(partner_indices, this.grid_size)
 
-      // If we have an output reflection and set a' = conj(a)
-      const flipped = rule.output_reflection ? term.conj : term
+      const new_terms: TermUpdate[] = terms_to_update.map(([indices, term]) => {
+        // Find the partner in the grid
+        const partner_indices = get_partner_indices(partner_type, indices, this.grid_size)
 
-      // Get the rotation factor, and do a' *= R
-      const partner_signed = this.to_signed(partner_indices)
-      const diagonals = indices_to_diff_sum(partner_signed, rule)
-      const rotation_power = get_rotation_power(rule, diagonals.diff)
-      const rotation_factor = ComplexPolar.root_of_unity(rule.rotation_folds, rotation_power)
-      const rotated = flipped.mult(rotation_factor)
+        // Apply the constraint to determine the value of this term
+        const partner_signed = this.to_signed(partner_indices)
+        const frequency_diff = get_freq_diff(rule, partner_signed.col)
+        const partner_term = get_partner_term(rule, frequency_diff, term)
 
-      // Set a' = C * a
-      coefficients[partner_index] = rotated
+        return [partner_indices, partner_term]
+      })
+
+      terms_to_update.push(...new_terms)
+    }
+
+    for (const [indices, value] of terms_to_update) {
+      const index = to_index_1d(indices, this.grid_size)
+      coefficients[index] = value
     }
   }
-}
-
-export interface PointSymmetryInfo {
-  id: string
-  label: string
-  symmetry: PointSymmetry
 }
