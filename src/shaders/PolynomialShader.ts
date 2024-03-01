@@ -90,17 +90,17 @@ void main() {
         color = palette(complex);
     } else {
         vec2 z = compute(complex);
-        color = palette(z);
-
-        // Draw input axes
-        color = draw_axes(
-            color,
-            complex,
-            input_axes_color,
-            input_axes_xyrt, 
-            input_axes_thickness
-        );
+        color = palette(z);    
     }
+
+    // Draw input axes
+    draw_axes(
+        color,
+        complex,
+        input_axes_color,
+        input_axes_xyrt, 
+        input_axes_thickness
+    );
 
     gl_FragColor = vec4(color, 1.0);
 }
