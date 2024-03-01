@@ -25,13 +25,21 @@ export class PolynomialSketch extends Sketch<PolynomialState> {
     this.shader.init(p)
     this.shader.set_coefficients(this.state.pattern)
     this.shader.set_uniform('rotation_order', this.state.rotation_order)
+
     this.set_color('primary', [0.5, 0.0, 1.0])
     this.set_color('secondary', [0.5, 1.0, 0.0])
     this.set_color('far', [0.0, 0.0, 0.0])
+    this.shader.set_uniform('far_power', 4)
 
     this.set_color('pulse', [1, 1, 0])
-    this.set_color('axes', [1, 1, 1])
+    this.set_color('input_axes', [1, 1, 1])
+    this.set_color('output_axes', [0, 1, 1])
     this.set_color('grid', [0.8, 0.8, 0.8])
+
+    this.set_thickness('pulse', 0.1)
+    this.set_thickness('grid', 0.1)
+    this.set_thickness('input_axes', 0.1)
+    this.set_thickness('output_axes', 0.1)
 
     this.shader.set_animation([])
     this.shader.disable()
@@ -67,6 +75,10 @@ export class PolynomialSketch extends Sketch<PolynomialState> {
     this.shader.set_uniform(`${prefix}_xyrt`, value.map(Number))
   }
 
+  set_thickness(prefix: string, value: number) {
+    this.shader.set_uniform(`${prefix}_thickness`, value)
+  }
+
   set rotation_order(value: number) {
     // When the rotation order is 1, we only have mirrors and inversions.
     // This looks better with more sectors, so set it to 4
@@ -81,5 +93,9 @@ export class PolynomialSketch extends Sketch<PolynomialState> {
 
   set secondary_color_mode(value: SecondaryColorType) {
     this.shader.set_uniform('secondary_color_mode', value)
+  }
+
+  set far_power(value: number) {
+    this.shader.set_uniform('far_power', value)
   }
 }

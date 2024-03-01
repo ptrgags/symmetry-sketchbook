@@ -18,6 +18,7 @@ import PointSymmetryEditor from '@/components/PointSymmetryEditor.vue'
 import XYRTFlags from '@/components/XYRTFlags.vue'
 import ColorPicker from '@/components/ColorPicker.vue'
 import { PALETTE_TYPES, type PaletteType } from '@/core/point_symmetry/PaletteType'
+import RangeSlider from '@/components/RangeSlider.vue'
 
 // The frequencies will be [-MAX_FREQ, MAX_FREQ] in each direction
 const MAX_FREQ = 3
@@ -188,70 +189,109 @@ watch(palette_type, (new_value: PaletteType) => {
             @update:model-value="(value) => viewer.set_color('far', value)"
             >Far Away Color</ColorPicker
           >
-
-          <h3>Axes</h3>
-          <XYRTFlags
-            id="axes-xyrt"
-            @update:model-value="(value) => viewer.set_xyrt_flags('axes', value)"
-          />
-          <ColorPicker
-            id="pulse-color"
-            :model-value="[1, 1, 1]"
-            @update:model-value="(value) => viewer.set_color('axes', value)"
-            >Color</ColorPicker
+          <RangeSlider
+            id="far-power"
+            :min="1"
+            :max="19"
+            :model-value="4"
+            @update:model-value="(value) => (viewer.far_power = 20 - value)"
+            >Far Away Fade</RangeSlider
           >
-          <div class="form-row">
-            <label for="ref-thickness">Thickness: </label>
-            <input id="ref-thickness" type="range" min="0.001" max="0.5" step="0.001" value="0.1" />
-          </div>
+          <details class="form-row">
+            <summary>Reference Geometry</summary>
 
-          <h3>Pulses</h3>
-          <XYRTFlags
-            id="pulse-xyrt"
-            @update:model-value="(value) => viewer.set_xyrt_flags('pulse', value)"
-          />
-          <ColorPicker
-            id="pulse-color"
-            :model-value="[1, 1, 0]"
-            @update:model-value="(value) => viewer.set_color('pulse', value)"
-            >Color</ColorPicker
-          >
-          <div class="form-row">
-            <label for="pulse-thickness">Thickness: </label>
-            <input
+            <h3>Axes</h3>
+            <XYRTFlags
+              id="input-axes-xyrt"
+              @update:model-value="(value) => viewer.set_xyrt_flags('input_axes', value)"
+            />
+            <ColorPicker
+              id="input-axes-color"
+              :model-value="[1, 1, 1]"
+              @update:model-value="(value) => viewer.set_color('input_axes', value)"
+              >Color</ColorPicker
+            >
+            <RangeSlider
+              id="input-axes-thickness"
+              :min="0.001"
+              :max="0.1"
+              :step="0.001"
+              :model-value="0.01"
+              @update:model-value="(value) => viewer.set_thickness('input_axes', value)"
+              >Thickness:</RangeSlider
+            >
+
+            <h3>Palette Axes</h3>
+            <XYRTFlags
+              id="output-axes-xyrt"
+              @update:model-value="(value) => viewer.set_xyrt_flags('output_axes', value)"
+            />
+            <ColorPicker
+              id="output-axes-color"
+              :model-value="[0, 1, 1]"
+              @update:model-value="(value) => viewer.set_color('output_axes', value)"
+              >Color</ColorPicker
+            >
+            <RangeSlider
+              id="output-axes-thickness"
+              :min="0.001"
+              :max="0.5"
+              :step="0.001"
+              :model-value="0.1"
+              @update:model-value="(value) => viewer.set_thickness('output_axes', value)"
+              >Thickness:</RangeSlider
+            >
+
+            <h3>Pulses</h3>
+            <XYRTFlags
+              id="pulse-xyrt"
+              @update:model-value="(value) => viewer.set_xyrt_flags('pulse', value)"
+            />
+            <ColorPicker
+              id="pulse-color"
+              :model-value="[1, 1, 0]"
+              @update:model-value="(value) => viewer.set_color('pulse', value)"
+              >Color</ColorPicker
+            >
+            <RangeSlider
               id="pulse-thickness"
-              type="range"
-              min="0.001"
-              max="0.5"
-              step="0.001"
-              value="0.1"
-            />
-          </div>
+              :min="0.001"
+              :max="0.5"
+              :step="0.001"
+              :model-value="0.1"
+              @update:model-value="(value) => viewer.set_thickness('pulse', value)"
+              >Thickness:</RangeSlider
+            >
 
-          <h3>Grid Lines</h3>
-          <XYRTFlags
-            id="grid-xyrt"
-            @update:model-value="(value) => viewer.set_xyrt_flags('grid', value)"
-          />
-          <ColorPicker
-            id="grid-color"
-            :model-value="[1, 1, 1]"
-            @update:model-value="(value) => viewer.set_color('grid', value)"
-            >Color</ColorPicker
-          >
-          <div class="form-row">
-            <label for="grid-thickness">Thickness: </label>
-            <input
-              id="grid-thickness"
-              type="range"
-              min="0.001"
-              max="0.5"
-              step="0.001"
-              value="0.1"
+            <h3>Grid Lines</h3>
+            <XYRTFlags
+              id="grid-xyrt"
+              @update:model-value="(value) => viewer.set_xyrt_flags('grid', value)"
             />
-          </div>
+            <ColorPicker
+              id="grid-color"
+              :model-value="[1, 1, 1]"
+              @update:model-value="(value) => viewer.set_color('grid', value)"
+              >Color</ColorPicker
+            >
+            <RangeSlider
+              id="grid-thickness"
+              :min="0.001"
+              :max="0.5"
+              :step="0.001"
+              :model-value="0.1"
+              @update:model-value="(value) => viewer.set_thickness('grid', value)"
+              >Thickness:</RangeSlider
+            >
+          </details>
         </TabContent>
       </TabLayout>
     </template>
   </TwoColumns>
 </template>
+
+<style>
+details {
+  width: 100%;
+}
+</style>

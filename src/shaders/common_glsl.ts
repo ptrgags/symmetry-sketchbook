@@ -79,15 +79,23 @@ common.uniforms_palette = `
 uniform vec3 primary_color;
 uniform vec3 secondary_color;
 uniform vec3 far_color;
+uniform float far_power;
 
 uniform vec4 grid_xyrt;
 uniform vec3 grid_color;
+uniform float grid_thickness;
 
 uniform vec4 pulse_xyrt;
 uniform vec3 pulse_color;
+uniform float pulse_thickness;
 
-uniform vec4 axes_xyrt;
-uniform vec3 axes_color;
+uniform vec4 input_axes_xyrt;
+uniform vec3 input_axes_color;
+uniform float input_axes_thickness;
+
+uniform vec4 output_axes_xyrt;
+uniform vec3 output_axes_color;
+uniform float output_axes_thickness;
 
 uniform bool invert_palette;
 uniform float secondary_color_mode;
@@ -166,6 +174,20 @@ float grid_lines(float x, float half_thickness) {
     float from_center = 2.0 * abs(fract(x) - 0.5);
     return smoothstep(1.0 - half_thickness, 1.0 - half_thickness + 0.01, from_center);
 }
+
+vec3 draw_axes(vec3 original_color, vec2 z_rect, vec3 axis_color, vec4 axis_xyrt, float axis_thickness) {
+    float x_axis = line(z_rect, vec2(0.0, 1.0), axis_thickness);
+    float y_axis = line(z_rect, vec2(1.0, 0.0), axis_thickness);
+    float r_axis = x_axis * step(0.0, z_rect.x);
+    float theta_axis = unit_circle(length(z_rect), axis_thickness);
+
+    vec3 color = original_color;
+    color = mix(color, axis_color, axis_xyrt.x * x_axis);
+    color = mix(color, axis_color, axis_xyrt.y * y_axis);
+    color = mix(color, axis_color, axis_xyrt.z * r_axis);
+    color = mix(color, axis_color, axis_xyrt.w * theta_axis);
+    return color;
+}
 `
 
 common.funcs_palette = `
@@ -210,23 +232,8 @@ vec3 palette(vec2 complex_rect) {
     float r_grid = grid_lines(z.x, 0.1);
     float theta_grid = grid_lines(2.0 * rotation_order * angle_normalized, 0.1 / z.x);
 
-    float x_axis = line(complex_rect, vec2(0.0, 1.0), 0.1);
-    float y_axis = line(complex_rect, vec2(1.0, 0.0), 0.1);
-    float r_axis = x_axis * step(0.0, complex_rect.x);
-    float theta_axis = unit_circle(z.x, 0.1);
-
     float unsigned_pulse = mod(2.0 * time, 10.0);
     float signed_pulse = 2.0 * unsigned_pulse - 10.0;
-
-    float x_pulse = line(complex_rect - vec2(signed_pulse, 0.0), vec2(1.0, 0.0), 0.1);
-    float y_pulse = line(complex_rect - vec2(0.0, signed_pulse), vec2(0.0, 1.0), 0.1);
-    float r_pulse = circle(z.r, unsigned_pulse, 0.1);
-
-    float theta_pulse = line(
-        vec2(angle_normalized - fract(0.5 * time), 0.0), 
-        vec2(1.0, 0.0), 
-        0.01 / z.x
-    );
 
     vec3 color = sector_color;
 
@@ -237,11 +244,22 @@ vec3 palette(vec2 complex_rect) {
     color = mix(color, grid_color, grid_xyrt.w * theta_grid);
     
     // Axes
-    color = mix(color, axes_color, axes_xyrt.x * x_axis);
-    color = mix(color, axes_color, axes_xyrt.y * y_axis);
-    color = mix(color, axes_color, axes_xyrt.z * r_axis);
-    color = mix(color, axes_color, axes_xyrt.w * theta_axis);
+    color = draw_axes(
+        color,
+        complex_rect,
+        output_axes_color,
+        output_axes_xyrt,
+        output_axes_thickness
+    );
 
+    float x_pulse = line(complex_rect - vec2(signed_pulse, 0.0), vec2(1.0, 0.0), pulse_thickness);
+    float y_pulse = line(complex_rect - vec2(0.0, signed_pulse), vec2(0.0, 1.0), pulse_thickness);
+    float r_pulse = circle(z.r, unsigned_pulse, 0.1);
+    float theta_pulse = line(
+        vec2(angle_normalized - fract(0.5 * time), 0.0), 
+        vec2(1.0, 0.0), 
+        0.01 / z.x
+    );
     // Pulses
     color = mix(color, pulse_color, pulse_xyrt.x * x_pulse);
     color = mix(color, pulse_color, pulse_xyrt.y * y_pulse);
@@ -249,7 +267,8 @@ vec3 palette(vec2 complex_rect) {
     color = mix(color, pulse_color, pulse_xyrt.w * theta_pulse);
 
     // Gradient away from the unit circle
-    color = mix(color, color * far_color, pow(1.0 - dist, 8.0));
+    color = mix(color, color * far_color, pow(1.0 - dist, far_power));
+
     return vec3(color);
 }
 `
