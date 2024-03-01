@@ -11,7 +11,13 @@ import {
 } from './GridIndices2D'
 import { mod } from './math'
 import { diff_sum_to_frequencies, type DiffSum } from './point_symmetry/DiffSum'
-import { get_rotation_power, type PointSymmetryRule } from './point_symmetry/PointSymmetryRule'
+import { PARTNER_FUNCTIONS } from './point_symmetry/PartnerType'
+import {
+  get_freq_diff,
+  get_partner_type,
+  get_rotation_power,
+  type PointSymmetryRule
+} from './point_symmetry/PointSymmetryRule'
 
 function indices_to_diff_sum(
   signed_indices: GridIndices2D,
@@ -19,69 +25,11 @@ function indices_to_diff_sum(
 ): DiffSum {
   const { row, col } = signed_indices
 
-  // Derivation:
-  //
-  // Symmetry rules are of the form:
-  //
-  // f rotate_k^l invert^p, mirror_x^q = rotate_k^u mirror_x^v f
-  //
-  // where:
-  // k = # of folds in rotation symmetry (set to 1 for no rotations)
-  // l = power of the input rotation
-  // p = 0 or 1 indicating if input inversions (1 / z) are used
-  // q = 0 or 1 indicating if input reflections are used
-  // u = power of the output rotation (also a k-fold rotation)
-  // v = 0 or 1 indicating if output reflections are used
-  //
-  // I'm also only using this function when l divides k and u divides k to
-  // avoid some headaches where the result may be not an integer but off by
-  // 0.5
-  //
-  // Rotation constraints restrict which diagonals we can use due to the
-  // equation:
-  //
-  // a_nm = rotate_k^P a_nm
-  //
-  // where P = (-1)^(p + q) * l* (n - m) - (-1)^(v) * u
-  //
-  // for the input frequencies n and m
-  //
-  // For the above constraint to be true, P must be congruent to 0 (mod k)
-  // in other words:
-  //
-  // let input_sign = (-1)^(p + q)
-  //     diff = (n - m)
-  //     output_sign = (-1)^v
-  // input_sign * l * diff - output_sign * u = k * R
-  //
-  // for some integer R.
-  //
-  // For the term grid, I want each column to correspond to a different
-  // diagonal (n - m == diff), so the column index must correspond to the
-  // value of R and we'll solve for diff:
-  //
-  // diff(R) = (k * R + output_sign * u) / (input_sign * l)
-  //
-  // TL;DR all this mess just to contract the grid so we skip gaps. This
-  // will allow me to fit as many coefficients as possible in the grid.
-  //
-  // Desmos graph visualization of the above
-  // https://www.desmos.com/calculator/bet7emamug
-  const k = symmetry_rule.rotation_folds
-  const l = Number(symmetry_rule.input_rotation)
-  const input_sign = Math.pow(
-    -1,
-    Number(symmetry_rule.input_reflection) + Number(symmetry_rule.input_inversion)
-  )
-  const output_sign = Math.pow(-1, Number(symmetry_rule.output_reflection))
-  const u = symmetry_rule.output_rotations
+  // Rotation symmetry puts constraints on which frequencies we can use, but
+  // this only affects the frequency difference, not the sum
+  const diff = get_freq_diff(symmetry_rule, col)
 
-  const diff = (k * col + output_sign * u) / (input_sign * l)
-
-  // Okay that was a lot! That takes care of the diff = (n - m) value, but what about
-  // the sum = (n + m) value?
-  //
-  // On one hand, we can choose anything we want, so ideally we'd do
+  // For the sum, we can choose anything we want, so ideally we'd do
   // sum = row and be done with it, but there's one minor subtlety to consider:
   //
   // Look at the diagonals of an integer grid:
@@ -142,36 +90,6 @@ function indices_to_diff_sum(
   }
 
   return { diff, sum }
-}
-
-type PartnerType = 'identity' | 'flip_col' | 'flip_row' | 'flip_both'
-type PartnerFunc = (indices: GridIndices2D, grid_size: number) => GridIndices2D
-
-const PARTNER_FUNCTIONS: { [key in PartnerType]: PartnerFunc } = {
-  identity,
-  flip_col,
-  flip_row,
-  flip_both
-}
-
-function get_partner_type(rule: PointSymmetryRule): PartnerType {
-  // Using !== as XOR
-  const swap = rule.input_reflection !== rule.output_reflection
-  const invert = rule.input_inversion
-
-  if (invert && swap) {
-    return 'flip_row'
-  }
-
-  if (invert) {
-    return 'flip_both'
-  }
-
-  if (swap) {
-    return 'flip_col'
-  }
-
-  return 'identity'
 }
 
 function validate_rules(rules: PointSymmetryRule[]) {

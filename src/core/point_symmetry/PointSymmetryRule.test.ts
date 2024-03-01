@@ -1,5 +1,5 @@
 import { describe, test, expect } from 'vitest'
-import { IDENTITY, PointSymmetryRule, get_rotation_power } from './PointSymmetryRule'
+import { IDENTITY, PointSymmetryRule, get_freq_diff, get_rotation_power } from './PointSymmetryRule'
 
 function ignore_signed_zero(x: number): number {
   if (x === 0) {
@@ -15,30 +15,36 @@ function test_rotation_power(rule: PointSymmetryRule, inputs: number[], expected
   expect(actual.map(ignore_signed_zero)).toStrictEqual(expected.map(ignore_signed_zero))
 }
 
+function test_freq_diff(rule: PointSymmetryRule, inputs: number[], expected: number[]) {
+  const actual = inputs.map((x) => get_freq_diff(rule, x))
+  expect(actual).toStrictEqual(expected)
+}
+
 describe('PointSymmetryRule', () => {
+  // Fragments of rules to combine with identity for brevity
+  const INPUT_ROTATION = {
+    rotation_folds: 3,
+    input_rotation: true
+  }
+
+  const INPUT_REFLECTION = {
+    input_reflection: true
+  }
+
+  const INPUT_INVERSION = {
+    input_inversion: true
+  }
+
+  const OUTPUT_ROTATION = {
+    rotation_folds: INPUT_ROTATION.rotation_folds,
+    output_rotations: 2
+  }
+
+  const OUTPUT_REFLECTION = {
+    output_reflection: true
+  }
+
   describe('get_rotation_power', () => {
-    // Fragments of rules to combine with identity for brevity
-    const INPUT_ROTATION = {
-      rotation_folds: 3,
-      input_rotation: true
-    }
-
-    const INPUT_REFLECTION = {
-      input_reflection: true
-    }
-
-    const INPUT_INVERSION = {
-      input_inversion: true
-    }
-
-    const OUTPUT_ROTATION = {
-      output_rotations: 2
-    }
-
-    const OUTPUT_REFLECTION = {
-      output_reflection: true
-    }
-
     const INPUT_DIFFS = [-3, -2, -1, 0, 1, 2, 3]
     test('transformations without rotations', () => {
       const ZERO = [0, 0, 0, 0, 0, 0, 0]
@@ -194,6 +200,51 @@ describe('PointSymmetryRule', () => {
         ...OUTPUT_REFLECTION
       }
       test_rotation_power(out_flip, INPUT_DIFFS, EXPECTED_ADD)
+    })
+  })
+
+  describe('get_freq_diff', () => {
+    const INPUT_COLS = [-3, -2, -1, 0, 1, 2, 3]
+    test('most transforms are ignored', () => {
+      const IGNORED = [
+        // No input rotations
+        IDENTITY,
+        { ...IDENTITY, ...INPUT_REFLECTION },
+        { ...IDENTITY, ...INPUT_INVERSION },
+        { ...IDENTITY, ...INPUT_INVERSION, ...INPUT_INVERSION },
+        { ...IDENTITY, ...INPUT_INVERSION, ...OUTPUT_ROTATION },
+        { ...IDENTITY, ...INPUT_REFLECTION, ...OUTPUT_REFLECTION },
+        // Rotation + mirrors
+        { ...IDENTITY, ...INPUT_ROTATION, ...INPUT_REFLECTION },
+        { ...IDENTITY, ...INPUT_ROTATION, ...OUTPUT_REFLECTION },
+        // Despite an even number of flips, this is not really a rotation
+        // constraint because it constrains the coefficient value, not
+        // the indices
+        { ...IDENTITY, ...INPUT_ROTATION, ...INPUT_REFLECTION, ...OUTPUT_REFLECTION }
+      ]
+
+      for (const rule of IGNORED) {
+        test_freq_diff(rule, INPUT_COLS, INPUT_COLS)
+      }
+    })
+
+    test('handles rotation symmetry', () => {
+      const rotation = {
+        ...IDENTITY,
+        ...INPUT_ROTATION
+      }
+      const EXPECTED_ROTATION = INPUT_COLS.map((x) => 3 * x)
+
+      test_freq_diff(rotation, INPUT_COLS, EXPECTED_ROTATION)
+
+      const color_turn = {
+        ...rotation,
+        ...OUTPUT_ROTATION
+      }
+
+      const EXPECTED_COLOR_TURN = INPUT_COLS.map((x) => 3 * x + 2)
+
+      test_freq_diff(color_turn, INPUT_COLS, EXPECTED_COLOR_TURN)
     })
   })
 })
