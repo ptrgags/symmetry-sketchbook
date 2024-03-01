@@ -1,3 +1,5 @@
+import type { GridIndices2D } from '../GridIndices2D'
+import { diff_row_to_sum, type DiffSum } from './DiffSum'
 import type { PartnerType } from './PartnerType'
 
 /**
@@ -145,4 +147,30 @@ export function get_freq_diff(rule: PointSymmetryRule, signed_col: number): numb
   const output_rotations = rule.output_rotations
 
   return folds * signed_col + output_rotations
+}
+
+/**
+ * For the UI, we have a grid of terms, but we want to only allow editing
+ * terms that match the symmetry rule. This function looks at the symmetry
+ * rule and picks appropriate (diff, sum) frequencies
+ * @param signed_indices The signed grid indices for a single grid cell
+ * @param symmetry_rule The symmetry rule to apply
+ * @returns A (diff, sum) of frequencies for this grid cell
+ */
+export function indices_to_diff_sum(
+  signed_indices: GridIndices2D,
+  symmetry_rule: PointSymmetryRule
+): DiffSum {
+  const { row, col } = signed_indices
+
+  // Rotation symmetry puts constraints on which frequencies we can use,
+  // everything else will pass through col as-is
+  const diff = get_freq_diff(symmetry_rule, col)
+
+  // The symmetry rule only affects the difference of frequencies, the
+  // sum of frequencies can be anything we want, though the fact that the
+  // diff, sum grid is at 45 degrees to the row, col grid restricts us a
+  // little
+  const sum = diff_row_to_sum(diff, row)
+  return { diff, sum }
 }

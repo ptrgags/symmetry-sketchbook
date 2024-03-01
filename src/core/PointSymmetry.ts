@@ -1,96 +1,15 @@
 import { ComplexPolar } from './Complex'
 import { type Frequency2D } from './Frequency2D'
-import {
-  type GridIndices2D,
-  to_indices_2d,
-  to_index_1d,
-  identity,
-  flip_col,
-  flip_both,
-  flip_row
-} from './GridIndices2D'
+import { type GridIndices2D, to_indices_2d, to_index_1d } from './GridIndices2D'
 import { mod } from './math'
 import { diff_sum_to_frequencies, type DiffSum } from './point_symmetry/DiffSum'
 import { PARTNER_FUNCTIONS } from './point_symmetry/PartnerType'
 import {
-  get_freq_diff,
   get_partner_type,
   get_rotation_power,
+  indices_to_diff_sum,
   type PointSymmetryRule
 } from './point_symmetry/PointSymmetryRule'
-
-function indices_to_diff_sum(
-  signed_indices: GridIndices2D,
-  symmetry_rule: PointSymmetryRule
-): DiffSum {
-  const { row, col } = signed_indices
-
-  // Rotation symmetry puts constraints on which frequencies we can use, but
-  // this only affects the frequency difference, not the sum
-  const diff = get_freq_diff(symmetry_rule, col)
-
-  // For the sum, we can choose anything we want, so ideally we'd do
-  // sum = row and be done with it, but there's one minor subtlety to consider:
-  //
-  // Look at the diagonals of an integer grid:
-  //
-  // n ->    ^               sum -->
-  // 0 1 2 3 |               0      diff
-  // 1 2 3 4 m     -->      1 1      |
-  // 2 3 4 5               2 2 2     v
-  // 3 4 5 6              3 3 3 3
-  //                       4 4 4
-  //                        5 5
-  //                         6
-  //
-  //                         ^
-  //                         |
-  //              they don't line up vertically! :'(
-  //
-  // We could just shift every other row. However, some symmetry rules
-  // require the grid of coefficients to be updated symmetric over the line
-  // m = -n (corresponding to the diagonal: sum = (n + m) = (n - n) = 0)
-  // so to do this, I want every other line of terms to expand outwards so
-  // the terms line up. This will require turning off some coefficients
-  // on the center line. That will be handled elsewhere so I'll just
-  // set it to 0:
-  //
-  //       sum ->
-  //     1 0 0 0 0
-  //     1 1 x 1 1  diff
-  //     2 2 2 2 2   |
-  //     3 3 x 3 3   v
-  //     4 4 4 4 4
-  //     5 5 x 5 5
-  //     6 6 x 6 6
-
-  // note that we check the parity of the computed diagonal, not the
-  // column number!
-  const parity = mod(diff, 2)
-  let sum
-  if (parity == 0) {
-    // The sum diagonals with integer solutions happen every other diagonal
-    // hence the * 2
-    sum = 2 * row
-  } else if (parity == 1 && row == 0) {
-    // These are the terms that we will ignore in the UI. For now
-    // just set it to 0
-    sum = 0
-  } else {
-    // We want the odd diagonals, however we want this pattern
-    // to be symmetric around the origin (2 * row + 1 would not work!).
-    //
-    // Here's one way to do this:
-    //
-    // https://www.desmos.com/calculator/rrn7cirfgo
-    //
-    // input:  ... -3, -2, -1, 0, 1, 2, 3, ...
-    // output: ... -5, -3, -1, 0, 1, 3, 5, ...
-    sum = 2 * Math.sign(row) * Math.max(Math.abs(row) - 0.5, 0)
-  }
-
-  return { diff, sum }
-}
 
 function validate_rules(rules: PointSymmetryRule[]) {
   if (rules.length === 0) {
