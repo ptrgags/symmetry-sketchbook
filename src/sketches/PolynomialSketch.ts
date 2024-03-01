@@ -1,5 +1,6 @@
 import { FourierSeries2D } from '@/core/FourierSeries2D'
 import { Sketch } from '@/core/Sketch'
+import type { SecondaryColorType } from '@/core/point_symmetry/PaletteType'
 import { PolynomialShader } from '@/shaders/PolynomialShader'
 import p5 from 'p5'
 
@@ -72,5 +73,13 @@ export class PolynomialSketch extends Sketch<PolynomialState> {
     const order = value >= 2 ? value : 4
 
     this.shader.set_uniform('rotation_order', order)
+  }
+
+  set invert_palette(value: boolean) {
+    this.shader.set_uniform('invert_palette', value)
+  }
+
+  set secondary_color_mode(value: SecondaryColorType) {
+    this.shader.set_uniform('secondary_color_mode', value)
   }
 }

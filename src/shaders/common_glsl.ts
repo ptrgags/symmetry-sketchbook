@@ -88,6 +88,9 @@ uniform vec3 pulse_color;
 
 uniform vec4 axes_xyrt;
 uniform vec3 axes_color;
+
+uniform bool invert_palette;
+uniform float secondary_color_mode;
 `
 
 common.funcs_view = `
@@ -166,6 +169,7 @@ float grid_lines(float x, float half_thickness) {
 `
 
 common.funcs_palette = `
+
 vec3 palette(vec2 complex_rect) {
     vec2 z = to_polar(complex_rect);
 
@@ -175,15 +179,27 @@ vec3 palette(vec2 complex_rect) {
 
     float sector = floor(rotation_order * angle_normalized);
     float sector_brightness = mix(0.25, 0.75, sector / (rotation_order - 1.0));
-    
-    float inside_circle = 1.0 - step(1.0, z.x);
-    vec3 sector_color = mix(primary_color, secondary_color, inside_circle);
-    //vec3 sector_color = mix(primary_color, secondary_color, mod(sector, 2.0));
 
-    sector_color = mix(sector_color, 1.0 - sector_color, float(complex_rect.y > 0.0));
+    const float NONE = 0.0;
+    const float HALVES = 1.0;
+    const float ALTERNATING = 2.0;
+    const float INSIDE_CIRCLE = 3.0;
+
+    vec3 sector_color = primary_color;
+    if (secondary_color_mode == HALVES) {
+        sector_color = mix(primary_color, secondary_color, float(complex_rect.y < 0.0));
+    } else if (secondary_color_mode == ALTERNATING) {
+        sector_color = mix(primary_color, secondary_color, mod(sector, 2.0));
+    } else if (secondary_color_mode == INSIDE_CIRCLE) {
+        float inside_circle = 1.0 - step(1.0, z.x);
+        sector_color = mix(primary_color, secondary_color, inside_circle);
+    }
+
+    if (invert_palette) {
+        sector_color = mix(sector_color, 1.0 - sector_color, float(complex_rect.y > 0.0));
+    }
+
     sector_color *= sector_brightness;
-
-    float sector_v = fract(rotation_order * angle_normalized);
 
     float dist = dist_from_pole(z.x);
     float r_parity = mod(floor(15.0 * z.x), 2.0);

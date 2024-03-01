@@ -13,10 +13,11 @@ import {
 } from '@/sketches/CoefficientPickerSketch'
 import { PolynomialSketch, type PolynomialState } from '@/sketches/PolynomialSketch'
 import { TermGridSketch, type TermGridState } from '@/sketches/TermGridSketch'
-import { ref, computed } from 'vue'
+import { ref, computed, watch } from 'vue'
 import PointSymmetryEditor from '@/components/PointSymmetryEditor.vue'
 import XYRTFlags from '@/components/XYRTFlags.vue'
 import ColorPicker from '@/components/ColorPicker.vue'
+import { PALETTE_TYPES, type PaletteType } from '@/core/point_symmetry/PaletteType'
 
 // The frequencies will be [-MAX_FREQ, MAX_FREQ] in each direction
 const MAX_FREQ = 3
@@ -39,6 +40,8 @@ const title = computed<string>(() => {
 })
 
 const symmetry = ref(new PointSymmetry(GRID_SIZE, [IDENTITY]))
+
+const palette_type = ref(PALETTE_TYPES[0])
 
 // p5.js sketches -------------------
 
@@ -131,6 +134,12 @@ function change_symmetry(rules: PointSymmetryRule[]) {
 
   update_viewer()
 }
+
+watch(palette_type, (new_value: PaletteType) => {
+  const palette_settings = new_value
+  viewer.invert_palette = palette_settings.invert
+  viewer.secondary_color_mode = palette_settings.secondary_color
+})
 </script>
 
 <template>
@@ -155,16 +164,10 @@ function change_symmetry(rules: PointSymmetryRule[]) {
           </div>
           <div class="form-row">
             <label for="palette-type">Palette Type: </label>
-            <select id="palette-type" value="primary">
-              <option value="primary">Primary Only</option>
-              <option value="secondary-half">Primary + secondary (halves)</option>
-              <option value="secondary-alternate">Primary + secondary (alternating)</option>
-              <option value="secondary-circle">Primary + secondary (inside circle)</option>
-              <option value="invert-primary">Inverted primary</option>
-              <option value="invert-secondary-alternate">
-                Inverted primary + secondary (alternating)
+            <select id="palette-type" v-model="palette_type">
+              <option v-for="option in PALETTE_TYPES" :key="option.id" :value="option">
+                {{ option.label }}
               </option>
-              <option value="invert-secondary-circle">Inverted primary + secondary (circle)</option>
             </select>
           </div>
           <ColorPicker
