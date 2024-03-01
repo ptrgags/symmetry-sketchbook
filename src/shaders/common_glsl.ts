@@ -204,14 +204,16 @@ vec3 palette(vec2 complex_rect) {
     float dist = dist_from_pole(z.x);
     float r_parity = mod(floor(15.0 * z.x), 2.0);
     float theta_parity = mod(floor(10.0 * z.y / PI), 2.0);
-
-    float theta_axis = unit_circle(z.x, 0.1);
+    
     float x_grid = grid_lines(complex_rect.x, 0.1);
     float y_grid = grid_lines(complex_rect.y, 0.1);
     float r_grid = grid_lines(z.x, 0.1);
     float theta_grid = grid_lines(2.0 * rotation_order * angle_normalized, 0.1 / z.x);
+
     float x_axis = line(complex_rect, vec2(0.0, 1.0), 0.1);
     float y_axis = line(complex_rect, vec2(1.0, 0.0), 0.1);
+    float r_axis = x_axis * step(0.0, complex_rect.x);
+    float theta_axis = unit_circle(z.x, 0.1);
 
     float unsigned_pulse = mod(2.0 * time, 10.0);
     float signed_pulse = 2.0 * unsigned_pulse - 10.0;
@@ -237,7 +239,7 @@ vec3 palette(vec2 complex_rect) {
     // Axes
     color = mix(color, axes_color, axes_xyrt.x * x_axis);
     color = mix(color, axes_color, axes_xyrt.y * y_axis);
-    // TODO: r axis
+    color = mix(color, axes_color, axes_xyrt.z * r_axis);
     color = mix(color, axes_color, axes_xyrt.w * theta_axis);
 
     // Pulses
