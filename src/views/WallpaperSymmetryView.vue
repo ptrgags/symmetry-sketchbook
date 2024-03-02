@@ -2,13 +2,15 @@
 import P5Sketch from '@/components/P5Sketch.vue'
 import TwoColumns from '@/components/TwoColumns.vue'
 import { FourierSeries2D } from '@/core/FourierSeries2D'
+import { WALLPAPER_GROUPS } from '@/core/wallpaper_symmetry/WallpaperSymmetryGroup'
 import { WallpaperSketch, type WallpaperState } from '@/sketches/WallpaperSketch'
 
 const state: WallpaperState = {
   pattern: FourierSeries2D.from_tuples([
     [1, 0, 1, 0],
     [0, 1, 1, 0]
-  ])
+  ]),
+  group: WALLPAPER_GROUPS.p2
 }
 
 const sketch = new WallpaperSketch(state)

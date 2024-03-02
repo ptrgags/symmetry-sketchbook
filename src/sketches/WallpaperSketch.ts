@@ -1,10 +1,13 @@
 import { FourierSeries2D } from '@/core/FourierSeries2D'
 import { Sketch } from '@/core/Sketch'
+import { get_lattice } from '@/core/wallpaper_symmetry/WallpaperLattice'
+import type { WallpaperSymmetryGroup } from '@/core/wallpaper_symmetry/WallpaperSymmetryGroup'
 import { WallpaperShader } from '@/shaders/WallpaperShader'
 import type p5 from 'p5'
 
 export interface WallpaperState {
   pattern: FourierSeries2D
+  group: WallpaperSymmetryGroup
 }
 
 export class WallpaperSketch extends Sketch<WallpaperState> {
@@ -20,9 +23,7 @@ export class WallpaperSketch extends Sketch<WallpaperState> {
     Sketch.show_canvas(canvas.elt)
 
     this.shader.init(p)
-    this.shader.set_coefficients(this.state.pattern)
-    this.shader.set_animation([])
-    this.shader.set_lattice([1, 0], [0, 1])
+    this.recompute()
     this.shader.disable()
   }
 
@@ -33,5 +34,7 @@ export class WallpaperSketch extends Sketch<WallpaperState> {
 
   recompute() {
     this.shader.set_coefficients(this.state.pattern)
+    const lattice = get_lattice(this.state.group.lattice)
+    this.shader.set_lattice(...lattice)
   }
 }

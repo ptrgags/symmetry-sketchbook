@@ -1,4 +1,4 @@
-import { ComplexPolar, ComplexRect } from '../Complex'
+import { ComplexPolar } from '../Complex'
 import type { GridIndices2D } from '../GridIndices2D'
 import { mod } from '../math'
 import { diff_row_to_sum, type DiffSum } from './DiffSum'

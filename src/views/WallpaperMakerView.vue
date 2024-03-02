@@ -8,11 +8,15 @@ import { FourierSeries2D, type FourierTerm2D } from '@/core/FourierSeries2D'
 import { TermGridSketch, type TermGridState } from '@/sketches/TermGridSketch'
 import { type WallpaperState, WallpaperSketch } from '@/sketches/WallpaperSketch'
 import { WallpaperSymmetry } from '@/core/wallpaper_symmetry/WallpaperSymmetry'
-import { ref } from 'vue'
+import { ref, watch } from 'vue'
 import {
   CoefficientPickerSketch,
   type CoefficientPickerState
 } from '@/sketches/CoefficientPickerSketch'
+import {
+  WALLPAPER_GROUPS,
+  type WallpaperSymmetryGroup
+} from '@/core/wallpaper_symmetry/WallpaperSymmetryGroup'
 
 // The frequencies will be [-MAX_FREQ, MAX_FREQ] in each direction
 const MAX_FREQ = 3
@@ -23,7 +27,11 @@ const DEFAULT_TERM = CENTER_1D * GRID_SIZE + CENTER_1D
 
 // Vue state -----------------------------
 
-const symmetry = ref(new WallpaperSymmetry(GRID_SIZE))
+const symmetry_group = defineModel<WallpaperSymmetryGroup>('symmetry_group', {
+  default: WALLPAPER_GROUPS.p1
+})
+
+const symmetry = ref(new WallpaperSymmetry(GRID_SIZE, symmetry_group.value))
 
 // P5.js sketches ----------------------------
 
@@ -31,7 +39,8 @@ const viewer_state: WallpaperState = {
   pattern: FourierSeries2D.from_tuples([
     [1, 0, 1, 0],
     [0, 1, 1, 0]
-  ])
+  ]),
+  group: symmetry_group.value
 }
 
 const viewer = new WallpaperSketch(viewer_state)
@@ -96,6 +105,20 @@ function update_coefficient(e: Event) {
 
 coefficient_picker.events.addEventListener('change', update_coefficient)
 coefficient_picker.events.addEventListener('input', update_coefficient)
+
+watch(symmetry_group, (new_value) => {
+  const group = new_value ?? WALLPAPER_GROUPS.p1
+  symmetry.value = new WallpaperSymmetry(GRID_SIZE, group)
+
+  const coefficients = term_grid_state.coefficients
+  coefficients.fill(ComplexPolar.ZERO)
+  term_grid_state.selected_index = DEFAULT_TERM
+  term_grid_state.frequency_map = (indices) => symmetry.value.frequency_map(indices)
+  term_grid_state.editable_map = () => symmetry.value.is_enabled()
+
+  viewer_state.group = group
+  update_viewer()
+})
 </script>
 
 <template>
@@ -106,7 +129,13 @@ coefficient_picker.events.addEventListener('input', update_coefficient)
     <template #right>
       <h1>Wallpaper Maker</h1>
       <TabLayout>
-        <TabContent title="Choose Symmetry"> </TabContent>
+        <TabContent title="Choose Symmetry">
+          <select v-model="symmetry_group">
+            <option v-for="(value, key) in WALLPAPER_GROUPS" :key="key" :value="value">
+              {{ key }}
+            </option>
+          </select>
+        </TabContent>
         <TabContent title="Edit Pattern">
           <P5Sketch :sketch="term_grid"></P5Sketch>
           <P5Sketch :sketch="coefficient_picker"></P5Sketch>
