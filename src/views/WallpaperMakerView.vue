@@ -1,0 +1,118 @@
+<script setup lang="ts">
+import P5Sketch from '@/components/P5Sketch.vue'
+import TabContent from '@/components/TabContent.vue'
+import TabLayout from '@/components/TabLayout.vue'
+import TwoColumns from '@/components/TwoColumns.vue'
+import { ComplexPolar, ComplexRect } from '@/core/Complex'
+import { FourierSeries2D, type FourierTerm2D } from '@/core/FourierSeries2D'
+import { TermGridSketch, type TermGridState } from '@/sketches/TermGridSketch'
+import { type WallpaperState, WallpaperSketch } from '@/sketches/WallpaperSketch'
+import { WallpaperSymmetry } from '@/core/wallpaper_symmetry/WallpaperSymmetry'
+import { ref } from 'vue'
+import {
+  CoefficientPickerSketch,
+  type CoefficientPickerState
+} from '@/sketches/CoefficientPickerSketch'
+
+// The frequencies will be [-MAX_FREQ, MAX_FREQ] in each direction
+const MAX_FREQ = 3
+const GRID_SIZE = 2 * MAX_FREQ + 1
+const TERM_COUNT = GRID_SIZE * GRID_SIZE
+const CENTER_1D = MAX_FREQ
+const DEFAULT_TERM = CENTER_1D * GRID_SIZE + CENTER_1D
+
+// Vue state -----------------------------
+
+const symmetry = ref(new WallpaperSymmetry(GRID_SIZE))
+
+// P5.js sketches ----------------------------
+
+const viewer_state: WallpaperState = {
+  pattern: FourierSeries2D.from_tuples([
+    [1, 0, 1, 0],
+    [0, 1, 1, 0]
+  ])
+}
+
+const viewer = new WallpaperSketch(viewer_state)
+
+const term_grid_state: TermGridState = {
+  cell_size: 40,
+  rows: GRID_SIZE,
+  cols: GRID_SIZE,
+  selected_index: DEFAULT_TERM,
+  coefficients: new Array(TERM_COUNT).fill(ComplexPolar.ZERO),
+  frequency_map: (indices) => symmetry.value.frequency_map(indices),
+  editable_map: () => symmetry.value.is_enabled()
+}
+const term_grid = new TermGridSketch(term_grid_state)
+
+const coefficient_picker_state: CoefficientPickerState = {
+  coefficient: ComplexRect.ZERO
+}
+const coefficient_picker = new CoefficientPickerSketch(coefficient_picker_state)
+
+// Event Handling --------------------------
+
+term_grid.events.addEventListener('term-selected', (e) => {
+  const z = (e as CustomEvent).detail as ComplexPolar
+  coefficient_picker_state.coefficient = z.to_rect()
+})
+
+function update_viewer() {
+  const coefficients = term_grid_state.coefficients
+  const terms: FourierTerm2D[] = []
+  for (let i = 0; i < GRID_SIZE; i++) {
+    for (let j = 0; j < GRID_SIZE; j++) {
+      const index = i * GRID_SIZE + j
+      const coefficient = coefficients[index]
+
+      if (coefficient.r === 0) {
+        continue
+      }
+
+      const frequencies = symmetry.value.frequency_map({ row: i, col: j })
+      terms.push({
+        frequencies,
+        coefficient
+      })
+    }
+  }
+
+  viewer_state.pattern = new FourierSeries2D(terms)
+  viewer.recompute()
+}
+
+function update_coefficient(e: Event) {
+  const z = (e as CustomEvent).detail as ComplexRect
+  symmetry.value.update_coefficients(
+    term_grid_state.coefficients,
+    term_grid_state.selected_index,
+    z.to_polar()
+  )
+
+  update_viewer()
+}
+
+coefficient_picker.events.addEventListener('change', update_coefficient)
+coefficient_picker.events.addEventListener('input', update_coefficient)
+</script>
+
+<template>
+  <TwoColumns>
+    <template #left>
+      <P5Sketch :sketch="viewer"></P5Sketch>
+    </template>
+    <template #right>
+      <h1>Wallpaper Maker</h1>
+      <TabLayout>
+        <TabContent title="Choose Symmetry"> </TabContent>
+        <TabContent title="Edit Pattern">
+          <P5Sketch :sketch="term_grid"></P5Sketch>
+          <P5Sketch :sketch="coefficient_picker"></P5Sketch>
+        </TabContent>
+        <TabContent title="Display Settings"> </TabContent>
+      </TabLayout>
+    </template>
+  </TwoColumns>
+</template>

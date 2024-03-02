@@ -64,16 +64,17 @@ const term_grid_state: TermGridState = {
 }
 const term_grid = new TermGridSketch(term_grid_state)
 
-const picker_state: CoefficientPickerState = {
+const coefficient_picker_state: CoefficientPickerState = {
   coefficient: ComplexRect.ZERO
 }
-const picker = new CoefficientPickerSketch(picker_state)
+const coefficient_picker = new CoefficientPickerSketch(coefficient_picker_state)
 
-// Event Handling ---
+// Event Handling ------------------------
+
 // When a new term is selected, pass that term to the picker
 term_grid.events.addEventListener('term-selected', (e) => {
   const z = (e as CustomEvent).detail as ComplexPolar
-  picker_state.coefficient = z.to_rect()
+  coefficient_picker_state.coefficient = z.to_rect()
 })
 
 function update_viewer() {
@@ -111,8 +112,8 @@ function update_coefficient(e: Event) {
   update_viewer()
 }
 
-picker.events.addEventListener('change', update_coefficient)
-picker.events.addEventListener('input', update_coefficient)
+coefficient_picker.events.addEventListener('change', update_coefficient)
+coefficient_picker.events.addEventListener('input', update_coefficient)
 
 function toggle_palette(e: Event) {
   const checkbox = e.target as HTMLInputElement
@@ -131,7 +132,7 @@ function change_symmetry(rules: PointSymmetryRule[]) {
 
   viewer.rotation_order = rules[0].rotation_folds ?? 1
 
-  picker_state.coefficient = ComplexRect.ZERO
+  coefficient_picker_state.coefficient = ComplexRect.ZERO
 
   update_viewer()
 }
@@ -155,7 +156,8 @@ watch(palette_type, (new_value: PaletteType) => {
           <PointSymmetryEditor @update:model-value="change_symmetry" />
         </TabContent>
         <TabContent title="Edit Pattern">
-          <P5Sketch :sketch="term_grid"></P5Sketch> <P5Sketch :sketch="picker"></P5Sketch>
+          <P5Sketch :sketch="term_grid"></P5Sketch>
+          <P5Sketch :sketch="coefficient_picker"></P5Sketch>
         </TabContent>
         <TabContent title="Display Settings">
           <h3>Color Palette</h3>

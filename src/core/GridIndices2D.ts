@@ -91,3 +91,38 @@ export function flip_both(indices: GridIndices2D, grid_size: number) {
   const { row, col } = indices
   return { row: grid_size - 1 - row, col: grid_size - 1 - col }
 }
+
+/**
+ * Map from unsigned (row, col) where each is in [0, GRID_SIZE] to signed
+ * values [-floor(grid_size / 2), floor(grid_size / 2)]
+ *
+ * @param indices The unsigned indices
+ * @returns
+ */
+export function to_signed(unsigned_indices: GridIndices2D, grid_size: number): GridIndices2D {
+  assert_nonnegative(grid_size, 'grid_size')
+  assert_indices_in_bounds(unsigned_indices, grid_size, 'indices')
+  const { row, col } = unsigned_indices
+  const flipped_row = grid_size - 1 - row
+  const center = Math.floor(grid_size / 2)
+  return {
+    col: col - center,
+    row: flipped_row - center
+  }
+}
+
+/**
+ * Inverse of to_signed
+ * @param frequencies The frequencies (n, m)
+ * @returns The corresponding grid indices (row, col)
+ */
+export function to_unsigned(signed_indices: GridIndices2D, grid_size: number): GridIndices2D {
+  assert_nonnegative(grid_size, 'grid_size')
+  const { row, col } = signed_indices
+  const center = Math.floor(grid_size / 2)
+  const flipped_row = row + center
+  return {
+    row: grid_size - 1 - flipped_row,
+    col: col + center
+  }
+}

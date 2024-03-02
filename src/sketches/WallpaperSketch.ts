@@ -30,4 +30,8 @@ export class WallpaperSketch extends Sketch<WallpaperState> {
     p.background(0, 40, 45)
     this.shader.draw()
   }
+
+  recompute() {
+    this.shader.set_coefficients(this.state.pattern)
+  }
 }

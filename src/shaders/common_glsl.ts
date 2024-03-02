@@ -58,15 +58,6 @@ uniform float animation[MAX_TERMS];
 // animation direction reversed. For waves, this produces
 // a standing wave effect.
 uniform bool enable_standing_waves;
-
-// If true, instead of showing the sum of terms, show them one by one,
-// blending between each pair.
-uniform bool show_wave_components;
-
-// Texture from p5.js
-uniform sampler2D texture0;
-
-
 `
 */
 

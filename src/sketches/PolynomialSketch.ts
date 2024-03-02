@@ -60,7 +60,6 @@ export class PolynomialSketch extends Sketch<PolynomialState> {
 
   recompute() {
     this.shader.set_coefficients(this.state.pattern)
-    this.shader.disable()
   }
 
   set show_palette(value: boolean) {

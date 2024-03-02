@@ -38,10 +38,9 @@ import PageLink from '@/components/PageLink.vue'
       ><RouterLink to="/wallpaper_symmetry/wallpaper_blender"
         >Wallpaper Blender</RouterLink
       ></PageLink
-    >
+    >-->
     <PageLink
       ><RouterLink to="/wallpaper_symmetry/wallpaper_maker">Wallpaper Maker</RouterLink></PageLink
     >
-    -->
   </div>
 </template>
