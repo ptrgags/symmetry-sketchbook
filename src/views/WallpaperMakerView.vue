@@ -52,7 +52,7 @@ const term_grid_state: TermGridState = {
   selected_index: DEFAULT_TERM,
   coefficients: new Array(TERM_COUNT).fill(ComplexPolar.ZERO),
   frequency_map: (indices) => symmetry.value.frequency_map(indices),
-  editable_map: () => symmetry.value.is_enabled()
+  editable_map: (indices) => symmetry.value.is_editable(indices)
 }
 const term_grid = new TermGridSketch(term_grid_state)
 
@@ -114,7 +114,7 @@ watch(symmetry_group, (new_value) => {
   coefficients.fill(ComplexPolar.ZERO)
   term_grid_state.selected_index = DEFAULT_TERM
   term_grid_state.frequency_map = (indices) => symmetry.value.frequency_map(indices)
-  term_grid_state.editable_map = () => symmetry.value.is_enabled()
+  term_grid_state.editable_map = (indices) => symmetry.value.is_editable(indices)
 
   viewer_state.group = group
   update_viewer()

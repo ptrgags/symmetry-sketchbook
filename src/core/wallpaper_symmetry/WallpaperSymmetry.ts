@@ -32,9 +32,17 @@ export class WallpaperSymmetry {
     return to_unsigned({ row: m, col: n }, this.grid_size)
   }
 
-  is_enabled(): boolean {
-    // TODO: Eventually the symmetry rule will apply some constraints
-    return true
+  is_editable(indices: GridIndices2D): boolean {
+    if (this.group.base_rule !== 'hexagon') {
+      return true
+    }
+
+    // For the hexagon lattice, the rule involves terms with an index
+    // -(n + m). This can sometimes go outside the grid, so turn off terms
+    // where |n + m| would be larger than the radius of the grid
+    const { n, m } = this.frequency_map(indices)
+    const max_n = Math.floor(this.grid_size / 2)
+    return Math.abs(n + m) <= max_n
   }
 
   update_coefficients(coefficients: ComplexPolar[], index: number, first_term: ComplexPolar) {

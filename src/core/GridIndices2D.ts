@@ -26,8 +26,11 @@ function assert_indices_in_bounds(
   grid_size: number,
   label: string
 ): asserts indices {
-  if (indices.row < 0 || indices.row >= grid_size || indices.col < 0 || indices.col >= grid_size) {
-    throw new Error(`${label}: indices must be in the range [0, ${grid_size}]`)
+  const { row, col } = indices
+  if (row < 0 || row >= grid_size || col < 0 || col >= grid_size) {
+    throw new Error(
+      `${label}: indices must be in the range [0, ${grid_size}], got (${row}, ${col})`
+    )
   }
 }
 

@@ -52,7 +52,7 @@ export class PointSymmetry {
     return this.self_rule ?? this.partner_rules[0]
   }
 
-  is_enabled(indices: GridIndices2D): boolean {
+  is_editable(indices: GridIndices2D): boolean {
     const signed_indices = to_signed(indices, this.grid_size)
     const { diff, sum } = indices_to_diff_sum(signed_indices, this.first_rule)
     const parity = mod(diff, 2)

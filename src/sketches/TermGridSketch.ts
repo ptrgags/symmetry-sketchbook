@@ -163,22 +163,24 @@ export class TermGridSketch extends Sketch<TermGridState> {
     const col = Math.floor(p.mouseX / cell_size)
     const row = Math.floor(p.mouseY / cell_size)
 
+    if (col < 0 || col >= cols || row < 0 || row >= rows) {
+      return true
+    }
+
     if (!this.can_edit({ row, col })) {
       return false
     }
 
-    if (0 <= col && col < cols && 0 <= row && row < rows) {
-      const index = row * cols + col
+    const index = row * cols + col
 
-      if (index !== selected_index) {
-        this.state.selected_index = index
-        const coefficient = coefficients[index]
-        this.events.dispatchEvent(
-          new CustomEvent('term-selected', {
-            detail: coefficient
-          })
-        )
-      }
+    if (index !== selected_index) {
+      this.state.selected_index = index
+      const coefficient = coefficients[index]
+      this.events.dispatchEvent(
+        new CustomEvent('term-selected', {
+          detail: coefficient
+        })
+      )
     }
 
     return false

@@ -60,7 +60,7 @@ const term_grid_state: TermGridState = {
   selected_index: DEFAULT_TERM,
   coefficients: new Array(TERM_COUNT).fill(ComplexPolar.ZERO),
   frequency_map: (indices) => symmetry.value.frequency_map(indices),
-  editable_map: (indices) => symmetry.value.is_enabled(indices)
+  editable_map: (indices) => symmetry.value.is_editable(indices)
 }
 const term_grid = new TermGridSketch(term_grid_state)
 
@@ -128,7 +128,7 @@ function change_symmetry(rules: PointSymmetryRule[]) {
 
   term_grid_state.selected_index = DEFAULT_TERM
   term_grid_state.frequency_map = (indices) => symmetry.value.frequency_map(indices)
-  term_grid_state.editable_map = (indices) => symmetry.value.is_enabled(indices)
+  term_grid_state.editable_map = (indices) => symmetry.value.is_editable(indices)
 
   viewer.rotation_order = rules[0].rotation_folds ?? 1
 
