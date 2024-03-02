@@ -4,6 +4,7 @@ import CurveViewerView from '@/views/CurveViewerView.vue'
 import CurveMakerView from '@/views/CurveMakerView.vue'
 import PointSymmetryView from '@/views/PointSymmetryView.vue'
 import PolynomialMakerView from '@/views/PolynomialMakerView.vue'
+import WallpaperSymmetryView from '@/views/WallpaperSymmetryView.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -43,6 +44,11 @@ const router = createRouter({
       props: {
         symmetry_mode: 'frieze'
       }
+    },
+    {
+      path: '/wallpaper_symmetry',
+      name: 'Wallpaper Symmetry',
+      component: WallpaperSymmetryView
     }
   ]
 })

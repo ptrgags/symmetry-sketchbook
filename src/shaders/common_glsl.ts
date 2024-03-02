@@ -63,11 +63,6 @@ uniform bool enable_standing_waves;
 // blending between each pair.
 uniform bool show_wave_components;
 
-// inverse of the basis matrix for the wallpaper lattice
-// This is used to convert to lattice coordinates
-// p5.js seems to ignore mat2 matrices so I'll use a mat3 instead.
-uniform mat3 inv_lattice;
-
 // Texture from p5.js
 uniform sampler2D texture0;
 

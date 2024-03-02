@@ -31,11 +31,9 @@ import PageLink from '@/components/PageLink.vue'
     >
     -->
     <PageLink><RouterLink to="/frieze_symmetry/frieze_maker">Frieze Maker</RouterLink></PageLink>
-    <!--
     <h3>Wallpaper Symmetry</h3>
-    <PageLink
-      ><RouterLink to="/wallpaper_symmetry/wallpaper_viewer">Wallpaper Viewer</RouterLink></PageLink
-    >
+    <PageLink><RouterLink to="/wallpaper_symmetry">Wallpaper Viewer</RouterLink></PageLink>
+    <!--
     <PageLink
       ><RouterLink to="/wallpaper_symmetry/wallpaper_blender"
         >Wallpaper Blender</RouterLink
