@@ -7,6 +7,7 @@ import {
   to_index_1d,
   to_unsigned
 } from '../GridIndices2D'
+import { mod } from '../math'
 import { apply_base_symmetry } from './BaseSymmetryRule'
 import { negate_term } from './NegateType'
 import { get_partner_frequencies } from './WallpaperPartnerType'
@@ -22,7 +23,6 @@ export class WallpaperSymmetry {
   }
 
   frequency_map(indices: GridIndices2D): Frequency2D {
-    // TODO: Eventually the symmetry rule will apply some constraints
     const { row: m, col: n } = to_signed(indices, this.grid_size)
     return { n, m }
   }
@@ -33,16 +33,30 @@ export class WallpaperSymmetry {
   }
 
   is_editable(indices: GridIndices2D): boolean {
-    if (this.group.base_rule !== 'hexagon') {
-      return true
+    const { n, m } = this.frequency_map(indices)
+    if (this.group.base_rule === 'hexagon') {
+      // For the hexagon lattice, the rule involves terms with an index
+      // -(n + m). This can sometimes go outside the grid, so turn off terms
+      // where |n + m| would be larger than the radius of the grid
+
+      const max_n = Math.floor(this.grid_size / 2)
+      if (Math.abs(n + m) > max_n) {
+        return false
+      }
     }
 
-    // For the hexagon lattice, the rule involves terms with an index
-    // -(n + m). This can sometimes go outside the grid, so turn off terms
-    // where |n + m| would be larger than the radius of the grid
-    const { n, m } = this.frequency_map(indices)
-    const max_n = Math.floor(this.grid_size / 2)
-    return Math.abs(n + m) <= max_n
+    // Color turning symmetries sometimes restrict terms to odd terms
+    // only
+    switch (this.group.parity) {
+      case 'odd_m':
+        return mod(m, 2) === 1
+      case 'odd_n':
+        return mod(n, 2) === 1
+      case 'odd_nm':
+        return mod(n + m, 2) == 1
+    }
+
+    return true
   }
 
   update_coefficients(coefficients: ComplexPolar[], index: number, first_term: ComplexPolar) {

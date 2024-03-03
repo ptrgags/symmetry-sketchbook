@@ -14,6 +14,7 @@ import {
   type CoefficientPickerState
 } from '@/sketches/CoefficientPickerSketch'
 import {
+  COLOR_REVERSING_GROUPS,
   WALLPAPER_GROUPS,
   type WallpaperSymmetryGroup
 } from '@/core/wallpaper_symmetry/WallpaperSymmetryGroup'
@@ -131,7 +132,7 @@ watch(symmetry_group, (new_value) => {
       <TabLayout>
         <TabContent title="Choose Symmetry">
           <select v-model="symmetry_group">
-            <option v-for="(value, key) in WALLPAPER_GROUPS" :key="key" :value="value">
+            <option v-for="(value, key) in COLOR_REVERSING_GROUPS" :key="key" :value="value">
               {{ key }}
             </option>
           </select>

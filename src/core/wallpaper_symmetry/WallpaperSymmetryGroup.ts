@@ -2,6 +2,8 @@ import type { BaseSymmetryRule } from './BaseSymmetryRule'
 import type { LatticeType } from './WallpaperLattice'
 import type { NegateType } from './NegateType'
 import type { WallpaperPartnerType } from './WallpaperPartnerType'
+import type { ParityRule } from './ParityRule'
+import { ColorReversingType } from './ColorReversingType'
 
 export interface WallpaperSymmetryRule {
   partner: WallpaperPartnerType
@@ -12,6 +14,8 @@ export interface WallpaperSymmetryGroup {
   lattice: LatticeType
   base_rule?: BaseSymmetryRule
   rules?: WallpaperSymmetryRule[]
+  parity?: ParityRule
+  color_reversing?: ColorReversingType
 }
 
 export const WALLPAPER_GROUPS: { [key: string]: WallpaperSymmetryGroup } = {
@@ -93,4 +97,162 @@ export const WALLPAPER_GROUPS: { [key: string]: WallpaperSymmetryGroup } = {
     base_rule: 'hexagon',
     rules: [{ partner: 'negate' }, { partner: 'swap' }]
   }
+}
+
+export const COLOR_REVERSING_GROUPS: { [key: string]: WallpaperSymmetryGroup } = {
+  // General Lattice
+  p1_p1: {
+    lattice: 'parallelogram',
+    parity: 'odd_nm',
+    color_reversing: ColorReversingType.Vertical
+  },
+  p2_p1: {
+    lattice: 'parallelogram',
+    rules: [{ partner: 'negate', negate: 'negate' }],
+    color_reversing: ColorReversingType.Vertical
+  },
+  p2_p2: {
+    lattice: 'parallelogram',
+    rules: [{ partner: 'negate' }],
+    parity: 'odd_nm',
+    color_reversing: ColorReversingType.Vertical
+  },
+  // Rectangular cell without 2-fold rotations
+  pg_p1: {
+    lattice: 'rectangle',
+    rules: [{ partner: 'negate_n', negate: 'negate_m1' }],
+    color_reversing: ColorReversingType.Vertical
+  },
+  pm_p1: {
+    lattice: 'rectangle',
+    rules: [{ partner: 'negate_n', negate: 'negate' }],
+    color_reversing: ColorReversingType.Horizontal
+  },
+  pg_pg: {
+    lattice: 'rectangle',
+    rules: [{ partner: 'negate_n', negate: 'negate_m' }],
+    parity: 'odd_n',
+    color_reversing: ColorReversingType.Vertical
+  },
+  pm_pg: {
+    lattice: 'rectangle',
+    rules: [{ partner: 'negate_n', negate: 'negate_m' }],
+    parity: 'odd_m',
+    color_reversing: ColorReversingType.Vertical
+  },
+  cm_pg: {
+    lattice: 'rectangle',
+    rules: [{ partner: 'negate_n', negate: 'negate_m' }],
+    parity: 'odd_nm',
+    color_reversing: ColorReversingType.Vertical
+  },
+  pmg_pg: {
+    lattice: 'rectangle',
+    rules: [{ partner: 'negate', negate: 'negate' }],
+    color_reversing: ColorReversingType.Horizontal
+  },
+  pgg_pg: {
+    lattice: 'rectangle',
+    rules: [
+      { partner: 'negate_n', negate: 'negate_nm' },
+      { partner: 'negate', negate: 'negate' }
+    ],
+    color_reversing: ColorReversingType.Horizontal
+  },
+  pm_pm_1: {
+    lattice: 'rectangle',
+    parity: 'odd_n',
+    rules: [{ partner: 'negate_n' }],
+    color_reversing: ColorReversingType.Horizontal
+  },
+  pm_pm_2: {
+    lattice: 'rectangle',
+    parity: 'odd_m',
+    rules: [{ partner: 'negate_n' }],
+    color_reversing: ColorReversingType.Horizontal
+  },
+  cm_pm: {
+    lattice: 'rectangle',
+    parity: 'odd_nm',
+    rules: [{ partner: 'negate_n' }],
+    color_reversing: ColorReversingType.Horizontal
+  },
+  pmm_pm: {
+    lattice: 'rectangle',
+    rules: [{ partner: 'negate_n' }, { partner: 'negate', negate: 'negate' }],
+    color_reversing: ColorReversingType.Vertical
+  },
+  pmg_pm: {
+    lattice: 'rectangle',
+    rules: [
+      { partner: 'negate_n', negate: 'negate_m1' },
+      { partner: 'negate', negate: 'negate' }
+    ],
+    color_reversing: ColorReversingType.Vertical
+  },
+  // Rhombic Lattice
+  cm_p1: {
+    lattice: 'rhombus',
+    rules: [{ partner: 'swap', negate: 'negate' }],
+    color_reversing: ColorReversingType.Horizontal
+  },
+  cmm_p2: {
+    lattice: 'rhombus',
+    rules: [{ partner: 'swap', negate: 'negate' }, { partner: 'negate' }],
+    color_reversing: ColorReversingType.Horizontal
+  },
+  pm_cm: {
+    lattice: 'rhombus',
+    rules: [{ partner: 'swap' }],
+    parity: 'odd_nm',
+    color_reversing: ColorReversingType.Horizontal
+  },
+  cmm_cm: {
+    lattice: 'rhombus',
+    rules: [
+      { partner: 'swap', negate: 'negate' },
+      { partner: 'negate', negate: 'negate' }
+    ],
+    color_reversing: ColorReversingType.Vertical
+  },
+  pmm_cmm: {
+    lattice: 'rhombus',
+    rules: [{ partner: 'swap' }, { partner: 'negate' }],
+    color_reversing: ColorReversingType.Vertical
+  },
+  // Rectangular cell with half-turns
+  pmm_p2: {
+    lattice: 'rectangle',
+    rules: [{ partner: 'negate_n', negate: 'negate' }, { partner: 'negate' }],
+    color_reversing: ColorReversingType.Horizontal
+  },
+  pmg_p2: {
+    lattice: 'rectangle',
+    rules: [{ partner: 'swap', negate: 'negate_m1' }, { partner: 'negate' }],
+    color_reversing: ColorReversingType.Horizontal
+  },
+  pgg_p2: {
+    lattice: 'rectangle',
+    rules: [{ partner: 'swap', negate: 'negate_nm1' }, { partner: 'negate' }],
+    color_reversing: ColorReversingType.Horizontal
+  },
+  pmm_pmm: {
+    lattice: 'rectangle',
+    rules: [{ partner: 'negate_n' }, { partner: 'negate' }],
+    parity: 'odd_n',
+    color_reversing: ColorReversingType.Vertical
+  },
+  cmm_pmm: {
+    lattice: 'rectangle',
+    rules: [{ partner: 'negate_n' }, { partner: 'negate' }],
+    parity: 'odd_nm',
+    color_reversing: ColorReversingType.Horizontal
+  },
+  pmm_pmg: {
+    lattice: 'rectangle',
+    rules: [{ partner: 'negate_n', negate: 'negate_m' }, { partner: 'negate' }],
+    parity: 'odd_m',
+    color_reversing: ColorReversingType.Horizontal
+  }
+  // TODO: start with pmg/pmg
 }
