@@ -52,23 +52,28 @@ watch([rotations, has_reflection], (new_value, old_value) => {
   })
 })
 </script>
+
 <template>
   <div class="constraint">
     <div class="form-row">Input symmetry: {{ to_string(constraint.input_symmetry) }}</div>
     <div class="form-row">
-      <label for="third-output-rotation">Output Turns:</label>
-      <input
-        id="third-output-rotation"
-        type="number"
-        min="0"
-        :max="props.rotationFolds - 1"
-        step="1"
-        v-model.number="rotations"
-      />
+      <label>
+        Output Turns:
+        <input
+          id="third-output-rotation"
+          type="number"
+          min="0"
+          :max="props.rotationFolds - 1"
+          step="1"
+          v-model.number="rotations"
+        />
+      </label>
     </div>
     <div v-if="constraint.output_reflection_editable" class="form-row">
-      <label for="third-output-reflection">Output Reflection?:</label>
-      <input id="third-output-reflection" type="checkbox" @change="toggle_reflection" />
+      <label
+        >Output Reflection?:
+        <input id="third-output-reflection" type="checkbox" @change="toggle_reflection"
+      /></label>
     </div>
   </div>
 </template>

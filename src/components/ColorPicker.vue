@@ -30,7 +30,9 @@ function on_change(e: Event) {
 
 <template>
   <div class="form-row">
-    <input id="color-picker" type="color" :value="vec3_to_color(modelValue)" @input="on_change" />
-    <label for="color-picker"> <slot></slot></label>
+    <label>
+      <input type="color" :value="vec3_to_color(modelValue)" @input="on_change" />
+      <slot></slot>
+    </label>
   </div>
 </template>

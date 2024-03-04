@@ -33,13 +33,9 @@ const toggle_theta = toggle(theta)
 
 <template>
   <div class="form-row">
-    <input id="x" type="checkbox" :checked="x" @change="toggle_x" />
-    <label for="x">x</label>
-    <input id="y" type="checkbox" :checked="y" @change="toggle_y" />
-    <label for="y">y</label>
-    <input id="r" type="checkbox" :checked="r" @change="toggle_r" />
-    <label for="r">r</label>
-    <input id="theta" type="checkbox" :checked="theta" @change="toggle_theta" />
-    <label for="theta">theta</label>
+    <label><input type="checkbox" :checked="x" @change="toggle_x" />x</label>
+    <label><input type="checkbox" :checked="y" @change="toggle_y" />y</label>
+    <label><input type="checkbox" :checked="r" @change="toggle_r" />r</label>
+    <label><input type="checkbox" :checked="theta" @change="toggle_theta" />theta</label>
   </div>
 </template>
