@@ -4,8 +4,9 @@
  * needs to be passed to the shader.
  */
 export enum ColorReversingType {
+  None = 0,
   // Color flipped on the lower half-plane
-  Horizontal = 0,
+  Horizontal = 1,
   // Color flipped on the left half-plane
-  Vertical = 1
+  Vertical = 2
 }

@@ -35,6 +35,27 @@ uniform mat3 inv_lattice;
 ${common.funcs_view}
 ${common.funcs_polar}
 
+vec3 palette_1d(float t) {
+    return fract(vec3(5.0, 7.0, 13.0) * t);
+}
+
+vec3 palette(vec2 z_rect) {
+    vec2 z_polar = to_polar(z_rect);
+
+    // get a normalized angle in [0, 1] starting from the +x axis
+    float angle_normalized = 0.5 + 0.5 * z_polar.y / PI;
+    angle_normalized = fract(angle_normalized - 0.5);
+
+
+    //float t = angle_normalized;
+    float t = fract(z_polar.r);
+
+    vec3 color = palette_1d(fract(2.0 * t));
+    vec3 inverted = 1.0 - color;
+
+    return mix(color, inverted, floor(2.0 * t));
+}
+
 vec2 compute(vec2 z) {
     vec2 sum = vec2(0.0);
     vec2 lattice_coords = mat2(inv_lattice) * z;
@@ -52,7 +73,7 @@ void main() {
     vec2 complex = to_complex(uv);
     vec2 z = compute(complex);
 
-    vec3 color = vec3(z, 0.0);
+    vec3 color = palette(z);
     
     /*
     const vec4 WHITE = vec4(1.0);
