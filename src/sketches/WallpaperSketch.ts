@@ -34,6 +34,10 @@ export class WallpaperSketch extends Sketch<WallpaperState> {
     this.shader.draw()
   }
 
+  set show_palette(value: boolean) {
+    this.shader.set_uniform('show_palette', value)
+  }
+
   recompute() {
     this.shader.set_coefficients(this.state.pattern)
     const lattice = get_lattice(this.state.group.lattice)

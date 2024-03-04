@@ -32,6 +32,8 @@ const symmetry_group = defineModel<WallpaperSymmetryGroup>('symmetry_group', {
   default: WALLPAPER_GROUPS.p1
 })
 
+const show_palette = defineModel<boolean>('enable_palette', { default: false })
+
 const symmetry = ref(new WallpaperSymmetry(GRID_SIZE, symmetry_group.value))
 
 // P5.js sketches ----------------------------
@@ -107,6 +109,10 @@ function update_coefficient(e: Event) {
 coefficient_picker.events.addEventListener('change', update_coefficient)
 coefficient_picker.events.addEventListener('input', update_coefficient)
 
+watch(show_palette, (show) => {
+  viewer.show_palette = show
+})
+
 watch(symmetry_group, (new_value) => {
   const group = new_value ?? WALLPAPER_GROUPS.p1
   symmetry.value = new WallpaperSymmetry(GRID_SIZE, group)
@@ -141,7 +147,13 @@ watch(symmetry_group, (new_value) => {
           <P5Sketch :sketch="term_grid"></P5Sketch>
           <P5Sketch :sketch="coefficient_picker"></P5Sketch>
         </TabContent>
-        <TabContent title="Display Settings"> </TabContent>
+        <TabContent title="Display Settings">
+          <h3>Color Palette</h3>
+          <div class="form-row">
+            <input id="toggle-palette" type="checkbox" v-model="show_palette" />
+            <label for="toggle-palette"> Show color palette</label>
+          </div>
+        </TabContent>
       </TabLayout>
     </template>
   </TwoColumns>

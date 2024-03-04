@@ -46,9 +46,8 @@ vec3 palette(vec2 z_rect) {
     float angle_normalized = 0.5 + 0.5 * z_polar.y / PI;
     angle_normalized = fract(angle_normalized - 0.5);
 
-
     //float t = angle_normalized;
-    float t = fract(z_polar.r);
+    float t = fract(0.1* z_polar.r);
 
     vec3 color = palette_1d(fract(2.0 * t));
     vec3 inverted = 1.0 - color;
@@ -70,21 +69,16 @@ vec2 compute(vec2 z) {
 }
 
 void main() {
-    vec2 complex = to_complex(uv);
-    vec2 z = compute(complex);
+    vec2 z_in = to_complex(uv);
+    
 
-    vec3 color = palette(z);
-    
-    /*
-    const vec4 WHITE = vec4(1.0);
-    vec2 cell_uv = fract(mat2(inv_lattice) * complex);
-    vec2 grid = step(0.99, cell_uv);
-    float grid_mask = max(grid.x, grid.y);
-    
-    vec4 image = tex_color;
-    image = mix(image, ref_layer, ref_layer.a);
-    image = mix(image, WHITE, grid_mask * show_ref_geometry);
-    */
+    vec3 color;
+    if (show_palette) {
+        color = palette(z_in);
+    } else {
+        vec2 z_out = compute(z_in);
+        color = palette(z_out);
+    }
     gl_FragColor = vec4(color, 1.0);
 }
 `
