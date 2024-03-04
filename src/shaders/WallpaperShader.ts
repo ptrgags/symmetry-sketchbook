@@ -8,8 +8,6 @@ attribute vec2 aTexCoord;
 
 varying vec2 uv;
 
-
-
 void main() {
     vec4 position = vec4(aPosition, 1.0);
     gl_Position = position;
@@ -47,7 +45,7 @@ vec3 palette(vec2 z_rect) {
     angle_normalized = fract(angle_normalized - 0.5);
 
     //float t = angle_normalized;
-    float t = fract(0.1* z_polar.r);
+    float t = fract(0.05 * z_polar.r);
 
     vec3 color = palette_1d(fract(2.0 * t));
     vec3 inverted = 1.0 - color;

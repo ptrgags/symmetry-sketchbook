@@ -8,7 +8,7 @@ import { FourierSeries2D, type FourierTerm2D } from '@/core/FourierSeries2D'
 import { TermGridSketch, type TermGridState } from '@/sketches/TermGridSketch'
 import { type WallpaperState, WallpaperSketch } from '@/sketches/WallpaperSketch'
 import { WallpaperSymmetry } from '@/core/wallpaper_symmetry/WallpaperSymmetry'
-import { ref, watch } from 'vue'
+import { computed, ref, watch } from 'vue'
 import {
   CoefficientPickerSketch,
   type CoefficientPickerState
@@ -28,13 +28,29 @@ const DEFAULT_TERM = CENTER_1D * GRID_SIZE + CENTER_1D
 
 // Vue state -----------------------------
 
+const category = defineModel<string>('category', {
+  default: 'wallpaper'
+})
+
 const symmetry_group = defineModel<WallpaperSymmetryGroup>('symmetry_group', {
   default: WALLPAPER_GROUPS.p1
 })
 
+const reversing_group = defineModel<WallpaperSymmetryGroup>('reversing_group', {
+  default: COLOR_REVERSING_GROUPS.p1_p1
+})
+
+const group = computed<WallpaperSymmetryGroup>(() => {
+  if (category.value === 'wallpaper') {
+    return symmetry_group.value
+  }
+
+  return reversing_group.value
+})
+
 const show_palette = defineModel<boolean>('enable_palette', { default: false })
 
-const symmetry = ref(new WallpaperSymmetry(GRID_SIZE, symmetry_group.value))
+const symmetry = ref(new WallpaperSymmetry(GRID_SIZE, group.value))
 
 // P5.js sketches ----------------------------
 
@@ -113,9 +129,9 @@ watch(show_palette, (show) => {
   viewer.show_palette = show
 })
 
-watch(symmetry_group, (new_value) => {
-  const group = new_value ?? WALLPAPER_GROUPS.p1
-  symmetry.value = new WallpaperSymmetry(GRID_SIZE, group)
+watch(group, (new_value) => {
+  const selected_group = new_value ?? WALLPAPER_GROUPS.p1
+  symmetry.value = new WallpaperSymmetry(GRID_SIZE, selected_group)
 
   const coefficients = term_grid_state.coefficients
   coefficients.fill(ComplexPolar.ZERO)
@@ -123,7 +139,7 @@ watch(symmetry_group, (new_value) => {
   term_grid_state.frequency_map = (indices) => symmetry.value.frequency_map(indices)
   term_grid_state.editable_map = (indices) => symmetry.value.is_editable(indices)
 
-  viewer_state.group = group
+  viewer_state.group = selected_group
   update_viewer()
 })
 </script>
@@ -137,11 +153,26 @@ watch(symmetry_group, (new_value) => {
       <h1>Wallpaper Maker</h1>
       <TabLayout>
         <TabContent title="Choose Symmetry">
-          <select v-model="symmetry_group">
-            <option v-for="(value, key) in COLOR_REVERSING_GROUPS" :key="key" :value="value">
-              {{ key }}
-            </option>
-          </select>
+          <div class="form-row">
+            <label for="wallpaper-category">Select Category: </label>
+            <select id="wallpaper-category" v-model="category">
+              <option value="wallpaper">17 Wallpaper Groups</option>
+              <option value="reversing">46 Color-reversing Wallpaper Groups</option>
+            </select>
+          </div>
+          <div class="form-row">
+            <label for="group">Select Wallpaper Group: </label>
+            <select id="group" v-if="category === 'wallpaper'" v-model="symmetry_group">
+              <option v-for="(value, key) in WALLPAPER_GROUPS" :key="key" :value="value">
+                {{ key }}
+              </option>
+            </select>
+            <select id="group" v-else v-model="reversing_group">
+              <option v-for="(value, key) in COLOR_REVERSING_GROUPS" :key="key" :value="value">
+                {{ key }}
+              </option>
+            </select>
+          </div>
         </TabContent>
         <TabContent title="Edit Pattern">
           <P5Sketch :sketch="term_grid"></P5Sketch>
