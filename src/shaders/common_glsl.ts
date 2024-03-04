@@ -11,7 +11,7 @@ common.defines = `
 // anyway, so I'm just going to list them in one big block.
 
 common.uniforms = `
-uniform bool show_palette;
+
 
 // current canvas aspect ratio (width / height);
 uniform float aspect;
@@ -62,6 +62,8 @@ uniform bool enable_standing_waves;
 */
 
 common.uniforms_palette = `
+uniform bool show_palette;
+
 uniform vec3 primary_color;
 uniform vec3 secondary_color;
 uniform vec3 far_color;

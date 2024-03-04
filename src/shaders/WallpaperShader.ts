@@ -25,6 +25,9 @@ varying vec2 uv;
 ${common.uniforms}
 ${common.uniforms_coefficients}
 
+uniform bool show_palette;
+uniform float color_reversing_type;
+
 // inverse of the basis matrix for the wallpaper lattice
 // This is used to convert to lattice coordinates
 // p5.js seems to ignore mat2 matrices so I'll use a mat3 instead.
@@ -37,20 +40,47 @@ vec3 palette_1d(float t) {
     return fract(vec3(5.0, 7.0, 13.0) * t);
 }
 
-vec3 palette(vec2 z_rect) {
+vec3 palette_polar(vec2 z_rect) {
     vec2 z_polar = to_polar(z_rect);
 
     // get a normalized angle in [0, 1] starting from the +x axis
     float angle_normalized = 0.5 + 0.5 * z_polar.y / PI;
     angle_normalized = fract(angle_normalized - 0.5);
 
-    //float t = angle_normalized;
-    float t = fract(0.05 * z_polar.r);
+    float t = angle_normalized;
+    //float t = fract(0.05 * z_polar.r);
 
-    vec3 color = palette_1d(fract(2.0 * t));
-    vec3 inverted = 1.0 - color;
+    return palette_1d(fract(2.0 * t));
+}
 
-    return mix(color, inverted, floor(2.0 * t));
+vec3 palette(vec2 z_rect) {
+    vec3 color_x = palette_1d(fract(0.05 * z_rect.x));
+    vec3 color_y = palette_1d(fract(0.05 * z_rect.y));
+    return color_x * color_y;
+}
+
+vec3 invert_palette(vec2 z_rect) {
+    const float NONE = 0.0;
+    const float HORIZONTAL = 1.0;
+    const float VERTICAL = 2.0;
+
+    if (color_reversing_type == HORIZONTAL) {
+        // if we're in the bottom half-plane, invert the coordinates and colors
+        float top_half = float(z_rect.y > 0.0);
+        vec2 z_in = mix(-z_rect, z_rect, top_half);
+        vec3 color = palette(z_in);
+        return mix(1.0 - color, color, top_half);
+    }
+
+    if (color_reversing_type == VERTICAL) {
+        // if we're in the left half-plane, invert the coordinates and colors
+        float right_half = float(z_rect.x > 0.0);
+        vec2 z_in = mix(-z_rect, z_rect, right_half);
+        vec3 color = palette(z_in);
+        return mix(1.0 - color, color, right_half);
+    }
+
+    return palette(z_rect);
 }
 
 vec2 compute(vec2 z) {
@@ -68,14 +98,13 @@ vec2 compute(vec2 z) {
 
 void main() {
     vec2 z_in = to_complex(uv);
-    
 
     vec3 color;
     if (show_palette) {
-        color = palette(z_in);
+        color = invert_palette(z_in);
     } else {
         vec2 z_out = compute(z_in);
-        color = palette(z_out);
+        color = invert_palette(z_out);
     }
     gl_FragColor = vec4(color, 1.0);
 }
