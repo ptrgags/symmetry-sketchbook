@@ -1,167 +1,40 @@
 <script setup lang="ts">
 import { toggle } from '@/core/ui_util'
 import {
-  InputSymmetryType,
   has_reflection,
   has_inversion,
   has_rotation
 } from '@/core/point_symmetry/InputSymmetryType'
 import { type PointSymmetryRule } from '@/core/point_symmetry/PointSymmetryRule'
 import { computed, ref, watch } from 'vue'
-import { type ColorTurnValue, type ColorTurnEditorConstraint } from './ColorTurnEditor.vue'
+import { type ColorTurnValue } from './ColorTurnEditor.vue'
 import ColorTurnEditor from './ColorTurnEditor.vue'
-
-interface GroupOption {
-  id: string
-  label: string
-  first_constraint: ColorTurnEditorConstraint
-  second_constraint?: ColorTurnEditorConstraint
-  third_constraint?: ColorTurnEditorConstraint
-}
-
-const NO_ROTATION_OPTIONS: GroupOption[] = [
-  {
-    id: 'identity',
-    label: 'No Symmetry',
-    first_constraint: {
-      input_symmetry: InputSymmetryType.Identity,
-      output_reflection_editable: true
-    }
-  },
-  {
-    id: 'mirror_x',
-    label: 'Mirror',
-    first_constraint: {
-      input_symmetry: InputSymmetryType.Mirror,
-      output_reflection_editable: true
-    }
-  },
-  {
-    id: 'inversion',
-    label: 'Circle inversion',
-    first_constraint: {
-      input_symmetry: InputSymmetryType.CircleInversion,
-      output_reflection_editable: true
-    }
-  },
-  {
-    id: 'reciprocal',
-    label: 'Complex inversion',
-    first_constraint: {
-      input_symmetry: InputSymmetryType.ComplexInversion,
-      output_reflection_editable: true
-    }
-  },
-  {
-    id: 'mirror_inversion',
-    label: 'Mirror + Complex inversion',
-    first_constraint: {
-      input_symmetry: InputSymmetryType.Mirror,
-      output_reflection_editable: true
-    },
-    second_constraint: {
-      input_symmetry: InputSymmetryType.ComplexInversion,
-      output_reflection_editable: true
-    }
-  }
-]
-
-const ROTATION_OPTIONS: GroupOption[] = [
-  {
-    id: 'p1',
-    label: 'Rotation',
-    first_constraint: {
-      input_symmetry: InputSymmetryType.Rotation,
-      output_reflection_editable: true
-    }
-  },
-  {
-    id: 'p11g',
-    label: 'Roto-inversion',
-    first_constraint: {
-      input_symmetry: InputSymmetryType.RotoInversion,
-      output_reflection_editable: true
-    }
-  },
-  {
-    id: 'p1m1',
-    label: 'Rotation + Mirror',
-    first_constraint: {
-      input_symmetry: InputSymmetryType.Rotation,
-      output_reflection_editable: true
-    },
-    second_constraint: {
-      input_symmetry: InputSymmetryType.Mirror,
-      output_reflection_editable: false
-    }
-  },
-  {
-    id: 'p11m',
-    label: 'Rotation + Circle inversion',
-    first_constraint: {
-      input_symmetry: InputSymmetryType.Rotation,
-      output_reflection_editable: true
-    },
-    second_constraint: {
-      input_symmetry: InputSymmetryType.CircleInversion,
-      output_reflection_editable: true
-    }
-  },
-  {
-    id: 'p2',
-    label: 'Rotation + Complex inversion',
-    first_constraint: {
-      input_symmetry: InputSymmetryType.Rotation,
-      output_reflection_editable: true
-    },
-    second_constraint: {
-      input_symmetry: InputSymmetryType.ComplexInversion,
-      output_reflection_editable: true
-    }
-  },
-  {
-    id: 'p2mg',
-    label: 'Roto-inversion + Mirror',
-    first_constraint: {
-      input_symmetry: InputSymmetryType.RotoInversion,
-      output_reflection_editable: true
-    },
-    second_constraint: {
-      input_symmetry: InputSymmetryType.Mirror,
-      output_reflection_editable: true
-    }
-  },
-  {
-    id: 'p2mm',
-    label: 'Rotation + Complex Inversion + Mirror',
-    first_constraint: {
-      input_symmetry: InputSymmetryType.Rotation,
-      output_reflection_editable: true
-    },
-    second_constraint: {
-      input_symmetry: InputSymmetryType.ComplexInversion,
-      output_reflection_editable: true
-    },
-    third_constraint: {
-      input_symmetry: InputSymmetryType.Mirror,
-      output_reflection_editable: false
-    }
-  }
-]
+import {
+  NO_ROTATION_OPTIONS,
+  ROTATION_OPTIONS,
+  type GroupOption
+} from '@/core/point_symmetry/GroupOption'
+import type { ColorTurnEditorConstraint } from '@/core/point_symmetry/ColorTurnEditorConstraint'
 
 const rotation_folds = defineModel<number>('rotation_folds', { default: 1 })
-const symmetry_group = defineModel<GroupOption>('symmetry_group')
+
+const no_rotation_group = defineModel<GroupOption>('no_rotation_group', {
+  default: NO_ROTATION_OPTIONS[0]
+})
+const rotation_group = defineModel<GroupOption>('rotation_group', {
+  default: ROTATION_OPTIONS[0]
+})
+
+const symmetry_group = computed<GroupOption>(() => {
+  if (rotation_folds.value === 1) {
+    return no_rotation_group.value
+  }
+
+  return rotation_group.value
+})
 
 const color_turning_enabled = ref<boolean>(false)
 const toggle_color_turning = toggle(color_turning_enabled)
-
-const group_options = computed<GroupOption[]>(() => {
-  if (rotation_folds.value === 1) {
-    return NO_ROTATION_OPTIONS
-  }
-
-  return ROTATION_OPTIONS
-})
 
 const first_color_turn = defineModel<ColorTurnValue>('first_color_turn')
 const second_color_turn = defineModel<ColorTurnValue>('second_color_turn')
@@ -284,8 +157,13 @@ watch(
     </div>
     <div class="form-row">
       <label for="symmetry-group">Symmetry Type: </label>
-      <select id="symmetry-group" v-model="symmetry_group">
-        <option v-for="option in group_options" :key="option.id" :value="option">
+      <select v-if="rotation_folds === 1" id="symmetry-group" v-model="no_rotation_group">
+        <option v-for="option in NO_ROTATION_OPTIONS" :key="option.id" :value="option">
+          {{ option.label }}
+        </option>
+      </select>
+      <select v-else id="symmetry-group" v-model="rotation_group">
+        <option v-for="option in ROTATION_OPTIONS" :key="option.id" :value="option">
           {{ option.label }}
         </option>
       </select>
