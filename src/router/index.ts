@@ -6,6 +6,7 @@ import PointSymmetryView from '@/views/PointSymmetryView.vue'
 import PolynomialMakerView from '@/views/PolynomialMakerView.vue'
 import WallpaperSymmetryView from '@/views/WallpaperSymmetryView.vue'
 import WallpaperMakerView from '@/views/WallpaperMakerView.vue'
+import OrbitalMotionView from '@/views/OrbitalMotionView.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
@@ -21,6 +22,10 @@ const router = createRouter({
     {
       path: '/curve_symmetry/curve_maker',
       component: CurveMakerView
+    },
+    {
+      path: '/curve_symmetry/orbital_motion',
+      component: OrbitalMotionView
     },
     {
       path: '/point_symmetry',

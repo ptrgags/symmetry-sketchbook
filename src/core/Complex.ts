@@ -58,6 +58,19 @@ export class ComplexRect {
   }
 
   /**
+   * Complex numbers subtract component-wise
+   *
+   * (a + bi) - (c + di) = (a - c) + (b - d)i
+   * @param other Another complex number
+   * @returns The difference this - other
+   */
+  sub(other: ComplexRect): ComplexRect {
+    const x = this.real - other.real
+    const y = this.imag - other.imag
+    return new ComplexRect(x, y)
+  }
+
+  /**
    * Complex numbers multiply with the foil method, but
    * i^2 = -1 so one of the signs is flipped.
    *

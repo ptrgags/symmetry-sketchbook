@@ -11,8 +11,8 @@ import PageLink from '@/components/PageLink.vue'
     </p>
     <h3>Parametric Curve Symmetry</h3>
     <PageLink><RouterLink to="/curve_symmetry">Curve Viewer</RouterLink></PageLink>
-    <!--<PageLink><RouterLink to="/curve_symmetry/orbital_motion">Orbital Motion</RouterLink></PageLink>
-      <PageLink><RouterLink to="/curve_symmetry/curve_blender">Curve Blender</RouterLink></PageLink> -->
+    <PageLink><RouterLink to="/curve_symmetry/orbital_motion">Orbital Motion</RouterLink></PageLink>
+    <!--<PageLink><RouterLink to="/curve_symmetry/curve_blender">Curve Blender</RouterLink></PageLink> -->
     <PageLink><RouterLink to="/curve_symmetry/curve_maker">Curve Maker</RouterLink></PageLink>
     <h3>Point Symmetry</h3>
     <PageLink><RouterLink to="/point_symmetry">Rosette Viewer</RouterLink></PageLink>

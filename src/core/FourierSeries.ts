@@ -44,6 +44,23 @@ export class FourierSeries {
   }
 
   /**
+   * Compute the full trajectory of a point following this
+   * fourier series, i.e. making the t parameter go from 0 to 2pi
+   * @param points How many points for the trajectory
+   * @returns A list of points on the curve
+   */
+  compute_trajectory(num_points: number): ComplexRect[] {
+    const curve: ComplexRect[] = new Array(num_points)
+
+    for (let i = 0; i < num_points; i++) {
+      const t = (i / num_points) * 2.0 * Math.PI
+      curve[i] = this.compute(t)
+    }
+
+    return curve
+  }
+
+  /**
    * Compute the partial sums. This is used for making the drawing machine
    * arm
    * @param t The time step to compute at

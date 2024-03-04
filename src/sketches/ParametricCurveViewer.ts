@@ -2,6 +2,7 @@ import p5 from 'p5'
 import { Sketch } from '@/core/Sketch'
 import { type Pixel } from '@/core/Pixel'
 import { FourierSeries } from '@/core/FourierSeries'
+import { draw_polyline } from '@/core/sketch_util'
 
 const MAX_X = 2.0
 const PERIOD = 800
@@ -13,19 +14,6 @@ const THICKNESS = 3.0
 export interface ParametricCurveState {
   pattern?: FourierSeries
   show_arm: boolean
-}
-
-function draw_polyline(p: p5, points: Pixel[], close: boolean) {
-  p.beginShape()
-  for (const { x, y } of points) {
-    p.vertex(x, y)
-  }
-
-  if (close) {
-    p.endShape(p.CLOSE)
-  } else {
-    p.endShape()
-  }
 }
 
 export class ParametricCurveViewer extends Sketch<ParametricCurveState> {
