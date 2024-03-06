@@ -3,9 +3,9 @@ import TwoColumns from '@/components/TwoColumns.vue'
 import P5Sketch from '@/components/P5Sketch.vue'
 
 import { ref, computed, type ComputedRef } from 'vue'
-import { SYMMETRY_TYPES } from '@/core/CurveSymmetryType'
-import { ParametricCurveViewer, type ParametricCurveState } from '@/sketches/ParametricCurveViewer'
-import { FourierSeries, type FourierTerm } from '@/core/FourierSeries'
+import { SYMMETRY_TYPES } from '@/core/curve_symmetry/CurveSymmetryType'
+import { ParametricCurveSketch, type ParametricCurveState } from '@/sketches/ParametricCurveSketch'
+import { FourierSeries, type FourierTerm } from '@/core/curve_symmetry/FourierSeries'
 import { TermGridSketch, type TermGridState } from '@/sketches/TermGridSketch'
 import {
   CoefficientPickerSketch,
@@ -35,7 +35,7 @@ const viewer_state: ParametricCurveState = {
   pattern: FourierSeries.from_tuples([[1, 1, 0]]),
   show_arm: false
 }
-const viewer = new ParametricCurveViewer(viewer_state)
+const viewer = new ParametricCurveSketch(viewer_state)
 
 const term_grid_state: TermGridState = {
   cell_size: 50,
@@ -124,3 +124,4 @@ function change_symmetry() {
     </template>
   </TwoColumns>
 </template>
+@/sketches/ParametricCurveSketch@/core/curve_symmetry/FourierSeries@/core/curve_symmetry/CurveSymmetryType

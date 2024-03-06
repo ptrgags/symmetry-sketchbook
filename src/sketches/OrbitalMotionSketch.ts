@@ -1,5 +1,5 @@
 import { ComplexRect } from '@/core/Complex'
-import { FourierSeries } from '@/core/FourierSeries'
+import { FourierSeries } from '@/core/curve_symmetry/FourierSeries'
 import { Sketch } from '@/core/Sketch'
 import type p5 from 'p5'
 

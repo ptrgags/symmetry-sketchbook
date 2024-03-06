@@ -1,7 +1,7 @@
 import p5 from 'p5'
 import { Sketch } from '@/core/Sketch'
 import { type Pixel } from '@/core/Pixel'
-import { FourierSeries } from '@/core/FourierSeries'
+import { FourierSeries } from '@/core/curve_symmetry/FourierSeries'
 import { draw_polyline } from '@/core/sketch_util'
 
 const MAX_X = 2.0
@@ -16,7 +16,7 @@ export interface ParametricCurveState {
   show_arm: boolean
 }
 
-export class ParametricCurveViewer extends Sketch<ParametricCurveState> {
+export class ParametricCurveSketch extends Sketch<ParametricCurveState> {
   start_frame: number = 0
   curve: Pixel[] = []
 

@@ -1,4 +1,4 @@
-import { ComplexRect, ComplexPolar } from './Complex'
+import { ComplexRect, ComplexPolar } from '../Complex'
 
 export interface FourierTerm {
   frequency: number

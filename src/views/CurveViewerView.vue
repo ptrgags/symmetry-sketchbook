@@ -2,11 +2,10 @@
 import P5Sketch from '@/components/P5Sketch.vue'
 import TwoColumns from '@/components/TwoColumns.vue'
 import { ROSETTES } from '@/presets/parametric_curves'
-import { ParametricCurveViewer, type ParametricCurveState } from '@/sketches/ParametricCurveViewer'
+import { ParametricCurveSketch, type ParametricCurveState } from '@/sketches/ParametricCurveSketch'
 import { ref, type Ref } from 'vue'
 import { useRoute } from 'vue-router'
-
-import type { FourierSeries } from '@/core/FourierSeries'
+import type { FourierSeries } from '@/core/curve_symmetry/FourierSeries'
 
 const route = useRoute()
 console.log(route.query)
@@ -34,7 +33,7 @@ const sketch_state: Ref<ParametricCurveState> = ref({
   show_arm: true
 })
 
-const sketch = new ParametricCurveViewer(sketch_state.value)
+const sketch = new ParametricCurveSketch(sketch_state.value)
 
 function change_pattern(event: Event) {
   const select = event.target as HTMLSelectElement
@@ -63,3 +62,4 @@ function change_pattern(event: Event) {
     </template>
   </TwoColumns>
 </template>
+@/core/curve_symmetry/FourierSeries

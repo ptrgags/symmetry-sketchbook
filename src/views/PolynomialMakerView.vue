@@ -297,3 +297,4 @@ details {
   width: 100%;
 }
 </style>
+@/core/point_symmetry/PointSymmetry

@@ -1,9 +1,9 @@
-import { ComplexPolar } from './Complex'
-import { type Frequency2D } from './Frequency2D'
-import { type GridIndices2D, to_indices_2d, to_index_1d, to_signed } from './GridIndices2D'
-import { mod } from './math'
-import { diff_sum_to_frequencies } from './point_symmetry/DiffSum'
-import { get_partner_indices } from './point_symmetry/PartnerType'
+import { ComplexPolar } from '../Complex'
+import { type Frequency2D } from '../Frequency2D'
+import { type GridIndices2D, to_indices_2d, to_index_1d, to_signed } from '../GridIndices2D'
+import { mod } from '../math'
+import { diff_sum_to_frequencies } from './DiffSum'
+import { get_partner_indices } from './PartnerType'
 import {
   enforce_self_partner_constraint,
   get_freq_diff,
@@ -11,7 +11,7 @@ import {
   get_partner_type,
   indices_to_diff_sum,
   type PointSymmetryRule
-} from './point_symmetry/PointSymmetryRule'
+} from './PointSymmetryRule'
 
 function validate_rules(rules: PointSymmetryRule[]) {
   if (rules.length === 0) {

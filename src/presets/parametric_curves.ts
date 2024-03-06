@@ -1,4 +1,4 @@
-import { FourierSeries } from '@/core/FourierSeries'
+import { FourierSeries } from '@/core/curve_symmetry/FourierSeries'
 
 const PI: number = Math.PI
 

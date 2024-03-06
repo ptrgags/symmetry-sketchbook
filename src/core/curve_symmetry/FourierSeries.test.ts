@@ -1,6 +1,6 @@
 import { describe, test, expect } from 'vitest'
 import { FourierSeries, SerializedFourierSeries } from './FourierSeries'
-import { ComplexPolar } from './Complex'
+import { ComplexPolar } from '../Complex'
 
 describe('FourierSeries serialization', () => {
   test('to_json works', () => {
