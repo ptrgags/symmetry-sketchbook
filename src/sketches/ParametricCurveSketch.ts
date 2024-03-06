@@ -62,6 +62,10 @@ export class ParametricCurveSketch extends Sketch<ParametricCurveState> {
     p.pop()
   }
 
+  set show_arm(value: boolean) {
+    this.state.show_arm = this.show_arm
+  }
+
   set pattern(value: FourierSeries) {
     this.state.pattern = value
   }

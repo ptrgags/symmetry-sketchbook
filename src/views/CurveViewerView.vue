@@ -11,6 +11,7 @@ import { uncompress_base64 } from '@/core/serialization'
 const route = useRoute()
 
 const selected_preset = defineModel<string>('selected_preset')
+const show_arm = defineModel<boolean>('show_arm', { default: true })
 
 const sketch = new ParametricCurveSketch({
   pattern: undefined,
@@ -61,6 +62,10 @@ watch(selected_preset, (value) => {
   sketch.pattern = ROSETTES[value]
   sketch.restart_animation()
 })
+
+watch(show_arm, (value) => {
+  sketch.show_arm = value
+})
 </script>
 
 <template>
@@ -75,6 +80,9 @@ watch(selected_preset, (value) => {
       <select id="preset-select" v-model="selected_preset">
         <option v-for="key in Object.keys(ROSETTES)" :key="key" :value="key">{{ key }}</option>
       </select>
+      <div class="form-row">
+        <label><input type="checkbox" v-model="show_arm" /> Show drawing arm</label>
+      </div>
       <p>
         This sketch generates curves by adding together circular motions. Each joint of the drawing
         machine represents a circular motion with a frequency (how fast it spins), and amplitude

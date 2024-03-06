@@ -25,9 +25,33 @@ function is_tuple(value: any): value is FourierTuple {
   return true
 }
 
+function tuple_to_csv(tuple: FourierTuple, digits: number): string {
+  const fixed = tuple.map((x) => x.toFixed(digits))
+  return fixed.join(',')
+}
+
+function csv_to_tuple(csv: string): FourierTuple | undefined {
+  const components = csv.split(',')
+  if (components.length !== 3) {
+    console.error(`tuple CSV ${csv} must be freq,amp,phase`)
+    return undefined
+  }
+
+  const numeric = components.map(parseFloat)
+  for (const val of numeric) {
+    if (!isFinite(val)) {
+      console.error('Components must be numbers')
+      return undefined
+    }
+  }
+
+  const [freq, amp, phase] = numeric
+  return [freq, amp, phase]
+}
+
 export interface SerializedFourierSeries {
   version: 1
-  terms: FourierTuple[]
+  terms: string[]
 }
 
 function is_series(value: any): value is SerializedFourierSeries {
@@ -41,7 +65,7 @@ function is_series(value: any): value is SerializedFourierSeries {
   }
 
   for (const term of terms) {
-    if (!is_tuple(term)) {
+    if (!is_tuple(csv_to_tuple(term))) {
       return false
     }
   }
@@ -149,15 +173,18 @@ export class FourierSeries {
   }
 
   to_json(): string {
-    const tuples: FourierTuple[] = this.terms.map((term) => {
+    // Convert the coefficients to CSV to 3 digits after the decimal point
+    // to keep the URLs shorter.
+    const tuple_csv: string[] = this.terms.map((term) => {
       const { frequency, coefficient } = term
       const { r, theta } = coefficient
-      return [frequency, r, theta]
+      const tuple: FourierTuple = [frequency, r, theta]
+      return tuple_to_csv(tuple, 3)
     })
 
     const serialized: SerializedFourierSeries = {
       version: 1,
-      terms: tuples
+      terms: tuple_csv
     }
 
     return JSON.stringify(serialized)
@@ -176,7 +203,12 @@ export class FourierSeries {
       return undefined
     }
 
-    return FourierSeries.from_tuples(parsed.terms)
+    // is_series checks that the tuples will be valid
+    const tuples: FourierTuple[] = parsed.terms
+      .map(csv_to_tuple)
+      .filter((x): x is FourierTuple => x !== undefined)
+
+    return FourierSeries.from_tuples(tuples)
   }
 
   static from_tuples(coefficients: FourierTuple[]): FourierSeries {

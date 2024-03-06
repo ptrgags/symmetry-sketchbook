@@ -3,7 +3,7 @@ import TwoColumns from '@/components/TwoColumns.vue'
 import P5Sketch from '@/components/P5Sketch.vue'
 
 import { ref, computed, type ComputedRef } from 'vue'
-import { SYMMETRY_TYPES } from '@/core/curve_symmetry/CurveSymmetryType'
+import { CurveSymmetryType, SYMMETRY_TYPES } from '@/core/curve_symmetry/CurveSymmetryType'
 import { ParametricCurveSketch, type ParametricCurveState } from '@/sketches/ParametricCurveSketch'
 import { FourierSeries, type FourierTerm } from '@/core/curve_symmetry/FourierSeries'
 import { TermGridSketch, type TermGridState } from '@/sketches/TermGridSketch'
@@ -87,7 +87,6 @@ function update_viewer() {
   viewer.recompute_curve()
 
   const json = viewer_state.pattern.to_json()
-  console.log(json)
   compress_base64(json)
     .then((x) => {
       pattern_base64.value = x
@@ -95,12 +94,15 @@ function update_viewer() {
     .catch(console.error)
 }
 
-picker.events.addEventListener('input', (e) => {
+function coefficient_changed(e: Event) {
   const z = (e as CustomEvent).detail as ComplexRect
   term_grid_state.coefficients[term_grid_state.selected_index] = z.to_polar()
 
   update_viewer()
-})
+}
+
+picker.events.addEventListener('input', coefficient_changed)
+picker.events.addEventListener('change', coefficient_changed)
 
 function change_symmetry() {
   const coefficients = term_grid_state.coefficients
@@ -115,6 +117,14 @@ function change_symmetry() {
 
   update_viewer()
 }
+
+function get_label(symmetry: CurveSymmetryType) {
+  if (symmetry.folds === 1) {
+    return 'No symmetry'
+  }
+
+  return `${symmetry.folds}-fold symmetry of type ${symmetry.order}`
+}
 </script>
 
 <template>
@@ -126,7 +136,7 @@ function change_symmetry() {
         <label for="symmetry-type">Symmetry Type: </label>
         <select id="symmetry-type" v-model="symmetry_type" @change="change_symmetry">
           <option v-for="(symmetry, index) in SYMMETRY_TYPES" :key="index" :value="symmetry">
-            {{ symmetry.folds }}-fold symmetry of type {{ symmetry.order }}
+            {{ get_label(symmetry) }}
           </option>
         </select>
         <P5Sketch :sketch="term_grid"></P5Sketch>
