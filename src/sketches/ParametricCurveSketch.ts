@@ -62,6 +62,10 @@ export class ParametricCurveSketch extends Sketch<ParametricCurveState> {
     p.pop()
   }
 
+  set pattern(value: FourierSeries) {
+    this.state.pattern = value
+  }
+
   recompute_curve() {
     const pattern = this.state.pattern
     if (!pattern) {

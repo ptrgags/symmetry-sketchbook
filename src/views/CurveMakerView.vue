@@ -13,6 +13,7 @@ import {
 } from '@/sketches/CoefficientPickerSketch'
 import { ComplexPolar, ComplexRect } from '@/core/Complex'
 import type { GridIndices2D } from '@/core/GridIndices2D'
+import { compress_base64 } from '@/core/serialization'
 
 // The frequencies in use will be [-MAX_FREQ, MAX_FREQ]
 const MAX_FREQ = 5
@@ -29,6 +30,8 @@ const frequency_map: ComputedRef<(indices: GridIndices2D) => number> = computed(
     return symmetry_type.value.get_frequency(k)
   }
 })
+
+const pattern_base64 = ref<string>()
 
 // p5.js sketches --------------------------------
 const viewer_state: ParametricCurveState = {
@@ -82,9 +85,17 @@ function update_viewer() {
 
   viewer_state.pattern = new FourierSeries(terms)
   viewer.recompute_curve()
+
+  const json = viewer_state.pattern.to_json()
+  console.log(json)
+  compress_base64(json)
+    .then((x) => {
+      pattern_base64.value = x
+    })
+    .catch(console.error)
 }
 
-picker.events.addEventListener('change', (e) => {
+picker.events.addEventListener('input', (e) => {
   const z = (e as CustomEvent).detail as ComplexRect
   term_grid_state.coefficients[term_grid_state.selected_index] = z.to_polar()
 
@@ -120,8 +131,14 @@ function change_symmetry() {
         </select>
         <P5Sketch :sketch="term_grid"></P5Sketch>
         <P5Sketch :sketch="picker"></P5Sketch>
+        <div v-if="pattern_base64" class="form-row">
+          <RouterLink
+            :to="{ path: '/curve_symmetry', query: { pattern: pattern_base64 } }"
+            target="_blank"
+            >Viewer Link</RouterLink
+          >
+        </div>
       </div>
     </template>
   </TwoColumns>
 </template>
-@/sketches/ParametricCurveSketch@/core/curve_symmetry/FourierSeries@/core/curve_symmetry/CurveSymmetryType

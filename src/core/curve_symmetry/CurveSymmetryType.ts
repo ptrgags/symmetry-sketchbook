@@ -28,6 +28,8 @@ export const SYMMETRY_TYPES: CurveSymmetryType[] = [
   // - If the folds and order must be co-prime, else it reduces to a different
   //   symmetry. (e.g. 4k + 2 -> 2k + 1)
   //
+  // 1-fold (no symmetry)
+  new CurveSymmetryType(1, 0),
   // 2-fold: 1
   new CurveSymmetryType(2, 1),
   // 3-fold: 1 | 2

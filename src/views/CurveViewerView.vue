@@ -2,44 +2,65 @@
 import P5Sketch from '@/components/P5Sketch.vue'
 import TwoColumns from '@/components/TwoColumns.vue'
 import { ROSETTES } from '@/presets/parametric_curves'
-import { ParametricCurveSketch, type ParametricCurveState } from '@/sketches/ParametricCurveSketch'
-import { ref, type Ref } from 'vue'
+import { ParametricCurveSketch } from '@/sketches/ParametricCurveSketch'
+import { onMounted, watch } from 'vue'
 import { useRoute } from 'vue-router'
-import type { FourierSeries } from '@/core/curve_symmetry/FourierSeries'
+import { FourierSeries } from '@/core/curve_symmetry/FourierSeries'
+import { uncompress_base64 } from '@/core/serialization'
 
 const route = useRoute()
-console.log(route.query)
 
-const DEFAULT_PRESET = '2k + 1'
-const selected_preset = ref(DEFAULT_PRESET)
+const selected_preset = defineModel<string>('selected_preset')
 
-function pick_initial_pattern(): FourierSeries {
+const sketch = new ParametricCurveSketch({
+  pattern: undefined,
+  show_arm: true
+})
+
+async function handle_query() {
   const query = route.query
   if (query.preset) {
     const preset_str = query.preset as string
     const preset = ROSETTES[preset_str]
-    if (preset) {
-      selected_preset.value = preset_str
-      return preset
+    if (!preset) {
+      throw new Error('invalid preset')
     }
+    selected_preset.value = preset_str
+    return
   }
 
-  return ROSETTES[DEFAULT_PRESET]
+  if (query.pattern) {
+    const json = await uncompress_base64(query.pattern as string)
+    console.log(json)
+    const series = FourierSeries.from_json(json)
+    if (!series) {
+      throw new Error('invalid pattern')
+    }
+
+    selected_preset.value = undefined
+    sketch.pattern = series
+    sketch.restart_animation()
+    return
+  }
+
+  // No query params, just select the first one from the dropdown
+  selected_preset.value = Object.keys(ROSETTES)[0]
 }
 
-const sketch_state: Ref<ParametricCurveState> = ref({
-  pattern: pick_initial_pattern(),
-  // can be set by UI
-  show_arm: true
+onMounted(() => {
+  handle_query().catch(console.error)
 })
 
-const sketch = new ParametricCurveSketch(sketch_state.value)
+watch(selected_preset, (value) => {
+  if (!value) {
+    // If we don't have a value, it was because the pattern was set via
+    // ?pattern=<base64 string>, this is handled elsewhere
+    return
+  }
 
-function change_pattern(event: Event) {
-  const select = event.target as HTMLSelectElement
-  sketch_state.value.pattern = ROSETTES[select.value]
+  sketch.pattern = ROSETTES[value]
   sketch.restart_animation()
-}
+})
 </script>
 
 <template>
@@ -51,7 +72,7 @@ function change_pattern(event: Event) {
       <h1>Curve Symmetry</h1>
       <label for="preset-select">Select Preset:</label>
       &nbsp;
-      <select id="preset-select" @change="change_pattern" :value="selected_preset">
+      <select id="preset-select" v-model="selected_preset">
         <option v-for="key in Object.keys(ROSETTES)" :key="key" :value="key">{{ key }}</option>
       </select>
       <p>
@@ -62,4 +83,3 @@ function change_pattern(event: Event) {
     </template>
   </TwoColumns>
 </template>
-@/core/curve_symmetry/FourierSeries
