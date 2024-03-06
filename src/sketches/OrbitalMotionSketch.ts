@@ -24,9 +24,6 @@ function compute_orbit_series(planet: Planet) {
   return FourierSeries.from_tuples([[planet.frequency, planet.orbital_radius, 0]])
 }
 
-// The sun's motion relative to the sun is... no motion!
-const SUN_ORBIT = FourierSeries.from_tuples([])
-
 export class OrbitalMotionSketch extends Sketch<OrbitalMotionState> {
   // The orbit of a planet is modeled as circular motion, which can
   // be modeled as a fourier series.
