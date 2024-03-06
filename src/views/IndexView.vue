@@ -16,9 +16,10 @@ import PageLink from '@/components/PageLink.vue'
     <PageLink><RouterLink to="/curve_symmetry/curve_maker">Curve Maker</RouterLink></PageLink>
     <h3>Point Symmetry</h3>
     <PageLink><RouterLink to="/point_symmetry">Rosette Viewer</RouterLink></PageLink>
-    <!--<PageLink
-      ><RouterLink to="/point_symmetry/tie_dye_analogy">Tie-Dye Analogy</RouterLink></PageLink
-    >
+    <PageLink>
+      <RouterLink to="/point_symmetry/tie_dye_analogy">Tie-Dye Analogy</RouterLink>
+    </PageLink>
+    <!--
     <PageLink
       ><RouterLink to="/point_symmetry/rosette_blender">Rosette Blender</RouterLink></PageLink
     >-->
@@ -39,8 +40,8 @@ import PageLink from '@/components/PageLink.vue'
         >Wallpaper Blender</RouterLink
       ></PageLink
     >-->
-    <PageLink
-      ><RouterLink to="/wallpaper_symmetry/wallpaper_maker">Wallpaper Maker</RouterLink></PageLink
-    >
+    <PageLink>
+      <RouterLink to="/wallpaper_symmetry/wallpaper_maker">Wallpaper Maker</RouterLink>
+    </PageLink>
   </div>
 </template>
