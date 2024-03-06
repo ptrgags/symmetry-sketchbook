@@ -7,6 +7,48 @@ export interface FourierTerm {
 
 export type FourierTuple = [freq: number, amp: number, phase: number]
 
+function is_tuple(value: any): value is FourierTuple {
+  if (!Array.isArray(value)) {
+    return false
+  }
+
+  if (value.length !== 3) {
+    return false
+  }
+
+  for (const component of value) {
+    if (typeof component !== 'number') {
+      return false
+    }
+  }
+
+  return true
+}
+
+export interface SerializedFourierSeries {
+  version: 1
+  terms: FourierTuple[]
+}
+
+function is_series(value: any): value is SerializedFourierSeries {
+  if (value.version !== 1) {
+    return false
+  }
+
+  const terms = value.terms ?? []
+  if (!Array.isArray(terms)) {
+    return false
+  }
+
+  for (const term of terms) {
+    if (!is_tuple(term)) {
+      return false
+    }
+  }
+
+  return true
+}
+
 /**
  * This class represents a finite sum of circular motions of the form
  *
@@ -106,19 +148,35 @@ export class FourierSeries {
     return new FourierSeries(terms)
   }
 
-  /**
-   * Shorthand string for representing a curve in the form
-   * freq,amp,phase:freq,amp,phase:...
-   * note that phase is scaled so it is a multiple of pi
-   */
-  to_string(): string {
-    const terms = []
-    for (const { frequency, coefficient } of this.terms) {
-      const { r: amplitude, theta: phase } = coefficient
-      const term_str = `${frequency},${amplitude},${phase / Math.PI}`
-      terms.push(term_str)
+  to_json(): string {
+    const tuples: FourierTuple[] = this.terms.map((term) => {
+      const { frequency, coefficient } = term
+      const { r, theta } = coefficient
+      return [frequency, r, theta]
+    })
+
+    const serialized: SerializedFourierSeries = {
+      version: 1,
+      terms: tuples
     }
-    return terms.join(':')
+
+    return JSON.stringify(serialized)
+  }
+
+  static from_json(json: string): FourierSeries | undefined {
+    let parsed
+    try {
+      parsed = JSON.parse(json)
+    } catch (e) {
+      console.error(e)
+      return undefined
+    }
+
+    if (!is_series(parsed)) {
+      return undefined
+    }
+
+    return FourierSeries.from_tuples(parsed.terms)
   }
 
   static from_tuples(coefficients: FourierTuple[]): FourierSeries {
@@ -128,42 +186,6 @@ export class FourierSeries {
         coefficient: new ComplexPolar(amp, phase)
       }
     })
-
-    return new FourierSeries(terms)
-  }
-
-  /**
-   * Load a pattern from a string in the same format as
-   * to_string()
-   */
-  static from_string(str: string): FourierSeries {
-    const terms: FourierTerm[] = str
-      .trim()
-      .split(':')
-      .map((term_str) => {
-        const [freq_str, amp_str, phase_str] = term_str.split(',')
-        const freq = parseInt(freq_str)
-        const amp = parseFloat(amp_str)
-        const phase = parseFloat(phase_str) * Math.PI
-
-        if (!isFinite(freq)) {
-          throw new Error('frequency must be an integer')
-        }
-
-        if (!isFinite(amp)) {
-          throw new Error('amplitude must be a real number')
-        }
-
-        if (!isFinite(phase)) {
-          throw new Error('phase must be a real number')
-        }
-
-        return {
-          frequency: freq,
-          coefficient: new ComplexPolar(amp, phase)
-        }
-      })
-      .sort()
 
     return new FourierSeries(terms)
   }
