@@ -17,8 +17,10 @@ void main() {
 `
 
 const FRAG_SHADER = `
-${common.defines}
 precision highp float;
+
+${common.defines}
+#define MAX_COLORS 12
 
 varying vec2 uv;
 
@@ -33,11 +35,25 @@ uniform float color_reversing_type;
 // p5.js seems to ignore mat2 matrices so I'll use a mat3 instead.
 uniform mat3 inv_lattice;
 
+uniform vec3 palette_colors[MAX_COLORS];
+uniform int color_count;
+
 ${common.funcs_view}
 ${common.funcs_polar}
 
 vec3 palette_1d(float t) {
-    return fract(vec3(5.0, 7.0, 13.0) * t);
+    vec3 color = vec3(0.0);
+    for (int i = 0; i < MAX_COLORS; i++) {
+        if (i >= color_count) {
+            break;
+        }
+
+        float mask = step(float(i) / float(color_count), t);
+        color = mix(color, palette_colors[i], mask);
+    }
+    return color;
+    //return fract(vec3(5.0, 7.0, 13.0) * t);
+    //return texture2D(tex_palette, vec2(t, 0.5)).rgb;
 }
 
 vec3 palette_polar(vec2 z_rect) {
@@ -54,9 +70,9 @@ vec3 palette_polar(vec2 z_rect) {
 }
 
 vec3 palette(vec2 z_rect) {
-    vec3 color_x = palette_1d(fract(0.05 * z_rect.x));
-    vec3 color_y = palette_1d(fract(0.05 * z_rect.y));
-    return color_x * color_y;
+    vec3 color_x = palette_1d(fract(0.5 * z_rect.x));
+    vec3 color_y = palette_1d(fract(0.5 * z_rect.y));
+    return color_y;
 }
 
 vec3 invert_palette(vec2 z_rect) {

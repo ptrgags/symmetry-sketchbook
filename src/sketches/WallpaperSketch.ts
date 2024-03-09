@@ -13,7 +13,6 @@ export interface WallpaperState {
 
 export class WallpaperSketch extends Sketch<WallpaperState> {
   shader: WallpaperShader
-  palette?: p5.Graphics
 
   constructor(state: WallpaperState) {
     super(state)
@@ -23,6 +22,13 @@ export class WallpaperSketch extends Sketch<WallpaperState> {
   setup(p: p5) {
     const canvas = p.createCanvas(500, 700, p.WEBGL)
     Sketch.show_canvas(canvas.elt)
+
+    p.textureMode(p.NORMAL)
+
+    this.update_palette([
+      [1, 0, 0],
+      [1, 1, 0]
+    ])
 
     this.shader.init(p)
     this.recompute()
@@ -36,6 +42,37 @@ export class WallpaperSketch extends Sketch<WallpaperState> {
 
   set show_palette(value: boolean) {
     this.shader.set_uniform('show_palette', value)
+  }
+
+  update_palette(colors: number[][]) {
+    if (!this.sketch) {
+      return
+    }
+
+    const flattened = colors.flat()
+    const remaining = Math.max(3 * 12 - flattened.length, 0)
+    const padding = new Array(remaining).fill(0.0)
+    const values = [...flattened, ...padding]
+    this.shader.set_uniform('palette_colors', values)
+    this.shader.set_uniform('color_count', colors.length)
+
+    /*
+    const img = this.sketch.createImage(colors.length, 1)
+    img.loadPixels()
+    for (const [index, color] of colors.entries()) {
+      const [r, g, b] = color
+      const c = this.sketch.color(255 * r, 255 * g, 255 * b)
+      img.set(index, 0, c)
+    }
+    console.log(img.pixels)
+    img.updatePixels()
+
+    this.shader.set_uniform('tex_palette', img)
+    */
+  }
+
+  set palette_colors(value: number[][]) {
+    this.update_palette(value)
   }
 
   recompute() {

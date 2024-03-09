@@ -29,10 +29,8 @@ function on_change(e: Event) {
 </script>
 
 <template>
-  <div class="form-row">
-    <label>
-      <input type="color" :value="vec3_to_color(modelValue)" @input="on_change" />
-      <slot></slot>
-    </label>
-  </div>
+  <label>
+    <input type="color" :value="vec3_to_color(modelValue)" @input="on_change" />
+    <slot></slot>
+  </label>
 </template>

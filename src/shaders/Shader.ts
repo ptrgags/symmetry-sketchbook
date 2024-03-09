@@ -86,7 +86,10 @@ export class Shader {
     this.enabled = false
   }
 
-  set_uniform(name: string, value: boolean | number | number[] | p5.MediaElement | p5.Graphics) {
+  set_uniform(
+    name: string,
+    value: boolean | number | number[] | p5.MediaElement | p5.Graphics | p5.Image
+  ) {
     if (!this.sketch || !this.shader) {
       return
     }

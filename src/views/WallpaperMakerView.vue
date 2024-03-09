@@ -18,6 +18,7 @@ import {
   WALLPAPER_GROUPS,
   type WallpaperSymmetryGroup
 } from '@/core/wallpaper_symmetry/WallpaperSymmetryGroup'
+import PalettePicker from '@/components/PalettePicker.vue'
 
 // The frequencies will be [-MAX_FREQ, MAX_FREQ] in each direction
 const MAX_FREQ = 3
@@ -51,6 +52,14 @@ const group = computed<WallpaperSymmetryGroup>(() => {
 const show_palette = defineModel<boolean>('enable_palette', { default: false })
 
 const symmetry = ref(new WallpaperSymmetry(GRID_SIZE, group.value))
+
+const palette = defineModel<number[][]>('palette', {
+  default: [
+    [1, 0, 0],
+    [0, 1, 0],
+    [0, 0, 1]
+  ]
+})
 
 // P5.js sketches ----------------------------
 
@@ -129,6 +138,18 @@ watch(show_palette, (show) => {
   viewer.show_palette = show
 })
 
+watch(
+  palette,
+  (value) => {
+    if (value) {
+      viewer.palette_colors = value
+    } else {
+      viewer.palette_colors = []
+    }
+  },
+  { deep: true }
+)
+
 watch(group, (new_value) => {
   const selected_group = new_value ?? WALLPAPER_GROUPS.p1
   symmetry.value = new WallpaperSymmetry(GRID_SIZE, selected_group)
@@ -183,6 +204,7 @@ watch(group, (new_value) => {
           <div class="form-row">
             <input id="toggle-palette" type="checkbox" v-model="show_palette" />
             <label for="toggle-palette"> Show color palette</label>
+            <PalettePicker v-model="palette"></PalettePicker>
           </div>
         </TabContent>
       </TabLayout>
