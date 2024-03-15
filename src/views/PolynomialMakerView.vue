@@ -33,11 +33,11 @@ const DEFAULT_TERM = (CENTER_1D - 1) * GRID_SIZE + CENTER_1D
 // Vue state
 
 const props = defineProps<{
-  symmetry_mode: 'rosette' | 'frieze'
+  symmetryMode: 'rosette' | 'frieze'
 }>()
 
 const title = computed<string>(() => {
-  return props.symmetry_mode === 'frieze' ? 'Frieze Maker' : 'Rosette Maker'
+  return props.symmetryMode === 'frieze' ? 'Frieze Maker' : 'Rosette Maker'
 })
 
 const symmetry = ref(new PointSymmetry(GRID_SIZE, [IDENTITY]))
@@ -47,7 +47,7 @@ const palette_type = ref(PALETTE_TYPES[0])
 // p5.js sketches -------------------
 
 const viewer_state: PolynomialState = {
-  symmetry_mode: props.symmetry_mode,
+  symmetry_mode: props.symmetryMode,
   pattern: FourierSeries2D.from_tuples([]),
   rotation_order: 5
 }
@@ -153,7 +153,10 @@ watch(palette_type, (new_value: PaletteType) => {
       <h1>{{ title }}</h1>
       <TabLayout>
         <TabContent title="Choose Symmetry">
-          <PointSymmetryEditor @update:model-value="change_symmetry" />
+          <PointSymmetryEditor
+            :symmetry-mode="props.symmetryMode"
+            @update:model-value="change_symmetry"
+          />
         </TabContent>
         <TabContent title="Edit Pattern">
           <P5Sketch :sketch="term_grid"></P5Sketch>

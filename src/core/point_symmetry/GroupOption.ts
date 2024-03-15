@@ -3,7 +3,10 @@ import { InputSymmetryType } from './InputSymmetryType'
 
 export interface GroupOption {
   id: string
-  label: string
+  label: {
+    rosette: string
+    frieze: string
+  }
   first_constraint: ColorTurnEditorConstraint
   second_constraint?: ColorTurnEditorConstraint
   third_constraint?: ColorTurnEditorConstraint
@@ -12,7 +15,10 @@ export interface GroupOption {
 export const NO_ROTATION_OPTIONS: GroupOption[] = [
   {
     id: 'identity',
-    label: 'No Symmetry',
+    label: {
+      rosette: 'No Symmetry',
+      frieze: 'No Symmetry'
+    },
     first_constraint: {
       input_symmetry: InputSymmetryType.Identity,
       output_reflection_editable: true
@@ -20,7 +26,10 @@ export const NO_ROTATION_OPTIONS: GroupOption[] = [
   },
   {
     id: 'mirror_x',
-    label: 'Mirror',
+    label: {
+      rosette: 'Mirror',
+      frieze: 'Mirrors (horizontal)'
+    },
     first_constraint: {
       input_symmetry: InputSymmetryType.Mirror,
       output_reflection_editable: true
@@ -28,7 +37,10 @@ export const NO_ROTATION_OPTIONS: GroupOption[] = [
   },
   {
     id: 'inversion',
-    label: 'Circle inversion',
+    label: {
+      rosette: 'Circle inversion',
+      frieze: 'Mirror (vertical)'
+    },
     first_constraint: {
       input_symmetry: InputSymmetryType.CircleInversion,
       output_reflection_editable: true
@@ -36,7 +48,10 @@ export const NO_ROTATION_OPTIONS: GroupOption[] = [
   },
   {
     id: 'reciprocal',
-    label: 'Complex inversion',
+    label: {
+      rosette: 'Complex inversion',
+      frieze: 'Rotations'
+    },
     first_constraint: {
       input_symmetry: InputSymmetryType.ComplexInversion,
       output_reflection_editable: true
@@ -44,7 +59,10 @@ export const NO_ROTATION_OPTIONS: GroupOption[] = [
   },
   {
     id: 'mirror_inversion',
-    label: 'Mirror + Complex inversion',
+    label: {
+      rosette: 'Mirror + Complex inversion',
+      frieze: 'Mirror (horizontal) + rotations'
+    },
     first_constraint: {
       input_symmetry: InputSymmetryType.Mirror,
       output_reflection_editable: true
@@ -59,7 +77,10 @@ export const NO_ROTATION_OPTIONS: GroupOption[] = [
 export const ROTATION_OPTIONS: GroupOption[] = [
   {
     id: 'p1',
-    label: 'Rotation',
+    label: {
+      rosette: 'Rotation',
+      frieze: 'Translations'
+    },
     first_constraint: {
       input_symmetry: InputSymmetryType.Rotation,
       output_reflection_editable: true
@@ -67,7 +88,10 @@ export const ROTATION_OPTIONS: GroupOption[] = [
   },
   {
     id: 'p11g',
-    label: 'Roto-inversion',
+    label: {
+      rosette: 'Roto-inversion',
+      frieze: 'Glide Reflections'
+    },
     first_constraint: {
       input_symmetry: InputSymmetryType.RotoInversion,
       output_reflection_editable: true
@@ -75,7 +99,10 @@ export const ROTATION_OPTIONS: GroupOption[] = [
   },
   {
     id: 'p1m1',
-    label: 'Rotation + Mirror',
+    label: {
+      rosette: 'Rotation + Mirror',
+      frieze: 'Translations + Mirrors (horizontal)'
+    },
     first_constraint: {
       input_symmetry: InputSymmetryType.Rotation,
       output_reflection_editable: true
@@ -87,7 +114,10 @@ export const ROTATION_OPTIONS: GroupOption[] = [
   },
   {
     id: 'p11m',
-    label: 'Rotation + Circle inversion',
+    label: {
+      rosette: 'Rotation + Circle inversion',
+      frieze: 'Translations + Mirror (vertical)'
+    },
     first_constraint: {
       input_symmetry: InputSymmetryType.Rotation,
       output_reflection_editable: true
@@ -99,7 +129,10 @@ export const ROTATION_OPTIONS: GroupOption[] = [
   },
   {
     id: 'p2',
-    label: 'Rotation + Complex inversion',
+    label: {
+      rosette: 'Rotation + Complex inversion',
+      frieze: 'Translations + Rotations'
+    },
     first_constraint: {
       input_symmetry: InputSymmetryType.Rotation,
       output_reflection_editable: true
@@ -111,7 +144,10 @@ export const ROTATION_OPTIONS: GroupOption[] = [
   },
   {
     id: 'p2mg',
-    label: 'Roto-inversion + Mirror',
+    label: {
+      rosette: 'Roto-inversion + Mirror',
+      frieze: 'Glide Reflections + Mirrors (horizontal)'
+    },
     first_constraint: {
       input_symmetry: InputSymmetryType.RotoInversion,
       output_reflection_editable: true
@@ -123,7 +159,10 @@ export const ROTATION_OPTIONS: GroupOption[] = [
   },
   {
     id: 'p2mm',
-    label: 'Rotation + Complex Inversion + Mirror',
+    label: {
+      rosette: 'Rotation + Complex Inversion + Mirror',
+      frieze: 'Translations + Mirrors'
+    },
     first_constraint: {
       input_symmetry: InputSymmetryType.Rotation,
       output_reflection_editable: true

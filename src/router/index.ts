@@ -40,14 +40,14 @@ const router = createRouter({
       path: '/point_symmetry/rosette_maker',
       component: PolynomialMakerView,
       props: {
-        symmetry_mode: 'rosette'
+        symmetryMode: 'rosette'
       }
     },
     {
       path: '/frieze_symmetry/frieze_maker',
       component: PolynomialMakerView,
       props: {
-        symmetry_mode: 'frieze'
+        symmetryMode: 'frieze'
       }
     },
     {

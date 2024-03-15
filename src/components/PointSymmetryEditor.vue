@@ -41,6 +41,7 @@ const second_color_turn = defineModel<ColorTurnValue>('second_color_turn')
 const third_color_turn = defineModel<ColorTurnValue>('third_color_turn')
 
 defineProps<{
+  symmetryMode: 'rosette' | 'frieze'
   value?: PointSymmetryRule[]
 }>()
 
@@ -159,12 +160,12 @@ watch(
       <label for="symmetry-group">Symmetry Type: </label>
       <select v-if="rotation_folds === 1" id="symmetry-group" v-model="no_rotation_group">
         <option v-for="option in NO_ROTATION_OPTIONS" :key="option.id" :value="option">
-          {{ option.label }}
+          {{ option.label[$props.symmetryMode] }}
         </option>
       </select>
       <select v-else id="symmetry-group" v-model="rotation_group">
         <option v-for="option in ROTATION_OPTIONS" :key="option.id" :value="option">
-          {{ option.label }}
+          {{ option.label[$props.symmetryMode] }}
         </option>
       </select>
     </div>
