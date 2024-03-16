@@ -58,8 +58,21 @@ export class PolynomialSketch extends Sketch<PolynomialState> {
     return false
   }
 
-  recompute() {
+  get_pattern_json(): string {
+    return this.state.pattern.to_json()
+  }
+
+  set pattern(value: FourierSeries2D) {
+    this.state.pattern = value
     this.shader.set_coefficients(this.state.pattern)
+  }
+
+  set rotation_order(value: number) {
+    // When the rotation order is 1, we only have mirrors and inversions.
+    // This looks better with more sectors, so set it to 4
+    const order = value >= 2 ? value : 4
+
+    this.shader.set_uniform('rotation_order', order)
   }
 
   set show_palette(value: boolean) {
@@ -76,14 +89,6 @@ export class PolynomialSketch extends Sketch<PolynomialState> {
 
   set_thickness(prefix: string, value: number) {
     this.shader.set_uniform(`${prefix}_thickness`, value)
-  }
-
-  set rotation_order(value: number) {
-    // When the rotation order is 1, we only have mirrors and inversions.
-    // This looks better with more sectors, so set it to 4
-    const order = value >= 2 ? value : 4
-
-    this.shader.set_uniform('rotation_order', order)
   }
 
   set invert_palette(value: boolean) {

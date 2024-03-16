@@ -32,6 +32,8 @@ async function handle_query() {
 
   if (query.pattern) {
     const json = await uncompress_base64(query.pattern as string)
+    // This log line is intentionally here to make it easier to copy and paste
+    // parameters so I can make presets.
     console.log(json)
     const series = FourierSeries.from_json(json)
     if (!series) {

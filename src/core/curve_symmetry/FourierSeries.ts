@@ -9,15 +9,18 @@ export type FourierTuple = [freq: number, amp: number, phase: number]
 
 function is_tuple(value: any): value is FourierTuple {
   if (!Array.isArray(value)) {
+    console.error('value must be an array')
     return false
   }
 
   if (value.length !== 3) {
+    console.error('value tuple must have 4 elements')
     return false
   }
 
   for (const component of value) {
     if (typeof component !== 'number') {
+      console.error(`component ${component} must be a number`)
       return false
     }
   }
@@ -56,11 +59,13 @@ export interface SerializedFourierSeries {
 
 function is_series(value: any): value is SerializedFourierSeries {
   if (value.version !== 1) {
+    console.error('version must be 1')
     return false
   }
 
   const terms = value.terms ?? []
   if (!Array.isArray(terms)) {
+    console.error('terms must be an array')
     return false
   }
 

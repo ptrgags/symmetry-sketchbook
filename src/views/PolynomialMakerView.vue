@@ -19,6 +19,7 @@ import XYRTFlags from '@/components/XYRTFlags.vue'
 import ColorPicker from '@/components/ColorPicker.vue'
 import { PALETTE_TYPES, type PaletteType } from '@/core/point_symmetry/PaletteType'
 import RangeSlider from '@/components/RangeSlider.vue'
+import { compress_base64 } from '@/core/serialization'
 
 // The frequencies will be [-MAX_FREQ, MAX_FREQ] in each direction
 const MAX_FREQ = 3
@@ -40,9 +41,15 @@ const title = computed<string>(() => {
   return props.symmetryMode === 'frieze' ? 'Frieze Maker' : 'Rosette Maker'
 })
 
+const viewer_path = computed<string>(() => {
+  return props.symmetryMode === 'frieze' ? '/frieze_symmetry' : '/point_symmetry'
+})
+
 const symmetry = ref(new PointSymmetry(GRID_SIZE, [IDENTITY]))
 
 const palette_type = ref(PALETTE_TYPES[0])
+
+const pattern_base64 = ref<string>()
 
 // p5.js sketches -------------------
 
@@ -97,8 +104,14 @@ function update_viewer() {
     }
   }
 
-  viewer_state.pattern = new FourierSeries2D(terms)
-  viewer.recompute()
+  viewer.pattern = new FourierSeries2D(terms)
+
+  const json = viewer.get_pattern_json()
+  compress_base64(json)
+    .then((x) => {
+      pattern_base64.value = x
+    })
+    .catch(console.error)
 }
 
 function update_coefficient(e: Event) {
@@ -289,6 +302,16 @@ watch(palette_type, (new_value: PaletteType) => {
               >Thickness:</RangeSlider
             >
           </details>
+        </TabContent>
+        <TabContent title="Export">
+          <div v-if="pattern_base64" class="form-row">
+            <RouterLink
+              :to="{ path: viewer_path, query: { pattern: pattern_base64 } }"
+              target="_blank"
+              >Viewer Link</RouterLink
+            >
+          </div>
+          <div v-else>Create a pattern using the other tabs, then a link will appear here</div>
         </TabContent>
       </TabLayout>
     </template>
