@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import TwoColumns from '@/components/TwoColumns.vue'
 import P5Sketch from '@/components/P5Sketch.vue'
-import { PolynomialSketch, type PolynomialState } from '@/sketches/PolynomialSketch'
+import { PolynomialSketch } from '@/sketches/PolynomialSketch'
 import { FourierSeries2D } from '@/core/FourierSeries2D'
 import { useRoute } from 'vue-router'
 import { uncompress_base64 } from '@/core/serialization'
