@@ -1,5 +1,5 @@
 import { Color } from '@/core/Color'
-import { FourierSeries2D } from '@/core/FourierSeries2D'
+import { FourierSeries2D, type SerializedFourierSeries2D } from '@/core/FourierSeries2D'
 import { Sketch } from '@/core/Sketch'
 import type { SecondaryColorType } from '@/core/point_symmetry/PaletteType'
 import { PolynomialShader } from '@/shaders/PolynomialShader'
@@ -57,10 +57,6 @@ export class PolynomialSketch extends Sketch<PolynomialState> {
     this.shader.set_mouse_uv(mouse_uv)
 
     return false
-  }
-
-  get_pattern_json(): string {
-    return this.state.pattern.to_json()
   }
 
   set pattern(value: FourierSeries2D) {

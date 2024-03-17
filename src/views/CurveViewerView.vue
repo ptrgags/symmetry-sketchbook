@@ -7,6 +7,9 @@ import { onMounted, watch } from 'vue'
 import { useRoute } from 'vue-router'
 import { FourierSeries } from '@/core/curve_symmetry/FourierSeries'
 import { uncompress_base64 } from '@/core/serialization/gzip_base64'
+import { is_string } from '@/core/validation'
+import { from_compressed_json } from '@/core/serialization/serialization'
+import { FourierSeriesSerializer } from '@/core/serialization/SerializedFourierSeries'
 
 const route = useRoute()
 
@@ -20,30 +23,23 @@ const sketch = new ParametricCurveSketch({
 
 async function handle_query() {
   const query = route.query
-  if (query.preset) {
-    const preset_str = query.preset as string
+  if (query.preset && is_string(query.preset, 'string')) {
+    const preset_str = query.preset
     const preset = ROSETTES[preset_str]
-    if (!preset) {
-      throw new Error('invalid preset')
+    if (preset) {
+      selected_preset.value = preset_str
+      return
     }
-    selected_preset.value = preset_str
-    return
   }
 
-  if (query.pattern) {
-    const json = await uncompress_base64(query.pattern as string)
-    // This log line is intentionally here to make it easier to copy and paste
-    // parameters so I can make presets.
-    console.log(json)
-    const series = FourierSeries.from_json(json)
-    if (!series) {
-      throw new Error('invalid pattern')
+  if (query.pattern && is_string(query.pattern, 'pattern')) {
+    const series = await from_compressed_json(query.pattern, new FourierSeriesSerializer())
+    if (series) {
+      selected_preset.value = undefined
+      sketch.pattern = series
+      sketch.restart_animation()
+      return
     }
-
-    selected_preset.value = undefined
-    sketch.pattern = series
-    sketch.restart_animation()
-    return
   }
 
   // No query params, just select the first one from the dropdown

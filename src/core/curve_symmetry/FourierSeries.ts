@@ -7,77 +7,6 @@ export interface FourierTerm {
 
 export type FourierTuple = [freq: number, amp: number, phase: number]
 
-function is_tuple(value: any): value is FourierTuple {
-  if (!Array.isArray(value)) {
-    console.error('value must be an array')
-    return false
-  }
-
-  if (value.length !== 3) {
-    console.error('value tuple must have 4 elements')
-    return false
-  }
-
-  for (const component of value) {
-    if (typeof component !== 'number') {
-      console.error(`component ${component} must be a number`)
-      return false
-    }
-  }
-
-  return true
-}
-
-function tuple_to_csv(tuple: FourierTuple, digits: number): string {
-  const fixed = tuple.map((x) => x.toFixed(digits))
-  return fixed.join(',')
-}
-
-function csv_to_tuple(csv: string): FourierTuple | undefined {
-  const components = csv.split(',')
-  if (components.length !== 3) {
-    console.error(`tuple CSV ${csv} must be freq,amp,phase`)
-    return undefined
-  }
-
-  const numeric = components.map(parseFloat)
-  for (const val of numeric) {
-    if (!isFinite(val)) {
-      console.error('Components must be numbers')
-      return undefined
-    }
-  }
-
-  const [freq, amp, phase] = numeric
-  return [freq, amp, phase]
-}
-
-export interface SerializedFourierSeries {
-  version: 1
-  terms: string[]
-}
-
-function is_series(value: any): value is SerializedFourierSeries {
-  if (value.version !== 1) {
-    console.error('version must be 1')
-    return false
-  }
-
-  const terms = value.terms ?? []
-  if (!Array.isArray(terms)) {
-    console.error('terms must be an array')
-    return false
-  }
-
-  for (const term of terms) {
-    if (!is_tuple(csv_to_tuple(term))) {
-      return false
-    }
-  }
-
-  return true
-}
-
 /**
  * This class represents a finite sum of circular motions of the form
  *
@@ -175,45 +104,6 @@ export class FourierSeries {
       }
     })
     return new FourierSeries(terms)
-  }
-
-  to_json(): string {
-    // Convert the coefficients to CSV to 3 digits after the decimal point
-    // to keep the URLs shorter.
-    const tuple_csv: string[] = this.terms.map((term) => {
-      const { frequency, coefficient } = term
-      const { r, theta } = coefficient
-      const tuple: FourierTuple = [frequency, r, theta]
-      return tuple_to_csv(tuple, 3)
-    })
-
-    const serialized: SerializedFourierSeries = {
-      version: 1,
-      terms: tuple_csv
-    }
-
-    return JSON.stringify(serialized)
-  }
-
-  static from_json(json: string): FourierSeries | undefined {
-    let parsed
-    try {
-      parsed = JSON.parse(json)
-    } catch (e) {
-      console.error(e)
-      return undefined
-    }
-
-    if (!is_series(parsed)) {
-      return undefined
-    }
-
-    // is_series checks that the tuples will be valid
-    const tuples: FourierTuple[] = parsed.terms
-      .map(csv_to_tuple)
-      .filter((x): x is FourierTuple => x !== undefined)
-
-    return FourierSeries.from_tuples(tuples)
   }
 
   static from_tuples(coefficients: FourierTuple[]): FourierSeries {

@@ -14,6 +14,8 @@ import {
 import { ComplexPolar, ComplexRect } from '@/core/Complex'
 import type { GridIndices2D } from '@/core/GridIndices2D'
 import { compress_base64 } from '@/core/serialization/gzip_base64'
+import { to_compressed_json } from '@/core/serialization/serialization'
+import { FourierSeriesSerializer } from '@/core/serialization/SerializedFourierSeries'
 
 // The frequencies in use will be [-MAX_FREQ, MAX_FREQ]
 const MAX_FREQ = 5
@@ -83,11 +85,12 @@ function update_viewer() {
     })
   }
 
-  viewer_state.pattern = new FourierSeries(terms)
+  const pattern = new FourierSeries(terms)
+  viewer_state.pattern = pattern
   viewer.recompute_curve()
 
-  const json = viewer_state.pattern.to_json()
-  compress_base64(json)
+  // Also update the link to the viewer
+  to_compressed_json(pattern, new FourierSeriesSerializer())
     .then((x) => {
       pattern_base64.value = x
     })

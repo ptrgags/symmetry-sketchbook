@@ -4,32 +4,31 @@ import P5Sketch from '@/components/P5Sketch.vue'
 import { PolynomialSketch } from '@/sketches/PolynomialSketch'
 import { FourierSeries2D } from '@/core/FourierSeries2D'
 import { useRoute } from 'vue-router'
-import { uncompress_base64 } from '@/core/serialization/gzip_base64'
 import { onMounted } from 'vue'
+import { from_compressed_json } from '@/core/serialization/serialization'
+import { is_string } from '@/core/validation'
+import { FourierSeries2DSerializer } from '@/core/serialization/SerializedFourierSeries2D'
 
 const route = useRoute()
 
+const DEFAULT_PATTERN = FourierSeries2D.from_tuples([[1, 0, 1, 0]])
+
 const sketch = new PolynomialSketch({
   symmetry_mode: 'rosette',
-  pattern: FourierSeries2D.from_tuples([[1, 0, 1, 0]]),
+  pattern: DEFAULT_PATTERN,
   rotation_order: 8
 })
 
 async function handle_query() {
   const query = route.query
-  if (query.pattern) {
-    const json = await uncompress_base64(query.pattern as string)
-    // This log line is intentionally here to make it easier to copy and paste
-    // parameters so I can make presets.
-    console.log(json)
-
-    const series = FourierSeries2D.from_json(json)
-    if (!series) {
-      throw new Error('invalid pattern')
+  if (query.pattern && is_string(query.pattern, 'pattern')) {
+    const series = await from_compressed_json(query.pattern, new FourierSeries2DSerializer())
+    if (series) {
+      sketch.pattern = series
     }
-
-    sketch.pattern = series
   }
+
+  sketch.pattern = DEFAULT_PATTERN
 }
 
 onMounted(() => {

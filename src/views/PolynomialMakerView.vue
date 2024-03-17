@@ -20,6 +20,8 @@ import PointSymmetryPaletteEditor from '@/components/PointSymmetryPaletteEditor.
 import { type PointSymmetryPalette } from '@/core/point_symmetry/PointSymmetryPalette'
 import { PALETTE_TYPES } from '@/core/point_symmetry/PaletteType'
 import { Color } from '@/core/Color'
+import { to_compressed_json } from '@/core/serialization/serialization'
+import { FourierSeries2DSerializer } from '@/core/serialization/SerializedFourierSeries2D'
 
 // The frequencies will be [-MAX_FREQ, MAX_FREQ] in each direction
 const MAX_FREQ = 3
@@ -133,10 +135,11 @@ function update_viewer() {
     }
   }
 
-  viewer.pattern = new FourierSeries2D(terms)
+  const pattern = new FourierSeries2D(terms)
+  viewer.pattern = pattern
 
-  const json = viewer.get_pattern_json()
-  compress_base64(json)
+  // Also update the link to the viewer
+  to_compressed_json(pattern, new FourierSeries2DSerializer())
     .then((x) => {
       pattern_base64.value = x
     })

@@ -58,21 +58,21 @@ export function from_json<Value, Serialized>(
     return undefined
   }
 
-  if (!parsed.has_version) {
-    console.error('JSON is missing version')
-    return undefined
-  }
-
   // Right now, all the versions are 1. If that ever changes, consider
   // making the parameters have a dictionary of version number to serializer
   if (parsed.version !== 1) {
     console.error(`version ${parsed.version} is not allowed! Version must be 1]`)
+    return undefined
   }
 
   if (!serializer.validate(parsed)) {
     // Errors will already be logged by the validation function
     return undefined
   }
+
+  // Log the parsed JSON at info level so I can copy the values whenever I
+  // want to make new presets
+  console.info(parsed)
 
   return serializer.deserialize(parsed)
 }
