@@ -1,10 +1,11 @@
+import type { Color } from '../Color'
 import type { PaletteType } from './PaletteType'
 
 export interface ReferenceGeometry {
   // Which coordinate directions are enabled for x, y, r or theta
   xyrt_flags: boolean[]
   // color [r, g, b] in [0, 1] for each component
-  color: number[]
+  color: Color
   // Line thickness
   thickness: number
 }
@@ -23,13 +24,13 @@ export enum ReferenceGeometryPrefix {
 export interface PointSymmetryPalette {
   palette_type: PaletteType
   // The primary color used in every palette
-  primary_color: number[]
+  primary_color: Color
   // The secondary color for some palettes
-  secondary_color: number[]
+  secondary_color: Color
   // What color to use for points "far away" from the unit disk
   // (either near the origin or near infinity). this color is _multiplied_
   // into the final color.
-  far_color: number[]
+  far_color: Color
   // Raise the distancce field to a power to lighten/darken the output
   far_power: number
   // Settings for displaying reference geometry in the shader

@@ -19,6 +19,7 @@ import {
   type WallpaperSymmetryGroup
 } from '@/core/wallpaper_symmetry/WallpaperSymmetryGroup'
 import PalettePicker from '@/components/PalettePicker.vue'
+import { Color } from '@/core/Color'
 
 // The frequencies will be [-MAX_FREQ, MAX_FREQ] in each direction
 const MAX_FREQ = 3
@@ -53,12 +54,8 @@ const show_palette = defineModel<boolean>('enable_palette', { default: false })
 
 const symmetry = ref(new WallpaperSymmetry(GRID_SIZE, group.value))
 
-const palette = defineModel<number[][]>('palette', {
-  default: [
-    [1, 0, 0],
-    [0, 1, 0],
-    [0, 0, 1]
-  ]
+const palette = defineModel<Color[]>('palette', {
+  default: [new Color(1, 0, 0), new Color(0, 1, 0), new Color(0, 0, 1)]
 })
 
 // P5.js sketches ----------------------------

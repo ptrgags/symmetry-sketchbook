@@ -19,6 +19,7 @@ import { compress_base64 } from '@/core/serialization'
 import PointSymmetryPaletteEditor from '@/components/PointSymmetryPaletteEditor.vue'
 import { type PointSymmetryPalette } from '@/core/point_symmetry/PointSymmetryPalette'
 import { PALETTE_TYPES } from '@/core/point_symmetry/PaletteType'
+import { Color } from '@/core/Color'
 
 // The frequencies will be [-MAX_FREQ, MAX_FREQ] in each direction
 const MAX_FREQ = 3
@@ -49,29 +50,29 @@ const symmetry = ref(new PointSymmetry(GRID_SIZE, [IDENTITY]))
 const palette = defineModel<PointSymmetryPalette>({
   default: {
     palette_type: PALETTE_TYPES[0],
-    primary_color: [0.5, 0.0, 1.0],
-    secondary_color: [0.5, 1.0, 0.0],
-    far_color: [0.0, 0.0, 0.0],
+    primary_color: new Color(0.5, 0.0, 1.0),
+    secondary_color: new Color(0.5, 1.0, 0.0),
+    far_color: new Color(0.0, 0.0, 0.0),
     far_power: 4,
     ref_geom: {
       input_axes: {
         xyrt_flags: [false, false, false, false],
-        color: [1, 1, 1],
+        color: new Color(1, 1, 1),
         thickness: 0.01
       },
       output_axes: {
         xyrt_flags: [false, false, false, false],
-        color: [0, 1, 1],
+        color: new Color(0, 1, 1),
         thickness: 0.1
       },
       pulse: {
         xyrt_flags: [false, false, false, false],
-        color: [1, 1, 0],
+        color: new Color(1, 1, 0),
         thickness: 0.1
       },
       grid: {
         xyrt_flags: [false, false, false, false],
-        color: [1, 1, 1],
+        color: new Color(1, 1, 1),
         thickness: 0.1
       }
     }

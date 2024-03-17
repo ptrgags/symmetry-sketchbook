@@ -1,3 +1,4 @@
+import { Color } from '@/core/Color'
 import { FourierSeries2D } from '@/core/FourierSeries2D'
 import { Sketch } from '@/core/Sketch'
 import { ColorReversingType } from '@/core/wallpaper_symmetry/ColorReversingType'
@@ -25,10 +26,7 @@ export class WallpaperSketch extends Sketch<WallpaperState> {
 
     p.textureMode(p.NORMAL)
 
-    this.update_palette([
-      [1, 0, 0],
-      [1, 1, 0]
-    ])
+    this.update_palette([new Color(1, 0, 0), new Color(1, 1, 0)])
 
     this.shader.init(p)
     this.recompute()
@@ -44,34 +42,20 @@ export class WallpaperSketch extends Sketch<WallpaperState> {
     this.shader.set_uniform('show_palette', value)
   }
 
-  update_palette(colors: number[][]) {
+  update_palette(colors: Color[]) {
     if (!this.sketch) {
       return
     }
 
-    const flattened = colors.flat()
+    const flattened = colors.flatMap((c) => c.to_vec3())
     const remaining = Math.max(3 * 12 - flattened.length, 0)
     const padding = new Array(remaining).fill(0.0)
     const values = [...flattened, ...padding]
     this.shader.set_uniform('palette_colors', values)
     this.shader.set_uniform('color_count', colors.length)
-
-    /*
-    const img = this.sketch.createImage(colors.length, 1)
-    img.loadPixels()
-    for (const [index, color] of colors.entries()) {
-      const [r, g, b] = color
-      const c = this.sketch.color(255 * r, 255 * g, 255 * b)
-      img.set(index, 0, c)
-    }
-    console.log(img.pixels)
-    img.updatePixels()
-
-    this.shader.set_uniform('tex_palette', img)
-    */
   }
 
-  set palette_colors(value: number[][]) {
+  set palette_colors(value: Color[]) {
     this.update_palette(value)
   }
 

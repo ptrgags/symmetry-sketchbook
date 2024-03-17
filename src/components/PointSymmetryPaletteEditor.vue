@@ -8,13 +8,13 @@ import {
   type PointSymmetryPalette
 } from '@/core/point_symmetry/PointSymmetryPalette'
 import { ref, watch } from 'vue'
+import type { Color } from '@/core/Color'
 
 const props = defineProps<{
   modelValue: PointSymmetryPalette
 }>()
 
 const palette = ref<PointSymmetryPalette>(props.modelValue)
-const palette_type = ref<PaletteType>(PALETTE_TYPES[0])
 
 const emit = defineEmits<{
   // Update with the whole struct. Used for serializing the palette.
@@ -22,7 +22,7 @@ const emit = defineEmits<{
 
   // More granular updates for setting uniforms
   (e: 'update:paletteType', paletteType: PaletteType): void
-  (e: 'update:color', prefix: string, color: number[]): void
+  (e: 'update:color', prefix: string, color: Color): void
   (e: 'update:farPower', value: number): void
   (e: 'update:xyrtFlags', prefix: string, xyrt_flags: boolean[]): void
   (e: 'update:thickness', prefix: string, thickness: number): void
@@ -85,12 +85,21 @@ for (const prefix of Object.values(ReferenceGeometryPrefix)) {
   <div class="form-row">
     <ColorPicker id="primary-color" v-model="palette.primary_color">Primary Color</ColorPicker>
   </div>
-  <div class="form-row"></div>
-  <ColorPicker id="secondary-color" v-model="palette.secondary_color">Secondary Color</ColorPicker>
-  <ColorPicker id="far-color" :model-value="[0.0, 0.0, 0.0]">Far Away Color</ColorPicker>
-  <RangeSlider id="far-power" :min="1" :max="19" v-model="palette.far_power"
-    >Far Away Fade</RangeSlider
-  >
+  <div class="form-row">
+    <ColorPicker id="secondary-color" v-model="palette.secondary_color"
+      >Secondary Color</ColorPicker
+    >
+  </div>
+
+  <div class="form-row">
+    <ColorPicker id="far-color" v-model="palette.far_color">Far Away Color</ColorPicker>
+  </div>
+  <div class="form-row">
+    <RangeSlider id="far-power" :min="1" :max="19" v-model="palette.far_power"
+      >Far Away Fade</RangeSlider
+    >
+  </div>
+
   <details class="form-row">
     <summary>Reference Geometry</summary>
 

@@ -1,15 +1,16 @@
 <script setup lang="ts">
 import { ref, watch } from 'vue'
 import ColorPicker from './ColorPicker.vue'
+import { Color } from '@/core/Color'
 
 const props = defineProps<{
-  modelValue: number[][]
+  modelValue: Color[]
 }>()
 
-const colors = ref<number[][]>(props.modelValue)
+const colors = ref<Color[]>(props.modelValue)
 
 const emit = defineEmits<{
-  (e: 'update:modelValue', value: number[][]): void
+  (e: 'update:modelValue', value: Color[]): void
 }>()
 
 watch(
@@ -28,7 +29,7 @@ function add_color() {
   if (colors.value.length >= 12) {
     return
   }
-  colors.value.push([0, 0, 0])
+  colors.value.push(new Color(0, 0, 0))
 }
 </script>
 

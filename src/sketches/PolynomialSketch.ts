@@ -1,3 +1,4 @@
+import { Color } from '@/core/Color'
 import { FourierSeries2D } from '@/core/FourierSeries2D'
 import { Sketch } from '@/core/Sketch'
 import type { SecondaryColorType } from '@/core/point_symmetry/PaletteType'
@@ -26,15 +27,15 @@ export class PolynomialSketch extends Sketch<PolynomialState> {
     this.shader.set_coefficients(this.state.pattern)
     this.shader.set_uniform('rotation_order', this.state.rotation_order)
 
-    this.set_color('primary', [0.5, 0.0, 1.0])
-    this.set_color('secondary', [0.5, 1.0, 0.0])
-    this.set_color('far', [0.0, 0.0, 0.0])
+    this.set_color('primary', new Color(0.5, 0.0, 1.0))
+    this.set_color('secondary', new Color(0.5, 1.0, 0.0))
+    this.set_color('far', new Color(0.0, 0.0, 0.0))
     this.shader.set_uniform('far_power', 4)
 
-    this.set_color('pulse', [1, 1, 0])
-    this.set_color('input_axes', [1, 1, 1])
-    this.set_color('output_axes', [0, 1, 1])
-    this.set_color('grid', [0.8, 0.8, 0.8])
+    this.set_color('pulse', new Color(1, 1, 0))
+    this.set_color('input_axes', new Color(1, 1, 1))
+    this.set_color('output_axes', new Color(0, 1, 1))
+    this.set_color('grid', new Color(0.8, 0.8, 0.8))
 
     this.set_thickness('pulse', 0.1)
     this.set_thickness('grid', 0.1)
@@ -79,8 +80,8 @@ export class PolynomialSketch extends Sketch<PolynomialState> {
     this.shader.set_uniform('show_palette', value)
   }
 
-  set_color(prefix: string, value: number[]) {
-    this.shader.set_uniform(`${prefix}_color`, value)
+  set_color(prefix: string, value: Color) {
+    this.shader.set_uniform(`${prefix}_color`, value.to_vec3())
   }
 
   set_xyrt_flags(prefix: string, value: boolean[]) {
