@@ -1,5 +1,5 @@
-import type { Color } from '../Color'
-import type { PaletteType } from './PaletteType'
+import { Color } from '../Color'
+import { PALETTE_TYPES, type PaletteType } from './PaletteType'
 
 export interface ReferenceGeometry {
   // Which coordinate directions are enabled for x, y, r or theta
@@ -46,3 +46,33 @@ export interface PointSymmetryPalette {
   // Settings for displaying reference geometry in the shader
   ref_geom: { [prefix in ReferenceGeometryPrefix]: ReferenceGeometry }
 }
+
+export const DEFAULT_PALETTE: PointSymmetryPalette = {
+  palette_type: PALETTE_TYPES[0],
+  primary_color: new Color(0.5, 0.0, 1.0),
+  secondary_color: new Color(0.5, 1.0, 0.0),
+  far_color: new Color(0.0, 0.0, 0.0),
+  far_power: 4,
+  ref_geom: {
+    input_axes: {
+      xyrt_flags: [false, false, false, false],
+      color: new Color(1, 1, 1),
+      thickness: 0.01
+    },
+    output_axes: {
+      xyrt_flags: [false, false, false, false],
+      color: new Color(0, 1, 1),
+      thickness: 0.1
+    },
+    pulse: {
+      xyrt_flags: [false, false, false, false],
+      color: new Color(1, 1, 0),
+      thickness: 0.1
+    },
+    grid: {
+      xyrt_flags: [false, false, false, false],
+      color: new Color(1, 1, 1),
+      thickness: 0.1
+    }
+  }
+} as const

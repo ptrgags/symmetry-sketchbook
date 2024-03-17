@@ -125,7 +125,9 @@ export class PointSymmetryPaletteSerializer
 
     // Make sure we have one of each type of reference geometry struct
     const valid_prefixes: string[] = Object.values(ReferenceGeometryPrefix).sort()
-    if (Object.keys(value.ref_geom).sort() !== valid_prefixes) {
+    const prefixes = Object.keys(value.ref_geom).sort()
+    const different = valid_prefixes.some((x, i) => x !== prefixes[i])
+    if (different) {
       console.error(`ref_geom must have keys [${valid_prefixes.join(', ')}]`)
       return false
     }

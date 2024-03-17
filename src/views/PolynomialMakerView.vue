@@ -13,14 +13,18 @@ import {
 } from '@/sketches/CoefficientPickerSketch'
 import { PolynomialSketch, type PolynomialPattern } from '@/sketches/PolynomialSketch'
 import { TermGridSketch, type TermGridState } from '@/sketches/TermGridSketch'
-import { ref, computed } from 'vue'
+import { ref, computed, watch } from 'vue'
 import PointSymmetryEditor from '@/components/PointSymmetryEditor.vue'
 import PointSymmetryPaletteEditor from '@/components/PointSymmetryPaletteEditor.vue'
-import { type PointSymmetryPalette } from '@/core/point_symmetry/PointSymmetryPalette'
+import {
+  DEFAULT_PALETTE,
+  type PointSymmetryPalette
+} from '@/core/point_symmetry/PointSymmetryPalette'
 import { PALETTE_TYPES } from '@/core/point_symmetry/PaletteType'
 import { Color } from '@/core/Color'
 import { to_compressed_json } from '@/core/serialization/serialization'
 import { PolynomialPatternSerializer } from '@/core/serialization/SerializedPolynomialPattern'
+import { PointSymmetryPaletteSerializer } from '@/core/serialization/SerializedPointSymmetryPalette'
 
 // The frequencies will be [-MAX_FREQ, MAX_FREQ] in each direction
 const MAX_FREQ = 3
@@ -33,6 +37,7 @@ const CENTER_1D = MAX_FREQ
 const DEFAULT_TERM = (CENTER_1D - 1) * GRID_SIZE + CENTER_1D
 
 const PATTERN_SERIALIZER = new PolynomialPatternSerializer()
+const PALETTE_SERIALIZER = new PointSymmetryPaletteSerializer()
 
 // Vue state
 
@@ -51,38 +56,11 @@ const viewer_path = computed<string>(() => {
 const symmetry = ref(new PointSymmetry(GRID_SIZE, [IDENTITY]))
 
 const palette = defineModel<PointSymmetryPalette>({
-  default: {
-    palette_type: PALETTE_TYPES[0],
-    primary_color: new Color(0.5, 0.0, 1.0),
-    secondary_color: new Color(0.5, 1.0, 0.0),
-    far_color: new Color(0.0, 0.0, 0.0),
-    far_power: 4,
-    ref_geom: {
-      input_axes: {
-        xyrt_flags: [false, false, false, false],
-        color: new Color(1, 1, 1),
-        thickness: 0.01
-      },
-      output_axes: {
-        xyrt_flags: [false, false, false, false],
-        color: new Color(0, 1, 1),
-        thickness: 0.1
-      },
-      pulse: {
-        xyrt_flags: [false, false, false, false],
-        color: new Color(1, 1, 0),
-        thickness: 0.1
-      },
-      grid: {
-        xyrt_flags: [false, false, false, false],
-        color: new Color(1, 1, 1),
-        thickness: 0.1
-      }
-    }
-  }
+  default: DEFAULT_PALETTE
 })
 
 const pattern_base64 = ref<string>()
+const palette_base64 = ref<string>()
 
 // p5.js sketches -------------------
 
@@ -91,7 +69,8 @@ const viewer = new PolynomialSketch({
   pattern: {
     series: FourierSeries2D.from_tuples([[1, 0, 1, 0]]),
     rotation_order: 4
-  }
+  },
+  palette: DEFAULT_PALETTE
 })
 
 const term_grid_state: TermGridState = {
@@ -190,6 +169,18 @@ function change_symmetry(rules: PointSymmetryRule[]) {
 
   update_viewer()
 }
+
+watch(
+  palette,
+  (value) => {
+    viewer.palette = value
+
+    to_compressed_json(value, PALETTE_SERIALIZER)
+      .then((x) => (palette_base64.value = x))
+      .catch(console.error)
+  },
+  { deep: true }
+)
 </script>
 
 <template>
@@ -237,7 +228,10 @@ function change_symmetry(rules: PointSymmetryRule[]) {
         <TabContent title="Export">
           <div v-if="pattern_base64" class="form-row">
             <RouterLink
-              :to="{ path: viewer_path, query: { pattern: pattern_base64 } }"
+              :to="{
+                path: viewer_path,
+                query: { pattern: pattern_base64, palette: palette_base64 }
+              }"
               target="_blank"
               >Viewer Link</RouterLink
             >

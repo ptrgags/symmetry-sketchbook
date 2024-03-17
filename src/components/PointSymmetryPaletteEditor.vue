@@ -30,24 +30,39 @@ const emit = defineEmits<{
 
 watch(
   () => palette.value.palette_type,
-  (value) => emit('update:paletteType', value)
+  (value) => {
+    emit('update:paletteType', value)
+    emit('update:modelValue', palette.value)
+  }
 )
 
 watch(
   () => palette.value.primary_color,
-  (value) => emit('update:color', 'primary', value)
+  (value) => {
+    emit('update:color', 'primary', value)
+    emit('update:modelValue', palette.value)
+  }
 )
 watch(
   () => palette.value.secondary_color,
-  (value) => emit('update:color', 'secondary', value)
+  (value) => {
+    emit('update:color', 'secondary', value)
+    emit('update:modelValue', palette.value)
+  }
 )
 watch(
   () => palette.value.far_color,
-  (value) => emit('update:color', 'far', value)
+  (value) => {
+    emit('update:color', 'far', value)
+    emit('update:modelValue', palette.value)
+  }
 )
 watch(
   () => palette.value.far_power,
-  (value) => emit('update:farPower', 20 - value)
+  (value) => {
+    emit('update:farPower', 20 - value)
+    emit('update:modelValue', palette.value)
+  }
 )
 
 // For each of these reference geometry types the options are the same
@@ -56,18 +71,21 @@ for (const prefix of Object.values(ReferenceGeometryPrefix)) {
     () => palette.value.ref_geom[prefix].xyrt_flags,
     (value) => {
       emit('update:xyrtFlags', prefix, value)
+      emit('update:modelValue', palette.value)
     }
   )
   watch(
     () => palette.value.ref_geom[prefix].color,
     (value) => {
       emit('update:color', prefix, value)
+      emit('update:modelValue', palette.value)
     }
   )
   watch(
     () => palette.value.ref_geom[prefix].thickness,
     (value) => {
       emit('update:thickness', prefix, value)
+      emit('update:modelValue', palette.value)
     }
   )
 }

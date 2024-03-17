@@ -8,6 +8,8 @@ import { onMounted } from 'vue'
 import { from_compressed_json } from '@/core/serialization/serialization'
 import { is_string } from '@/core/validation'
 import { PolynomialPatternSerializer } from '@/core/serialization/SerializedPolynomialPattern'
+import { PointSymmetryPaletteSerializer } from '@/core/serialization/SerializedPointSymmetryPalette'
+import { DEFAULT_PALETTE } from '@/core/point_symmetry/PointSymmetryPalette'
 
 const route = useRoute()
 
@@ -16,23 +18,34 @@ const DEFAULT_PATTERN = {
   rotation_order: 8
 }
 const PATTERN_SERIALIZER = new PolynomialPatternSerializer()
+const PALETTE_SERIALIZER = new PointSymmetryPaletteSerializer()
 
 const sketch = new PolynomialSketch({
   symmetry_mode: 'rosette',
-  pattern: DEFAULT_PATTERN
+  pattern: DEFAULT_PATTERN,
+  palette: DEFAULT_PALETTE
 })
+
+async function handle_palette(palette_string: string) {
+  const palette = await from_compressed_json(palette_string, PALETTE_SERIALIZER)
+  if (palette) {
+    sketch.palette = palette
+  }
+}
 
 async function handle_query() {
   const query = route.query
-  if (query.pattern && is_string(query.pattern, 'pattern')) {
-    const series = await from_compressed_json(query.pattern, PATTERN_SERIALIZER)
-    if (series) {
-      sketch.pattern = series
-      return
-    }
+
+  if (query.palette && is_string(query.palette, 'palette')) {
+    handle_palette(query.palette)
   }
 
-  sketch.pattern = DEFAULT_PATTERN
+  if (query.pattern && is_string(query.pattern, 'pattern')) {
+    const pattern = await from_compressed_json(query.pattern, PATTERN_SERIALIZER)
+    if (pattern) {
+      sketch.pattern = pattern
+    }
+  }
 }
 
 onMounted(() => {
