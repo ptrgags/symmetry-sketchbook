@@ -4,7 +4,7 @@ import P5Sketch from '@/components/P5Sketch.vue'
 import { PolynomialSketch } from '@/sketches/PolynomialSketch'
 import { FourierSeries2D } from '@/core/FourierSeries2D'
 import { useRoute } from 'vue-router'
-import { uncompress_base64 } from '@/core/serialization'
+import { uncompress_base64 } from '@/core/serialization/gzip_base64'
 import { onMounted } from 'vue'
 
 const route = useRoute()

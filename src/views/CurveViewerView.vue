@@ -6,7 +6,7 @@ import { ParametricCurveSketch } from '@/sketches/ParametricCurveSketch'
 import { onMounted, watch } from 'vue'
 import { useRoute } from 'vue-router'
 import { FourierSeries } from '@/core/curve_symmetry/FourierSeries'
-import { uncompress_base64 } from '@/core/serialization'
+import { uncompress_base64 } from '@/core/serialization/gzip_base64'
 
 const route = useRoute()
 

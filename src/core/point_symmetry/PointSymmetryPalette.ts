@@ -10,6 +10,14 @@ export interface ReferenceGeometry {
   thickness: number
 }
 
+export interface SerializedReferenceGeometry {
+  xyrt_flags: boolean[]
+  // Store the hex string rather than numbers as it will be more compact
+  // in the JSON
+  color: string
+  thickness: number
+}
+
 export enum ReferenceGeometryPrefix {
   // Axes in the input space. Doesn't look fancy, but it helps get your bearings
   InputAxes = 'input_axes',

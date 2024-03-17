@@ -13,7 +13,7 @@ import {
 } from '@/sketches/CoefficientPickerSketch'
 import { ComplexPolar, ComplexRect } from '@/core/Complex'
 import type { GridIndices2D } from '@/core/GridIndices2D'
-import { compress_base64 } from '@/core/serialization'
+import { compress_base64 } from '@/core/serialization/gzip_base64'
 
 // The frequencies in use will be [-MAX_FREQ, MAX_FREQ]
 const MAX_FREQ = 5

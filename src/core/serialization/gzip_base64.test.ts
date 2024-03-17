@@ -1,7 +1,7 @@
 import { describe, test, expect } from 'vitest'
-import { compress_base64, uncompress_base64 } from './serialization'
+import { compress_base64, uncompress_base64 } from './gzip_base64'
 
-describe('serialization', () => {
+describe('gzip_base64', () => {
   const json = '{"foo": 3, "bar": "hello world"}'
   const compressed = 'H4sIAAAAAAAACqtWSsvPV7JSMNZRUEpKLFKyUlDKSM3JyVcozy/KSVGqBQA4SB0UIAAAAA=='
 
