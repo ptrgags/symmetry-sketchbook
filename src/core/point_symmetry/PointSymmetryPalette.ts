@@ -30,6 +30,8 @@ export enum ReferenceGeometryPrefix {
 }
 
 export interface PointSymmetryPalette {
+  // The primary and secondary color can be applied a few different ways,
+  // so this selects between them
   palette_type: PaletteType
   // The primary color used in every palette
   primary_color: Color

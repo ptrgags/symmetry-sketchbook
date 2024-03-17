@@ -43,6 +43,7 @@ export async function to_compressed_json<Value, Serialized>(
   serializer: Serializer<Value, Serialized>
 ) {
   const json = to_json(value, serializer)
+  console.info(json)
   return await compress_base64(json)
 }
 

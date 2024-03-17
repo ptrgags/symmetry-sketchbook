@@ -5,10 +5,14 @@ import type { SecondaryColorType } from '@/core/point_symmetry/PaletteType'
 import { PolynomialShader } from '@/shaders/PolynomialShader'
 import p5 from 'p5'
 
+export interface PolynomialPattern {
+  series: FourierSeries2D
+  rotation_order: number
+}
+
 export interface PolynomialState {
   symmetry_mode: 'rosette' | 'frieze'
-  pattern: FourierSeries2D
-  rotation_order: number
+  pattern: PolynomialPattern
 }
 
 export class PolynomialSketch extends Sketch<PolynomialState> {
@@ -24,8 +28,9 @@ export class PolynomialSketch extends Sketch<PolynomialState> {
     Sketch.show_canvas(canvas.elt)
 
     this.shader.init(p)
-    this.shader.set_coefficients(this.state.pattern)
-    this.shader.set_uniform('rotation_order', this.state.rotation_order)
+    this.shader.set_coefficients(this.state.pattern.series)
+    this.shader.set_uniform('rotation_order', this.state.pattern.rotation_order)
+    this.shader.set_uniform('show_palette', false)
 
     this.set_color('primary', new Color(0.5, 0.0, 1.0))
     this.set_color('secondary', new Color(0.5, 1.0, 0.0))
@@ -59,17 +64,10 @@ export class PolynomialSketch extends Sketch<PolynomialState> {
     return false
   }
 
-  set pattern(value: FourierSeries2D) {
+  set pattern(value: PolynomialPattern) {
     this.state.pattern = value
-    this.shader.set_coefficients(this.state.pattern)
-  }
-
-  set rotation_order(value: number) {
-    // When the rotation order is 1, we only have mirrors and inversions.
-    // This looks better with more sectors, so set it to 4
-    const order = value >= 2 ? value : 4
-
-    this.shader.set_uniform('rotation_order', order)
+    this.shader.set_coefficients(value.series)
+    this.shader.set_uniform('rotation_order', value.rotation_order)
   }
 
   set show_palette(value: boolean) {

@@ -11,17 +11,16 @@ import {
   type CoefficientPickerState,
   CoefficientPickerSketch
 } from '@/sketches/CoefficientPickerSketch'
-import { PolynomialSketch } from '@/sketches/PolynomialSketch'
+import { PolynomialSketch, type PolynomialPattern } from '@/sketches/PolynomialSketch'
 import { TermGridSketch, type TermGridState } from '@/sketches/TermGridSketch'
 import { ref, computed } from 'vue'
 import PointSymmetryEditor from '@/components/PointSymmetryEditor.vue'
-import { compress_base64 } from '@/core/serialization/gzip_base64'
 import PointSymmetryPaletteEditor from '@/components/PointSymmetryPaletteEditor.vue'
 import { type PointSymmetryPalette } from '@/core/point_symmetry/PointSymmetryPalette'
 import { PALETTE_TYPES } from '@/core/point_symmetry/PaletteType'
 import { Color } from '@/core/Color'
 import { to_compressed_json } from '@/core/serialization/serialization'
-import { FourierSeries2DSerializer } from '@/core/serialization/SerializedFourierSeries2D'
+import { PolynomialPatternSerializer } from '@/core/serialization/SerializedPolynomialPattern'
 
 // The frequencies will be [-MAX_FREQ, MAX_FREQ] in each direction
 const MAX_FREQ = 3
@@ -32,6 +31,8 @@ const CENTER_1D = MAX_FREQ
 // term. But selecting the one above it will produce visible results in most
 // if not all cases.
 const DEFAULT_TERM = (CENTER_1D - 1) * GRID_SIZE + CENTER_1D
+
+const PATTERN_SERIALIZER = new PolynomialPatternSerializer()
 
 // Vue state
 
@@ -87,8 +88,10 @@ const pattern_base64 = ref<string>()
 
 const viewer = new PolynomialSketch({
   symmetry_mode: props.symmetryMode,
-  pattern: FourierSeries2D.from_tuples([]),
-  rotation_order: 5
+  pattern: {
+    series: FourierSeries2D.from_tuples([[1, 0, 1, 0]]),
+    rotation_order: 4
+  }
 })
 
 const term_grid_state: TermGridState = {
@@ -135,11 +138,19 @@ function update_viewer() {
     }
   }
 
-  const pattern = new FourierSeries2D(terms)
+  // When the rotation order is 1, we only have mirrors and inversions.
+  // This looks better with more sectors, so set it to 4
+  const folds = symmetry.value.first_rule.rotation_folds ?? 1
+  const rotation_order = folds >= 2 ? folds : 4
+
+  const pattern: PolynomialPattern = {
+    rotation_order,
+    series: new FourierSeries2D(terms)
+  }
   viewer.pattern = pattern
 
   // Also update the link to the viewer
-  to_compressed_json(pattern, new FourierSeries2DSerializer())
+  to_compressed_json(pattern, PATTERN_SERIALIZER)
     .then((x) => {
       pattern_base64.value = x
     })
@@ -174,8 +185,6 @@ function change_symmetry(rules: PointSymmetryRule[]) {
   term_grid_state.selected_index = DEFAULT_TERM
   term_grid_state.frequency_map = (indices) => symmetry.value.frequency_map(indices)
   term_grid_state.editable_map = (indices) => symmetry.value.is_editable(indices)
-
-  viewer.rotation_order = rules[0].rotation_folds ?? 1
 
   coefficient_picker_state.coefficient = ComplexRect.ZERO
 

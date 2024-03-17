@@ -7,24 +7,28 @@ import { useRoute } from 'vue-router'
 import { onMounted } from 'vue'
 import { from_compressed_json } from '@/core/serialization/serialization'
 import { is_string } from '@/core/validation'
-import { FourierSeries2DSerializer } from '@/core/serialization/SerializedFourierSeries2D'
+import { PolynomialPatternSerializer } from '@/core/serialization/SerializedPolynomialPattern'
 
 const route = useRoute()
 
-const DEFAULT_PATTERN = FourierSeries2D.from_tuples([[1, 0, 1, 0]])
+const DEFAULT_PATTERN = {
+  series: FourierSeries2D.from_tuples([[1, 0, 1, 0]]),
+  rotation_order: 8
+}
+const PATTERN_SERIALIZER = new PolynomialPatternSerializer()
 
 const sketch = new PolynomialSketch({
   symmetry_mode: 'rosette',
-  pattern: DEFAULT_PATTERN,
-  rotation_order: 8
+  pattern: DEFAULT_PATTERN
 })
 
 async function handle_query() {
   const query = route.query
   if (query.pattern && is_string(query.pattern, 'pattern')) {
-    const series = await from_compressed_json(query.pattern, new FourierSeries2DSerializer())
+    const series = await from_compressed_json(query.pattern, PATTERN_SERIALIZER)
     if (series) {
       sketch.pattern = series
+      return
     }
   }
 
