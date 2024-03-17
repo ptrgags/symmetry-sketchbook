@@ -38,6 +38,11 @@ export class WallpaperSketch extends Sketch<WallpaperState> {
     this.shader.draw()
   }
 
+  set pattern(value: FourierSeries2D) {
+    this.state.pattern = value
+    this.recompute()
+  }
+
   set show_palette(value: boolean) {
     this.shader.set_uniform('show_palette', value)
   }

@@ -20,6 +20,8 @@ import {
 } from '@/core/wallpaper_symmetry/WallpaperSymmetryGroup'
 import PalettePicker from '@/components/PalettePicker.vue'
 import { Color } from '@/core/Color'
+import { to_compressed_json } from '@/core/serialization/serialization'
+import { FourierSeries2DSerializer } from '@/core/serialization/SerializedFourierSeries2D'
 
 // The frequencies will be [-MAX_FREQ, MAX_FREQ] in each direction
 const MAX_FREQ = 3
@@ -57,6 +59,8 @@ const symmetry = ref(new WallpaperSymmetry(GRID_SIZE, group.value))
 const palette = defineModel<Color[]>('palette', {
   default: [new Color(1, 0, 0), new Color(0, 1, 0), new Color(0, 0, 1)]
 })
+
+const pattern_base64 = ref<string>()
 
 // P5.js sketches ----------------------------
 
@@ -113,8 +117,15 @@ function update_viewer() {
     }
   }
 
-  viewer_state.pattern = new FourierSeries2D(terms)
-  viewer.recompute()
+  const pattern = new FourierSeries2D(terms)
+  viewer.pattern = pattern
+
+  // Also update the link to the viewer
+  to_compressed_json(pattern, new FourierSeries2DSerializer())
+    .then((x) => {
+      pattern_base64.value = x
+    })
+    .catch(console.error)
 }
 
 function update_coefficient(e: Event) {
@@ -170,7 +181,7 @@ watch(group, (new_value) => {
     <template #right>
       <h1>Wallpaper Maker</h1>
       <TabLayout>
-        <TabContent title="Choose Symmetry">
+        <TabContent title="Symmetry">
           <div class="form-row">
             <label for="wallpaper-category">Select Category: </label>
             <select id="wallpaper-category" v-model="category">
@@ -192,16 +203,25 @@ watch(group, (new_value) => {
             </select>
           </div>
         </TabContent>
-        <TabContent title="Edit Pattern">
+        <TabContent title="Pattern">
           <P5Sketch :sketch="term_grid"></P5Sketch>
           <P5Sketch :sketch="coefficient_picker"></P5Sketch>
         </TabContent>
-        <TabContent title="Display Settings">
+        <TabContent title="Palette">
           <h3>Color Palette</h3>
           <div class="form-row">
             <input id="toggle-palette" type="checkbox" v-model="show_palette" />
             <label for="toggle-palette"> Show color palette</label>
             <PalettePicker v-model="palette"></PalettePicker>
+          </div>
+        </TabContent>
+        <TabContent title="Export">
+          <div v-if="pattern_base64" class="form-row">
+            <RouterLink
+              :to="{ path: '/wallpaper_symmetry', query: { pattern: pattern_base64 } }"
+              target="_blank"
+              >Viewer Link</RouterLink
+            >
           </div>
         </TabContent>
       </TabLayout>
