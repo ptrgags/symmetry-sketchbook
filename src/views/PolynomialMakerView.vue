@@ -18,6 +18,7 @@ import PointSymmetryEditor from '@/components/PointSymmetryEditor.vue'
 import { compress_base64 } from '@/core/serialization'
 import PointSymmetryPaletteEditor from '@/components/PointSymmetryPaletteEditor.vue'
 import { type PointSymmetryPalette } from '@/core/point_symmetry/PointSymmetryPalette'
+import { PALETTE_TYPES } from '@/core/point_symmetry/PaletteType'
 
 // The frequencies will be [-MAX_FREQ, MAX_FREQ] in each direction
 const MAX_FREQ = 3
@@ -47,6 +48,7 @@ const symmetry = ref(new PointSymmetry(GRID_SIZE, [IDENTITY]))
 
 const palette = defineModel<PointSymmetryPalette>({
   default: {
+    palette_type: PALETTE_TYPES[0],
     primary_color: [0.5, 0.0, 1.0],
     secondary_color: [0.5, 1.0, 0.0],
     far_color: [0.0, 0.0, 0.0],

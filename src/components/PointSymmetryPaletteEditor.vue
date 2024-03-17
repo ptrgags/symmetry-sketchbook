@@ -76,7 +76,7 @@ for (const prefix of Object.values(ReferenceGeometryPrefix)) {
 <template>
   <div class="form-row">
     <label for="palette-type">Palette Type: </label>
-    <select id="palette-type" v-model="palette_type">
+    <select id="palette-type" v-model="palette.palette_type">
       <option v-for="option in PALETTE_TYPES" :key="option.id" :value="option">
         {{ option.label }}
       </option>
