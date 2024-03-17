@@ -6,6 +6,7 @@ import {
   get_partner_type,
   get_rotation_power
 } from './PointSymmetryRule'
+import { fail } from 'assert'
 
 function ignore_signed_zero(x: number): number {
   if (x === 0) {
@@ -298,6 +299,64 @@ describe('PointSymmetryRule', () => {
       const EXPECTED_COLOR_TURN = INPUT_COLS.map((x) => 3 * x + 2)
 
       test_freq_diff(color_turn, INPUT_COLS, EXPECTED_COLOR_TURN)
+    })
+  })
+
+  describe('indices_to_diff_sum', () => {
+    test('no rotation', () => {
+      fail('not implemented')
+    })
+
+    test('rotation', () => {
+      fail('not implemented')
+    })
+
+    test('handles odd diagonals correctly', () => {
+      fail('not implemented')
+    })
+  })
+
+  describe('enforce_self_partner_constraint', () => {
+    test('throws for partner constraint', () => {
+      fail('not implemented')
+    })
+
+    test('returns zero if term is invalid', () => {
+      fail('not implemented')
+    })
+
+    test('no output transformation', () => {
+      fail('not implemented')
+    })
+
+    test('output mirrors', () => {
+      fail('not implemented')
+    })
+
+    test('output rotations', () => {
+      fail('not implemented')
+    })
+
+    test('both mirrors and rotations', () => {
+      fail('not implemented')
+    })
+  })
+
+  describe('get_partner_term', () => {
+    test('throws for self-partner constraint', () => {
+      fail('not implemented')
+    })
+
+    test('mirrored partner term', () => {
+      fail('not implemented')
+    })
+
+    test('rotated partner term', () => {
+      fail('not implemented')
+    })
+
+    test('rotated and mirrored partner term', () => {
+      fail('not implemented')
     })
   })
 })

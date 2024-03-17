@@ -181,7 +181,7 @@ export function enforce_self_partner_constraint(
   rule: PointSymmetryRule,
   frequency_diff: number,
   term: ComplexPolar
-) {
+): ComplexPolar {
   if (get_partner_type(rule) !== 'identity') {
     throw new Error('rule is not a self-partner constraint!')
   }

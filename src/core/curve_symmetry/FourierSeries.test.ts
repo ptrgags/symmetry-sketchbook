@@ -12,10 +12,7 @@ describe('FourierSeries serialization', () => {
     const json = series.to_json()
     expect(JSON.parse(json)).toStrictEqual({
       version: 1,
-      terms: [
-        [1, 1, 0],
-        [3, 0.5, 0.1]
-      ]
+      terms: ['1.000,1.000,0.000', '3.000,0.500,0.100']
     })
   })
 
@@ -32,10 +29,7 @@ describe('FourierSeries serialization', () => {
   test('deserializes', () => {
     const series: SerializedFourierSeries = {
       version: 1,
-      terms: [
-        [1, 1, 0],
-        [2, 0.5, 0]
-      ]
+      terms: ['1.000,1.000,0', '2.000,0.500,0.000']
     }
 
     const unserialized = FourierSeries.from_json(JSON.stringify(series))
