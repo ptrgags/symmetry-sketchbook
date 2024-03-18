@@ -1,13 +1,13 @@
 <script setup lang="ts">
 import P5Sketch from '@/components/P5Sketch.vue'
 import TwoColumns from '@/components/TwoColumns.vue'
-import { Color } from '@/core/Color'
 import { FourierSeries2D } from '@/core/FourierSeries2D'
 import { FourierSeries2DSerializer } from '@/core/serialization/SerializedFourierSeries2D'
 import { from_compressed_json } from '@/core/serialization/serialization'
 import { is_string } from '@/core/validation'
+import { DEFAULT_PALETTE } from '@/core/wallpaper_symmetry/WallpaperPalette'
 import { WALLPAPER_GROUPS } from '@/core/wallpaper_symmetry/WallpaperSymmetryGroup'
-import { WallpaperSketch, type WallpaperState } from '@/sketches/WallpaperSketch'
+import { WallpaperSketch } from '@/sketches/WallpaperSketch'
 import { onMounted } from 'vue'
 import { useRoute } from 'vue-router'
 
@@ -20,7 +20,7 @@ const DEFAULT_PATTERN = FourierSeries2D.from_tuples([
 
 const sketch = new WallpaperSketch({
   pattern: DEFAULT_PATTERN,
-  palette: [new Color(1, 0, 0), new Color(0, 1, 0), new Color(0, 0, 1)],
+  palette: DEFAULT_PALETTE,
   group: WALLPAPER_GROUPS.p2
 })
 

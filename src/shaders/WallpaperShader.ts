@@ -2,6 +2,8 @@ import type p5 from 'p5'
 import { SymmetryShader } from './SymmetryShader'
 import { common } from './common_glsl'
 
+export const MAX_COLORS = 12
+
 const VERT_SHADER = `
 attribute vec3 aPosition;
 attribute vec2 aTexCoord;
@@ -20,7 +22,7 @@ const FRAG_SHADER = `
 precision highp float;
 
 ${common.defines}
-#define MAX_COLORS 12
+#define MAX_COLORS ${MAX_COLORS}
 
 varying vec2 uv;
 

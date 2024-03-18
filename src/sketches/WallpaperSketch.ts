@@ -1,15 +1,15 @@
-import { Color } from '@/core/Color'
 import { FourierSeries2D } from '@/core/FourierSeries2D'
 import { Sketch } from '@/core/Sketch'
 import { ColorReversingType } from '@/core/wallpaper_symmetry/ColorReversingType'
 import { get_lattice } from '@/core/wallpaper_symmetry/WallpaperLattice'
+import type { WallpaperPalette } from '@/core/wallpaper_symmetry/WallpaperPalette'
 import type { WallpaperSymmetryGroup } from '@/core/wallpaper_symmetry/WallpaperSymmetryGroup'
-import { WallpaperShader } from '@/shaders/WallpaperShader'
+import { WallpaperShader, MAX_COLORS } from '@/shaders/WallpaperShader'
 import type p5 from 'p5'
 
 export interface WallpaperState {
   pattern: FourierSeries2D
-  palette: Color[]
+  palette: WallpaperPalette
   group: WallpaperSymmetryGroup
 }
 
@@ -27,9 +27,9 @@ export class WallpaperSketch extends Sketch<WallpaperState> {
 
     p.textureMode(p.NORMAL)
 
-    this.update_palette(this.state.palette)
-
     this.shader.init(p)
+
+    this.palette = this.state.palette
     this.recompute()
     this.shader.disable()
   }
@@ -48,21 +48,23 @@ export class WallpaperSketch extends Sketch<WallpaperState> {
     this.shader.set_uniform('show_palette', value)
   }
 
-  update_palette(colors: Color[]) {
+  set palette(value: WallpaperPalette) {
+    this.state.palette = value
+
     if (!this.sketch) {
       return
     }
 
+    const colors = value.colors.slice(0, MAX_COLORS)
     const flattened = colors.flatMap((c) => c.to_vec3())
-    const remaining = Math.max(3 * 12 - flattened.length, 0)
+    const remaining = Math.max(3 * MAX_COLORS - flattened.length, 0)
     const padding = new Array(remaining).fill(0.0)
     const values = [...flattened, ...padding]
     this.shader.set_uniform('palette_colors', values)
     this.shader.set_uniform('color_count', colors.length)
-  }
 
-  set palette_colors(value: Color[]) {
-    this.update_palette(value)
+    this.shader.set_uniform('diagonal_thickness', value.diagonal_thickness)
+    this.shader.set_uniform('palette_type', value.palette_type)
   }
 
   recompute() {

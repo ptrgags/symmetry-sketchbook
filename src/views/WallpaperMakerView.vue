@@ -18,10 +18,10 @@ import {
   WALLPAPER_GROUPS,
   type WallpaperSymmetryGroup
 } from '@/core/wallpaper_symmetry/WallpaperSymmetryGroup'
-import PalettePicker from '@/components/PalettePicker.vue'
-import { Color } from '@/core/Color'
+import WallpaperPalettePicker from '@/components/WallpaperPalettePicker.vue'
 import { to_compressed_json } from '@/core/serialization/serialization'
 import { FourierSeries2DSerializer } from '@/core/serialization/SerializedFourierSeries2D'
+import { type WallpaperPalette, DEFAULT_PALETTE } from '@/core/wallpaper_symmetry/WallpaperPalette'
 
 // The frequencies will be [-MAX_FREQ, MAX_FREQ] in each direction
 const MAX_FREQ = 3
@@ -56,9 +56,7 @@ const show_palette = defineModel<boolean>('enable_palette', { default: false })
 
 const symmetry = ref(new WallpaperSymmetry(GRID_SIZE, group.value))
 
-const palette = defineModel<Color[]>('palette', {
-  default: [new Color(1, 0, 0), new Color(0, 1, 0), new Color(0, 0, 1)]
-})
+const palette = defineModel<WallpaperPalette>('palette', { default: DEFAULT_PALETTE })
 
 const pattern_base64 = ref<string>()
 
@@ -150,10 +148,7 @@ watch(show_palette, (show) => {
 watch(
   palette,
   (value) => {
-    if (!value) {
-      console.log('undefined value')
-    }
-    viewer.palette_colors = value
+    viewer.palette = value
   },
   { deep: true }
 )
@@ -208,11 +203,14 @@ watch(group, (new_value) => {
           <P5Sketch :sketch="coefficient_picker"></P5Sketch>
         </TabContent>
         <TabContent title="Palette">
-          <h3>Color Palette</h3>
           <div class="form-row">
-            <input id="toggle-palette" type="checkbox" v-model="show_palette" />
-            <label for="toggle-palette"> Show color palette</label>
-            <PalettePicker v-model="palette"></PalettePicker>
+            <label>
+              <input id="toggle-palette" type="checkbox" v-model="show_palette" />
+              Show color palette
+            </label>
+          </div>
+          <div class="form-row">
+            <WallpaperPalettePicker v-model="palette"></WallpaperPalettePicker>
           </div>
         </TabContent>
         <TabContent title="Export">
