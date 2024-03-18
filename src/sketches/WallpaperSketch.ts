@@ -9,6 +9,7 @@ import type p5 from 'p5'
 
 export interface WallpaperState {
   pattern: FourierSeries2D
+  palette: Color[]
   group: WallpaperSymmetryGroup
 }
 
@@ -26,7 +27,7 @@ export class WallpaperSketch extends Sketch<WallpaperState> {
 
     p.textureMode(p.NORMAL)
 
-    this.update_palette([new Color(1, 0, 0), new Color(1, 1, 0)])
+    this.update_palette(this.state.palette)
 
     this.shader.init(p)
     this.recompute()

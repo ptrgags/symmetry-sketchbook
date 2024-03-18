@@ -69,6 +69,7 @@ const viewer_state: WallpaperState = {
     [1, 0, 1, 0],
     [0, 1, 1, 0]
   ]),
+  palette: palette.value,
   group: symmetry_group.value
 }
 
@@ -149,11 +150,10 @@ watch(show_palette, (show) => {
 watch(
   palette,
   (value) => {
-    if (value) {
-      viewer.palette_colors = value
-    } else {
-      viewer.palette_colors = []
+    if (!value) {
+      console.log('undefined value')
     }
+    viewer.palette_colors = value
   },
   { deep: true }
 )

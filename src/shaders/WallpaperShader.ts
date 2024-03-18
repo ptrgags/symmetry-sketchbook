@@ -70,9 +70,12 @@ vec3 palette_polar(vec2 z_rect) {
 }
 
 vec3 palette(vec2 z_rect) {
+    vec2 stripe_direction = 40.0 * vec2(5.0, 7.0);
+    float stripe_mask = mod(floor(dot(stripe_direction ,uv)), 2.0);
+
     vec3 color_x = palette_1d(fract(0.5 * z_rect.x));
     vec3 color_y = palette_1d(fract(0.5 * z_rect.y));
-    return color_y;
+    return mix(color_x, color_y, stripe_mask);
 }
 
 vec3 invert_palette(vec2 z_rect) {
