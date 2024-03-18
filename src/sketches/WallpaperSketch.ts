@@ -63,7 +63,7 @@ export class WallpaperSketch extends Sketch<WallpaperState> {
     this.shader.set_uniform('palette_colors', values)
     this.shader.set_uniform('color_count', colors.length)
 
-    this.shader.set_uniform('diagonal_thickness', value.diagonal_thickness)
+    this.shader.set_uniform('diagonal_density', 1.0 / value.diagonal_thickness)
     this.shader.set_uniform('palette_type', value.palette_type)
   }
 

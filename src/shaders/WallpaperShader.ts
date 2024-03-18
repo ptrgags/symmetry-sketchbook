@@ -40,6 +40,12 @@ uniform mat3 inv_lattice;
 uniform vec3 palette_colors[MAX_COLORS];
 uniform int color_count;
 
+// Enum to select between stripes and plaid
+uniform float palette_type;
+
+// Density = 1 / diagonal thickness.
+uniform float diagonal_density;
+
 ${common.funcs_view}
 ${common.funcs_polar}
 
@@ -54,8 +60,6 @@ vec3 palette_1d(float t) {
         color = mix(color, palette_colors[i], mask);
     }
     return color;
-    //return fract(vec3(5.0, 7.0, 13.0) * t);
-    //return texture2D(tex_palette, vec2(t, 0.5)).rgb;
 }
 
 vec3 palette_polar(vec2 z_rect) {
@@ -66,17 +70,27 @@ vec3 palette_polar(vec2 z_rect) {
     angle_normalized = fract(angle_normalized - 0.5);
 
     float t = angle_normalized;
-    //float t = fract(0.05 * z_polar.r);
 
     return palette_1d(fract(2.0 * t));
 }
 
 vec3 palette(vec2 z_rect) {
-    vec2 stripe_direction = 40.0 * vec2(5.0, 7.0);
-    float stripe_mask = mod(floor(dot(stripe_direction ,uv)), 2.0);
+    vec2 stripe_direction = diagonal_density * vec2(500.0, 700.0);
+    float stripes = floor(dot(stripe_direction, uv));
+    float stripe_mask = mod(stripes, 2.0);
 
     vec3 color_x = palette_1d(fract(0.5 * z_rect.x));
     vec3 color_y = palette_1d(fract(0.5 * z_rect.y));
+
+    const float HORIZONTAL_STRIPES = 0.0;
+    const float VERTICAL_STRIPES = 1.0;
+    const float PLAID = 2.0;
+    if (palette_type == HORIZONTAL_STRIPES) {
+        return color_y;
+    } else if (palette_type == VERTICAL_STRIPES) {
+        return color_x;
+    }
+
     return mix(color_x, color_y, stripe_mask);
 }
 
