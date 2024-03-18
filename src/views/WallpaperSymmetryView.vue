@@ -3,6 +3,7 @@ import P5Sketch from '@/components/P5Sketch.vue'
 import TwoColumns from '@/components/TwoColumns.vue'
 import { FourierSeries2D } from '@/core/FourierSeries2D'
 import { FourierSeries2DSerializer } from '@/core/serialization/SerializedFourierSeries2D'
+import { WallpaperPaletteSerializer } from '@/core/serialization/SerializedWallpaperPalette'
 import { from_compressed_json } from '@/core/serialization/serialization'
 import { is_string } from '@/core/validation'
 import { DEFAULT_PALETTE } from '@/core/wallpaper_symmetry/WallpaperPalette'
@@ -24,16 +25,28 @@ const sketch = new WallpaperSketch({
   group: WALLPAPER_GROUPS.p2
 })
 
+const PALETTE_SERIALIZER = new WallpaperPaletteSerializer()
+
+async function handle_palette(palette_string: string) {
+  const palette = await from_compressed_json(palette_string, PALETTE_SERIALIZER)
+  if (palette) {
+    sketch.palette = palette
+  }
+}
+
 async function handle_query() {
   const query = route.query
+
+  if (query.palette && is_string(query.palette, 'palette')) {
+    handle_palette(query.palette)
+  }
+
   if (query.pattern && is_string(query.pattern, 'pattern')) {
     const series = await from_compressed_json(query.pattern, new FourierSeries2DSerializer())
     if (series) {
       sketch.pattern = series
     }
   }
-
-  sketch.pattern = DEFAULT_PATTERN
 }
 
 onMounted(() => {

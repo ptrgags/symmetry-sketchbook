@@ -20,8 +20,6 @@ import {
   DEFAULT_PALETTE,
   type PointSymmetryPalette
 } from '@/core/point_symmetry/PointSymmetryPalette'
-import { PALETTE_TYPES } from '@/core/point_symmetry/PaletteType'
-import { Color } from '@/core/Color'
 import { to_compressed_json } from '@/core/serialization/serialization'
 import { PolynomialPatternSerializer } from '@/core/serialization/SerializedPolynomialPattern'
 import { PointSymmetryPaletteSerializer } from '@/core/serialization/SerializedPointSymmetryPalette'
@@ -176,7 +174,9 @@ watch(
     viewer.palette = value
 
     to_compressed_json(value, PALETTE_SERIALIZER)
-      .then((x) => (palette_base64.value = x))
+      .then((x) => {
+        palette_base64.value = x
+      })
       .catch(console.error)
   },
   { deep: true }

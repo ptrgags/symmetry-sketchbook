@@ -22,6 +22,7 @@ import WallpaperPalettePicker from '@/components/WallpaperPalettePicker.vue'
 import { to_compressed_json } from '@/core/serialization/serialization'
 import { FourierSeries2DSerializer } from '@/core/serialization/SerializedFourierSeries2D'
 import { type WallpaperPalette, DEFAULT_PALETTE } from '@/core/wallpaper_symmetry/WallpaperPalette'
+import { WallpaperPaletteSerializer } from '@/core/serialization/SerializedWallpaperPalette'
 
 // The frequencies will be [-MAX_FREQ, MAX_FREQ] in each direction
 const MAX_FREQ = 3
@@ -29,6 +30,9 @@ const GRID_SIZE = 2 * MAX_FREQ + 1
 const TERM_COUNT = GRID_SIZE * GRID_SIZE
 const CENTER_1D = MAX_FREQ
 const DEFAULT_TERM = CENTER_1D * GRID_SIZE + CENTER_1D
+
+const PATTERN_SERIALIZER = new FourierSeries2DSerializer()
+const PALETTE_SERIALIZER = new WallpaperPaletteSerializer()
 
 // Vue state -----------------------------
 
@@ -59,6 +63,7 @@ const symmetry = ref(new WallpaperSymmetry(GRID_SIZE, group.value))
 const palette = defineModel<WallpaperPalette>('palette', { default: DEFAULT_PALETTE })
 
 const pattern_base64 = ref<string>()
+const palette_base64 = ref<string>()
 
 // P5.js sketches ----------------------------
 
@@ -120,7 +125,7 @@ function update_viewer() {
   viewer.pattern = pattern
 
   // Also update the link to the viewer
-  to_compressed_json(pattern, new FourierSeries2DSerializer())
+  to_compressed_json(pattern, PATTERN_SERIALIZER)
     .then((x) => {
       pattern_base64.value = x
     })
@@ -149,6 +154,12 @@ watch(
   palette,
   (value) => {
     viewer.palette = value
+
+    to_compressed_json(value, PALETTE_SERIALIZER)
+      .then((x) => {
+        palette_base64.value = x
+      })
+      .catch(console.error)
   },
   { deep: true }
 )
@@ -216,7 +227,10 @@ watch(group, (new_value) => {
         <TabContent title="Export">
           <div v-if="pattern_base64" class="form-row">
             <RouterLink
-              :to="{ path: '/wallpaper_symmetry', query: { pattern: pattern_base64 } }"
+              :to="{
+                path: '/wallpaper_symmetry',
+                query: { pattern: pattern_base64, palette: palette_base64 }
+              }"
               target="_blank"
               >Viewer Link</RouterLink
             >
