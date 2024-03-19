@@ -3,6 +3,7 @@ import P5Sketch from '@/components/P5Sketch.vue'
 import TabContent from '@/components/TabContent.vue'
 import TabLayout from '@/components/TabLayout.vue'
 import TwoColumns from '@/components/TwoColumns.vue'
+import ReferenceGeometryEditor from '@/components/ReferenceGeometryEditor.vue'
 import { ComplexPolar, ComplexRect } from '@/core/Complex'
 import { FourierSeries2D, type FourierTerm2D } from '@/core/FourierSeries2D'
 import { TermGridSketch, type TermGridState } from '@/sketches/TermGridSketch'
@@ -23,6 +24,7 @@ import { to_compressed_json } from '@/core/serialization/serialization'
 import { FourierSeries2DSerializer } from '@/core/serialization/SerializedFourierSeries2D'
 import { type WallpaperPalette, DEFAULT_PALETTE } from '@/core/wallpaper_symmetry/WallpaperPalette'
 import { WallpaperPaletteSerializer } from '@/core/serialization/SerializedWallpaperPalette'
+import { default_ref_geom, type ReferenceGeometryCollection } from '@/core/ReferenceGeometry'
 
 // The frequencies will be [-MAX_FREQ, MAX_FREQ] in each direction
 const MAX_FREQ = 3
@@ -61,6 +63,10 @@ const show_palette = defineModel<boolean>('enable_palette', { default: false })
 const symmetry = ref(new WallpaperSymmetry(GRID_SIZE, group.value))
 
 const palette = defineModel<WallpaperPalette>('palette', { default: DEFAULT_PALETTE })
+
+const ref_geom = defineModel<ReferenceGeometryCollection>('ref_geom', {
+  default: default_ref_geom
+})
 
 const pattern_base64 = ref<string>()
 const palette_base64 = ref<string>()
@@ -177,6 +183,14 @@ watch(group, (new_value) => {
   viewer_state.group = selected_group
   update_viewer()
 })
+
+watch(
+  ref_geom,
+  (value) => {
+    viewer.ref_geom = value
+  },
+  { deep: true }
+)
 </script>
 
 <template>
@@ -223,6 +237,10 @@ watch(group, (new_value) => {
           <div class="form-row">
             <WallpaperPalettePicker v-model="palette"></WallpaperPalettePicker>
           </div>
+          <details class="form-row">
+            <summary>Reference Geometry</summary>
+            <ReferenceGeometryEditor v-model="ref_geom"></ReferenceGeometryEditor>
+          </details>
         </TabContent>
         <TabContent title="Export">
           <div v-if="pattern_base64" class="form-row">

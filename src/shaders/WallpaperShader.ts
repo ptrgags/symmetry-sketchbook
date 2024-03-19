@@ -28,6 +28,7 @@ varying vec2 uv;
 
 ${common.uniforms}
 ${common.uniforms_coefficients}
+${common.uniforms_ref_geom}
 
 uniform bool show_palette;
 uniform float color_reversing_type;
@@ -48,6 +49,7 @@ uniform float diagonal_density;
 
 ${common.funcs_view}
 ${common.funcs_polar}
+${common.funcs_geom}
 
 vec3 palette_1d(float t) {
     vec3 color = vec3(0.0);
@@ -137,9 +139,43 @@ vec3 invert_palette(vec2 z_rect) {
     return palette(z_rect);
 }
 
+vec3 apply_ref_geom(inout vec3 color, vec2 z_rect) {
+    vec2 z_polar = to_polar(z_rect);
+
+    // get a normalized angle in [0, 1] starting from the +x axis
+    float angle_normalized = 0.5 + 0.5 * z_polar.y / PI;
+    angle_normalized = fract(angle_normalized - 0.5);
+
+    vec2 polar_repacked = vec2(z_polar.x, angle_normalized);
+
+    draw_grid(
+        color,
+        z_rect,
+        polar_repacked
+    );
+    
+    // Axes
+    draw_axes(
+        color,
+        z_rect,
+        output_axes_color,
+        output_axes_xyrt,
+        output_axes_thickness
+    );
+
+    // Pulses
+    draw_pulses(
+        color,
+        z_rect,
+        polar_repacked
+    );
+
+    return vec3(color);
+}
+
 vec2 compute(vec2 z) {
     vec2 sum = vec2(0.0);
-    vec2 lattice_coords = mat2(inv_lattice) * z;
+    vec2 lattice_coords = /*mat2(inv_lattice) * */ z;
     for (int i = 0; i < MAX_TERMS; i++) {
         // a_nm expi(2pi * i * dot(nm, A^(-1) z))
         vec2 nm = powers[i];
@@ -151,15 +187,27 @@ vec2 compute(vec2 z) {
 }
 
 void main() {
-    vec2 z_in = to_complex(uv);
+    vec2 z_in = mat2(inv_lattice) * to_complex(uv);
 
     vec3 color;
     if (show_palette) {
         color = invert_palette(z_in);
+        apply_ref_geom(color, z_in);
     } else {
         vec2 z_out = compute(z_in);
         color = invert_palette(z_out);
+        apply_ref_geom(color, z_out);
     }
+
+    // Draw axes in the input space
+    draw_axes(
+        color,
+        z_in,
+        input_axes_color,
+        input_axes_xyrt,
+        input_axes_thickness
+    );
+
     gl_FragColor = vec4(color, 1.0);
 }
 `

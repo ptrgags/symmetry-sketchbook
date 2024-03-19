@@ -150,7 +150,7 @@ vec3 palette(vec2 complex_rect) {
 
     // Gradient away from the unit circle
     float dist = dist_from_pole(z.x);
-    color = mix(color, color * far_color, pow(1.0 - dist, far_power));
+    color = mix(color, far_color, pow(1.0 - dist, far_power));
 
     return vec3(color);
 }

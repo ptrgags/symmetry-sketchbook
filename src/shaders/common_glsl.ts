@@ -266,24 +266,3 @@ vec2 standing_waves(vec2 complex) {
     return z;
 }
 `
-
-common.funcs_ref_geometry = `
-vec4 ref_geometry(vec2 z) {
-    float unit_circle_dist = abs(length(z) - 1.0);
-    float unit_circle_mask = smoothstep(0.02, 0.01, unit_circle_dist);
-    
-    float modulus = length(z);
-    float far_away = smoothstep(100.0, 200.0, modulus);
-    float near_zero = smoothstep(0.011, 0.01, modulus);
-    
-    const vec4 CYAN = vec4(0.0, 1.0, 1.0, 1.0);
-    const vec4 YELLOW = vec4(1.0, 1.0, 0.0, 1.0);
-    const vec4 BLACK = vec4(0.0, 0.0, 0.0, 1.0);
-
-    vec4 image = vec4(0.0);
-    image = mix(image, CYAN, unit_circle_mask * show_ref_geometry);
-    image = mix(image, YELLOW, near_zero * show_ref_geometry);
-    image = mix(image, BLACK, far_away);
-    return image;
-}
-`
