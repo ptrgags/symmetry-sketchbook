@@ -4,12 +4,14 @@ import P5Sketch from '@/components/P5Sketch.vue'
 import { PolynomialSketch } from '@/sketches/PolynomialSketch'
 import { FourierSeries2D } from '@/core/FourierSeries2D'
 import { useRoute } from 'vue-router'
-import { onMounted } from 'vue'
+import { onMounted, watch } from 'vue'
 import { from_compressed_json } from '@/core/serialization/serialization'
 import { is_string } from '@/core/validation'
 import { PolynomialPatternSerializer } from '@/core/serialization/SerializedPolynomialPattern'
 import { PointSymmetryPaletteSerializer } from '@/core/serialization/SerializedPointSymmetryPalette'
-import { DEFAULT_PALETTE } from '@/core/point_symmetry/PointSymmetryPalette'
+import { default_palette } from '@/core/point_symmetry/PointSymmetryPalette'
+import { type ReferenceGeometryCollection, default_ref_geom } from '@/core/ReferenceGeometry'
+import ReferenceGeometryEditor from '@/components/ReferenceGeometryEditor.vue'
 
 const route = useRoute()
 
@@ -20,10 +22,13 @@ const DEFAULT_PATTERN = {
 const PATTERN_SERIALIZER = new PolynomialPatternSerializer()
 const PALETTE_SERIALIZER = new PointSymmetryPaletteSerializer()
 
+const ref_geom = defineModel<ReferenceGeometryCollection>('ref_geom', { default: default_ref_geom })
+
 const sketch = new PolynomialSketch({
   symmetry_mode: 'rosette',
   pattern: DEFAULT_PATTERN,
-  palette: DEFAULT_PALETTE
+  palette: default_palette(),
+  ref_geom: ref_geom.value
 })
 
 async function handle_palette(palette_string: string) {
@@ -51,6 +56,14 @@ async function handle_query() {
 onMounted(() => {
   handle_query().catch(console.error)
 })
+
+watch(
+  ref_geom,
+  (value) => {
+    sketch.ref_geom = value
+  },
+  { deep: true }
+)
 </script>
 
 <template>
@@ -60,6 +73,10 @@ onMounted(() => {
     </template>
     <template #right>
       <h1>Rosette Gallery</h1>
+      <details class="form-row">
+        <summary>Reference Geometry</summary>
+        <ReferenceGeometryEditor v-model="ref_geom"></ReferenceGeometryEditor>
+      </details>
     </template>
   </TwoColumns>
 </template>

@@ -43,7 +43,6 @@ export async function to_compressed_json<Value, Serialized>(
   serializer: Serializer<Value, Serialized>
 ) {
   const json = to_json(value, serializer)
-  console.info(json)
   return await compress_base64(json)
 }
 
@@ -71,11 +70,11 @@ export function from_json<Value, Serialized>(
     return undefined
   }
 
-  // Log the parsed JSON at info level so I can copy the values whenever I
+  const deserialized = serializer.deserialize(parsed)
+  // Log the deserialized values at info level so I can copy the values whenever I
   // want to make new presets
-  console.info(parsed)
-
-  return serializer.deserialize(parsed)
+  console.info(deserialized)
+  return deserialized
 }
 
 export async function from_compressed_json<Value, Serialized>(

@@ -75,6 +75,9 @@ vec3 palette_polar(vec2 z_rect) {
 }
 
 vec3 palette(vec2 z_rect) {
+    // Compute stripes in the x and y direction. The 0.5 factor is
+    // so a single repeat of the palette goes from 0 to 2 in the respective
+    // direction of the complex plane
     vec3 color_x = palette_1d(fract(0.5 * z_rect.x));
     vec3 color_y = palette_1d(fract(0.5 * z_rect.y));
 

@@ -1,5 +1,6 @@
 <script setup lang="ts">
 import P5Sketch from '@/components/P5Sketch.vue'
+import ReferenceGeometryEditor from '@/components/ReferenceGeometryEditor.vue'
 import TwoColumns from '@/components/TwoColumns.vue'
 import TabLayout from '@/components/TabLayout.vue'
 import TabContent from '@/components/TabContent.vue'
@@ -17,12 +18,13 @@ import { ref, computed, watch } from 'vue'
 import PointSymmetryEditor from '@/components/PointSymmetryEditor.vue'
 import PointSymmetryPaletteEditor from '@/components/PointSymmetryPaletteEditor.vue'
 import {
-  DEFAULT_PALETTE,
+  default_palette,
   type PointSymmetryPalette
 } from '@/core/point_symmetry/PointSymmetryPalette'
 import { to_compressed_json } from '@/core/serialization/serialization'
 import { PolynomialPatternSerializer } from '@/core/serialization/SerializedPolynomialPattern'
 import { PointSymmetryPaletteSerializer } from '@/core/serialization/SerializedPointSymmetryPalette'
+import { default_ref_geom, type ReferenceGeometryCollection } from '@/core/ReferenceGeometry'
 
 // The frequencies will be [-MAX_FREQ, MAX_FREQ] in each direction
 const MAX_FREQ = 3
@@ -53,8 +55,12 @@ const viewer_path = computed<string>(() => {
 
 const symmetry = ref(new PointSymmetry(GRID_SIZE, [IDENTITY]))
 
-const palette = defineModel<PointSymmetryPalette>({
-  default: DEFAULT_PALETTE
+const palette = defineModel<PointSymmetryPalette>('palette', {
+  default: default_palette
+})
+
+const ref_geom = defineModel<ReferenceGeometryCollection>('ref_geom', {
+  default: default_ref_geom
 })
 
 const pattern_base64 = ref<string>()
@@ -68,7 +74,8 @@ const viewer = new PolynomialSketch({
     series: FourierSeries2D.from_tuples([[1, 0, 1, 0]]),
     rotation_order: 4
   },
-  palette: DEFAULT_PALETTE
+  palette: palette.value,
+  ref_geom: ref_geom.value
 })
 
 const term_grid_state: TermGridState = {
@@ -181,6 +188,14 @@ watch(
   },
   { deep: true }
 )
+
+watch(
+  ref_geom,
+  (value) => {
+    viewer.ref_geom = value
+  },
+  { deep: true }
+)
 </script>
 
 <template>
@@ -207,23 +222,11 @@ watch(
             <input id="toggle-palette" type="checkbox" @change="toggle_palette" />
             <label for="toggle-palette"> Show color palette</label>
           </div>
-          <PointSymmetryPaletteEditor
-            v-model="palette"
-            @update:far-power="
-              (value) => {
-                viewer.far_power = value
-              }
-            "
-            @update:palette-type="
-              (value) => {
-                viewer.invert_palette = value.invert
-                viewer.secondary_color_mode = value.secondary_color
-              }
-            "
-            @update:color="(...args) => viewer.set_color(...args)"
-            @update:xyrt-flags="(...args) => viewer.set_xyrt_flags(...args)"
-            @update:thickness="(...args) => viewer.set_thickness(...args)"
-          ></PointSymmetryPaletteEditor>
+          <PointSymmetryPaletteEditor v-model="palette"></PointSymmetryPaletteEditor>
+          <details class="form-row">
+            <summary>Reference Geometry</summary>
+            <ReferenceGeometryEditor v-model="ref_geom"></ReferenceGeometryEditor>
+          </details>
         </TabContent>
         <TabContent title="Export">
           <div v-if="pattern_base64" class="form-row">

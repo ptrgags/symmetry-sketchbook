@@ -1,11 +1,9 @@
 import { Color } from '@/core/Color'
-import { FourierSeries2D, type SerializedFourierSeries2D } from '@/core/FourierSeries2D'
+import { FourierSeries2D } from '@/core/FourierSeries2D'
+import type { ReferenceGeometryCollection } from '@/core/ReferenceGeometry'
 import { Sketch } from '@/core/Sketch'
 import type { SecondaryColorType } from '@/core/point_symmetry/PaletteType'
-import {
-  ReferenceGeometryPrefix,
-  type PointSymmetryPalette
-} from '@/core/point_symmetry/PointSymmetryPalette'
+import { type PointSymmetryPalette } from '@/core/point_symmetry/PointSymmetryPalette'
 import { PolynomialShader } from '@/shaders/PolynomialShader'
 import p5 from 'p5'
 
@@ -18,6 +16,7 @@ export interface PolynomialState {
   symmetry_mode: 'rosette' | 'frieze'
   palette: PointSymmetryPalette
   pattern: PolynomialPattern
+  ref_geom: ReferenceGeometryCollection
 }
 
 export class PolynomialSketch extends Sketch<PolynomialState> {
@@ -77,17 +76,11 @@ export class PolynomialSketch extends Sketch<PolynomialState> {
     this.shader.set_uniform(`${prefix}_thickness`, value)
   }
 
-  set invert_palette(value: boolean) {
-    this.shader.set_uniform('invert_palette', value)
-  }
+  set invert_palette(value: boolean) {}
 
-  set secondary_color_mode(value: SecondaryColorType) {
-    this.shader.set_uniform('secondary_color_mode', value)
-  }
+  set secondary_color_mode(value: SecondaryColorType) {}
 
-  set far_power(value: number) {
-    this.shader.set_uniform('far_power', value)
-  }
+  set far_power(value: number) {}
 
   set palette(value: PointSymmetryPalette) {
     this.state.palette = value
@@ -95,15 +88,16 @@ export class PolynomialSketch extends Sketch<PolynomialState> {
     this.set_color('secondary', value.secondary_color)
     this.set_color('far', value.far_color)
 
-    this.invert_palette = value.palette_type.invert
-    this.secondary_color_mode = value.palette_type.secondary_color
-    this.far_power = value.far_power
+    this.shader.set_uniform('invert_palette', value.palette_type.invert)
+    this.shader.set_uniform('secondary_color_mode', value.palette_type.secondary_color)
+    this.shader.set_uniform('far_power', value.far_power)
+  }
 
-    for (const prefix of Object.values(ReferenceGeometryPrefix)) {
-      const ref_geom = value.ref_geom[prefix]
-      this.set_xyrt_flags(prefix, ref_geom.xyrt_flags)
-      this.set_color(prefix, ref_geom.color)
-      this.set_thickness(prefix, ref_geom.thickness)
+  set ref_geom(value: ReferenceGeometryCollection) {
+    for (const [prefix, geom] of Object.entries(value)) {
+      this.set_xyrt_flags(prefix, geom.xyrt_flags)
+      this.set_color(prefix, geom.color)
+      this.set_thickness(prefix, geom.thickness)
     }
   }
 }
