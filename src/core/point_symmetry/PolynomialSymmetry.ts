@@ -10,10 +10,10 @@ import {
   get_partner_term,
   get_partner_type,
   indices_to_diff_sum,
-  type PointSymmetryRule
-} from './PointSymmetryRule'
+  type PolynomialSymmetryRule
+} from './PolynomialSymmetryRule'
 
-function validate_rules(rules: PointSymmetryRule[]) {
+function validate_rules(rules: PolynomialSymmetryRule[]) {
   if (rules.length === 0) {
     throw new Error('There must be at least one rule')
   }
@@ -27,12 +27,12 @@ function validate_rules(rules: PointSymmetryRule[]) {
   }
 }
 
-export class PointSymmetry {
+export class PolynomialSymmetry {
   grid_size: number
-  self_rule?: PointSymmetryRule
-  partner_rules: PointSymmetryRule[] = []
+  self_rule?: PolynomialSymmetryRule
+  partner_rules: PolynomialSymmetryRule[] = []
 
-  constructor(grid_size: number, rules: PointSymmetryRule[]) {
+  constructor(grid_size: number, rules: PolynomialSymmetryRule[]) {
     this.grid_size = grid_size
 
     validate_rules(rules)
@@ -48,7 +48,7 @@ export class PointSymmetry {
     }
   }
 
-  get first_rule(): PointSymmetryRule {
+  get first_rule(): PolynomialSymmetryRule {
     return this.self_rule ?? this.partner_rules[0]
   }
 

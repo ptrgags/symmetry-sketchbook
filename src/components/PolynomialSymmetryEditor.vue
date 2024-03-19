@@ -5,7 +5,7 @@ import {
   has_inversion,
   has_rotation
 } from '@/core/point_symmetry/InputSymmetryType'
-import { type PointSymmetryRule } from '@/core/point_symmetry/PointSymmetryRule'
+import { type PolynomialSymmetryRule } from '@/core/point_symmetry/PolynomialSymmetryRule'
 import { computed, ref, watch } from 'vue'
 import { type ColorTurnValue } from './ColorTurnEditor.vue'
 import ColorTurnEditor from './ColorTurnEditor.vue'
@@ -42,11 +42,11 @@ const third_color_turn = defineModel<ColorTurnValue>('third_color_turn')
 
 defineProps<{
   symmetryMode: 'rosette' | 'frieze'
-  value?: PointSymmetryRule[]
+  value?: PolynomialSymmetryRule[]
 }>()
 
 const emit = defineEmits<{
-  (e: 'update:modelValue', value: PointSymmetryRule[]): void
+  (e: 'update:modelValue', value: PolynomialSymmetryRule[]): void
 }>()
 
 function make_rule(
@@ -54,7 +54,7 @@ function make_rule(
   constraint: ColorTurnEditorConstraint,
   output_rotations: number,
   output_reflection: boolean
-): PointSymmetryRule {
+): PolynomialSymmetryRule {
   const input_symmetry = constraint.input_symmetry
   const input_rotation = has_rotation(input_symmetry)
   const input_reflection = has_reflection(input_symmetry)
@@ -94,14 +94,14 @@ watch(
     // Every symmetry group has at least one constrait
     const constraint = group.first_constraint
     const output_symmetry1 = color_turn_enabled && output1 ? output1 : default_output
-    const first_rule: PointSymmetryRule = make_rule(
+    const first_rule: PolynomialSymmetryRule = make_rule(
       folds,
       constraint,
       output_symmetry1.output_rotations,
       output_symmetry1.output_reflection
     )
 
-    const rules: PointSymmetryRule[] = [first_rule]
+    const rules: PolynomialSymmetryRule[] = [first_rule]
 
     if (group.second_constraint) {
       const constraint2 = group.second_constraint
@@ -206,3 +206,4 @@ watch(
   margin: 4px 0;
 }
 </style>
+@/core/point_symmetry/PolynomialSymmetryRule

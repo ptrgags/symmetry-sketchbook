@@ -51,7 +51,7 @@ export function diff_sum_to_frequencies(diff_sum: DiffSum): Frequency2D {
 }
 
 /**
- * Helper function for get_freq_diff in PointSymmetryRule.ts
+ * Helper function for get_freq_diff in PolynomialSymmetryRule.ts
  *
  * As part of the the polynomial editor (see PolynomialMakerView.vue), we
  * want to compute a frequency pair for each term in a grid. The difference

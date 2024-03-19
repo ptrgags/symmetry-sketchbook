@@ -6,8 +6,8 @@ import TabLayout from '@/components/TabLayout.vue'
 import TabContent from '@/components/TabContent.vue'
 import { ComplexPolar, ComplexRect } from '@/core/Complex'
 import { FourierSeries2D, type FourierTerm2D } from '@/core/FourierSeries2D'
-import { PointSymmetry } from '@/core/point_symmetry/PointSymmetry'
-import { type PointSymmetryRule, IDENTITY } from '@/core/point_symmetry/PointSymmetryRule'
+import { PolynomialSymmetry } from '@/core/point_symmetry/PolynomialSymmetry'
+import { type PolynomialSymmetryRule, IDENTITY } from '@/core/point_symmetry/PolynomialSymmetryRule'
 import {
   type CoefficientPickerState,
   CoefficientPickerSketch
@@ -15,15 +15,12 @@ import {
 import { PolynomialSketch, type PolynomialPattern } from '@/sketches/PolynomialSketch'
 import { TermGridSketch, type TermGridState } from '@/sketches/TermGridSketch'
 import { ref, computed, watch } from 'vue'
-import PointSymmetryEditor from '@/components/PointSymmetryEditor.vue'
-import PointSymmetryPaletteEditor from '@/components/PointSymmetryPaletteEditor.vue'
-import {
-  default_palette,
-  type PointSymmetryPalette
-} from '@/core/point_symmetry/PointSymmetryPalette'
+import PolynomialSymmetryEditor from '@/components/PolynomialSymmetryEditor.vue'
+import PolynomialPaletteEditor from '@/components/PolynomialPaletteEditor.vue'
+import { default_palette, type PolynomialPalette } from '@/core/point_symmetry/PolynomialPalette'
 import { to_compressed_json } from '@/core/serialization/serialization'
 import { PolynomialPatternSerializer } from '@/core/serialization/SerializedPolynomialPattern'
-import { PointSymmetryPaletteSerializer } from '@/core/serialization/SerializedPointSymmetryPalette'
+import { PolynomialPaletteSerializer } from '@/core/serialization/SerializedPolynomialPalette'
 import { default_ref_geom, type ReferenceGeometryCollection } from '@/core/ReferenceGeometry'
 
 // The frequencies will be [-MAX_FREQ, MAX_FREQ] in each direction
@@ -37,7 +34,7 @@ const CENTER_1D = MAX_FREQ
 const DEFAULT_TERM = (CENTER_1D - 1) * GRID_SIZE + CENTER_1D
 
 const PATTERN_SERIALIZER = new PolynomialPatternSerializer()
-const PALETTE_SERIALIZER = new PointSymmetryPaletteSerializer()
+const PALETTE_SERIALIZER = new PolynomialPaletteSerializer()
 
 // Vue state
 
@@ -53,9 +50,9 @@ const viewer_path = computed<string>(() => {
   return props.symmetryMode === 'frieze' ? '/frieze_symmetry' : '/point_symmetry'
 })
 
-const symmetry = ref(new PointSymmetry(GRID_SIZE, [IDENTITY]))
+const symmetry = ref(new PolynomialSymmetry(GRID_SIZE, [IDENTITY]))
 
-const palette = defineModel<PointSymmetryPalette>('palette', {
+const palette = defineModel<PolynomialPalette>('palette', {
   default: default_palette
 })
 
@@ -160,8 +157,8 @@ function toggle_palette(e: Event) {
   viewer.show_palette = checkbox.checked
 }
 
-function change_symmetry(rules: PointSymmetryRule[]) {
-  symmetry.value = new PointSymmetry(GRID_SIZE, rules)
+function change_symmetry(rules: PolynomialSymmetryRule[]) {
+  symmetry.value = new PolynomialSymmetry(GRID_SIZE, rules)
 
   const coefficients = term_grid_state.coefficients
   coefficients.fill(ComplexPolar.ZERO)
@@ -207,7 +204,7 @@ watch(
       <h1>{{ title }}</h1>
       <TabLayout>
         <TabContent title="Symmetry">
-          <PointSymmetryEditor
+          <PolynomialSymmetryEditor
             :symmetry-mode="props.symmetryMode"
             @update:model-value="change_symmetry"
           />
@@ -222,7 +219,7 @@ watch(
             <input id="toggle-palette" type="checkbox" @change="toggle_palette" />
             <label for="toggle-palette"> Show color palette</label>
           </div>
-          <PointSymmetryPaletteEditor v-model="palette"></PointSymmetryPaletteEditor>
+          <PolynomialPaletteEditor v-model="palette"></PolynomialPaletteEditor>
           <details class="form-row">
             <summary>Reference Geometry</summary>
             <ReferenceGeometryEditor v-model="ref_geom"></ReferenceGeometryEditor>

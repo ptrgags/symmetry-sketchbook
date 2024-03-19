@@ -4,14 +4,22 @@ import P5Sketch from '@/components/P5Sketch.vue'
 import { PolynomialSketch } from '@/sketches/PolynomialSketch'
 import { FourierSeries2D } from '@/core/FourierSeries2D'
 import { useRoute } from 'vue-router'
-import { onMounted, watch } from 'vue'
+import { computed, onMounted, watch } from 'vue'
 import { from_compressed_json } from '@/core/serialization/serialization'
 import { is_string } from '@/core/validation'
 import { PolynomialPatternSerializer } from '@/core/serialization/SerializedPolynomialPattern'
-import { PointSymmetryPaletteSerializer } from '@/core/serialization/SerializedPointSymmetryPalette'
-import { default_palette } from '@/core/point_symmetry/PointSymmetryPalette'
+import { PolynomialPaletteSerializer } from '@/core/serialization/SerializedPolynomialPalette'
+import { default_palette } from '@/core/point_symmetry/PolynomialPalette'
 import { type ReferenceGeometryCollection, default_ref_geom } from '@/core/ReferenceGeometry'
 import ReferenceGeometryEditor from '@/components/ReferenceGeometryEditor.vue'
+
+const props = defineProps<{
+  symmetryMode: 'rosette' | 'frieze'
+}>()
+
+const title = computed<string>(() => {
+  return props.symmetryMode === 'frieze' ? 'Frieze Symmetry Gallery' : 'Rosette Symmetry Gallery'
+})
 
 const route = useRoute()
 
@@ -20,12 +28,12 @@ const DEFAULT_PATTERN = {
   rotation_order: 8
 }
 const PATTERN_SERIALIZER = new PolynomialPatternSerializer()
-const PALETTE_SERIALIZER = new PointSymmetryPaletteSerializer()
+const PALETTE_SERIALIZER = new PolynomialPaletteSerializer()
 
 const ref_geom = defineModel<ReferenceGeometryCollection>('ref_geom', { default: default_ref_geom })
 
 const sketch = new PolynomialSketch({
-  symmetry_mode: 'rosette',
+  symmetry_mode: props.symmetryMode,
   pattern: DEFAULT_PATTERN,
   palette: default_palette(),
   ref_geom: ref_geom.value
@@ -72,7 +80,7 @@ watch(
       <P5Sketch :sketch="sketch"></P5Sketch>
     </template>
     <template #right>
-      <h1>Rosette Gallery</h1>
+      <h1>{{ title }}</h1>
       <details class="form-row">
         <summary>Reference Geometry</summary>
         <ReferenceGeometryEditor v-model="ref_geom"></ReferenceGeometryEditor>
@@ -80,3 +88,4 @@ watch(
     </template>
   </TwoColumns>
 </template>
+@/core/serialization/SerializedPolynomialSymmetryPalette@/core/point_symmetry/PolynomialPalette

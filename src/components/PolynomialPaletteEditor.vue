@@ -3,17 +3,17 @@ import ColorPicker from './ColorPicker.vue'
 
 import RangeSlider from './RangeSlider.vue'
 import { PALETTE_TYPES } from '@/core/point_symmetry/PaletteType'
-import { type PointSymmetryPalette } from '@/core/point_symmetry/PointSymmetryPalette'
+import { type PolynomialPalette } from '@/core/point_symmetry/PolynomialPalette'
 import { ref, watch } from 'vue'
 
 const props = defineProps<{
-  modelValue: PointSymmetryPalette
+  modelValue: PolynomialPalette
 }>()
 
-const palette = ref<PointSymmetryPalette>(props.modelValue)
+const palette = ref<PolynomialPalette>(props.modelValue)
 
 const emit = defineEmits<{
-  (e: 'update:modelValue', value: PointSymmetryPalette): void
+  (e: 'update:modelValue', value: PolynomialPalette): void
 }>()
 
 watch(palette, (value) => emit('update:modelValue', value), { deep: true })
@@ -46,3 +46,4 @@ watch(palette, (value) => emit('update:modelValue', value), { deep: true })
     >
   </div>
 </template>
+@/core/point_symmetry/PolynomialPalette

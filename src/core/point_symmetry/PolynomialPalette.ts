@@ -1,7 +1,7 @@
 import { Color } from '../Color'
 import { PALETTE_TYPES, type PaletteType } from './PaletteType'
 
-export interface PointSymmetryPalette {
+export interface PolynomialPalette {
   // The primary and secondary color can be applied a few different ways,
   // so this selects between them
   palette_type: PaletteType
@@ -17,7 +17,7 @@ export interface PointSymmetryPalette {
   far_power: number
 }
 
-export function default_palette(): PointSymmetryPalette {
+export function default_palette(): PolynomialPalette {
   return {
     palette_type: PALETTE_TYPES[0],
     primary_color: new Color(0.5, 0.0, 1.0),

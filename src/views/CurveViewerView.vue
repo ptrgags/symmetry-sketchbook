@@ -72,7 +72,7 @@ watch(show_arm, (value) => {
       <P5Sketch :sketch="sketch"></P5Sketch>
     </template>
     <template #right>
-      <h1>Curve Symmetry</h1>
+      <h1>Curve Symmetry Gallery</h1>
       <label for="preset-select">Select Preset:</label>
       &nbsp;
       <select id="preset-select" v-model="selected_preset">

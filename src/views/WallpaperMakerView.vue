@@ -7,11 +7,7 @@ import ReferenceGeometryEditor from '@/components/ReferenceGeometryEditor.vue'
 import { ComplexPolar, ComplexRect } from '@/core/Complex'
 import { FourierSeries2D, type FourierTerm2D } from '@/core/FourierSeries2D'
 import { TermGridSketch, type TermGridState } from '@/sketches/TermGridSketch'
-import {
-  type WallpaperState,
-  WallpaperSketch,
-  type WallpaperPattern
-} from '@/sketches/WallpaperSketch'
+import { WallpaperSketch, type WallpaperPattern } from '@/sketches/WallpaperSketch'
 import { WallpaperSymmetry } from '@/core/wallpaper_symmetry/WallpaperSymmetry'
 import { computed, ref, watch } from 'vue'
 import {
@@ -23,7 +19,7 @@ import {
   WALLPAPER_GROUPS,
   type WallpaperSymmetryGroup
 } from '@/core/wallpaper_symmetry/WallpaperSymmetryGroup'
-import WallpaperPalettePicker from '@/components/WallpaperPalettePicker.vue'
+import WallpaperPalettePicker from '@/components/WallpaperPaletteEditor.vue'
 import { to_compressed_json } from '@/core/serialization/serialization'
 import { type WallpaperPalette, DEFAULT_PALETTE } from '@/core/wallpaper_symmetry/WallpaperPalette'
 import { WallpaperPaletteSerializer } from '@/core/serialization/SerializedWallpaperPalette'
@@ -258,6 +254,7 @@ watch(
               >Viewer Link</RouterLink
             >
           </div>
+          <div v-else>Create a pattern using the other tabs, then a link will appear here</div>
         </TabContent>
       </TabLayout>
     </template>

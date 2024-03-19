@@ -1,11 +1,11 @@
 import { describe, test, expect } from 'vitest'
 import {
   IDENTITY,
-  PointSymmetryRule,
+  PolynomialSymmetryRule,
   get_freq_diff,
   get_partner_type,
   get_rotation_power
-} from './PointSymmetryRule'
+} from './PolynomialSymmetryRule'
 import { fail } from 'assert'
 
 function ignore_signed_zero(x: number): number {
@@ -16,18 +16,18 @@ function ignore_signed_zero(x: number): number {
   return x
 }
 
-function test_rotation_power(rule: PointSymmetryRule, inputs: number[], expected: number[]) {
+function test_rotation_power(rule: PolynomialSymmetryRule, inputs: number[], expected: number[]) {
   const actual = inputs.map((x) => get_rotation_power(rule, x))
   // because toStrictEqual() treats 0 different from -0 :(
   expect(actual.map(ignore_signed_zero)).toStrictEqual(expected.map(ignore_signed_zero))
 }
 
-function test_freq_diff(rule: PointSymmetryRule, inputs: number[], expected: number[]) {
+function test_freq_diff(rule: PolynomialSymmetryRule, inputs: number[], expected: number[]) {
   const actual = inputs.map((x) => get_freq_diff(rule, x))
   expect(actual).toStrictEqual(expected)
 }
 
-describe('PointSymmetryRule', () => {
+describe('PolynomialRule', () => {
   // Fragments of rules to combine with identity for brevity
   const INPUT_ROTATION = {
     rotation_folds: 3,

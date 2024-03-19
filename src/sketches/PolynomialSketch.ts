@@ -2,7 +2,7 @@ import { Color } from '@/core/Color'
 import { FourierSeries2D } from '@/core/FourierSeries2D'
 import type { ReferenceGeometryCollection } from '@/core/ReferenceGeometry'
 import { Sketch } from '@/core/Sketch'
-import { type PointSymmetryPalette } from '@/core/point_symmetry/PointSymmetryPalette'
+import { type PolynomialPalette } from '@/core/point_symmetry/PolynomialPalette'
 import { PolynomialShader } from '@/shaders/PolynomialShader'
 import p5 from 'p5'
 
@@ -13,7 +13,7 @@ export interface PolynomialPattern {
 
 export interface PolynomialState {
   symmetry_mode: 'rosette' | 'frieze'
-  palette: PointSymmetryPalette
+  palette: PolynomialPalette
   pattern: PolynomialPattern
   ref_geom: ReferenceGeometryCollection
 }
@@ -75,7 +75,7 @@ export class PolynomialSketch extends Sketch<PolynomialState> {
     this.shader.set_uniform(`${prefix}_thickness`, value)
   }
 
-  set palette(value: PointSymmetryPalette) {
+  set palette(value: PolynomialPalette) {
     this.state.palette = value
     this.set_color('primary', value.primary_color)
     this.set_color('secondary', value.secondary_color)

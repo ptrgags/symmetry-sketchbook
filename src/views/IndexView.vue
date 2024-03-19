@@ -15,7 +15,7 @@ import PageLink from '@/components/PageLink.vue'
     <!--<PageLink><RouterLink to="/curve_symmetry/curve_blender">Curve Blender</RouterLink></PageLink> -->
     <PageLink><RouterLink to="/curve_symmetry/curve_maker">Curve Maker</RouterLink></PageLink>
     <h3>Point Symmetry</h3>
-    <PageLink><RouterLink to="/point_symmetry">Rosette Viewer</RouterLink></PageLink>
+    <PageLink><RouterLink to="/point_symmetry">Rosette Gallery</RouterLink></PageLink>
     <PageLink>
       <RouterLink to="/point_symmetry/tie_dye_analogy">Tie-Dye Analogy</RouterLink>
     </PageLink>
@@ -25,15 +25,15 @@ import PageLink from '@/components/PageLink.vue'
     >-->
     <PageLink><RouterLink to="/point_symmetry/rosette_maker">Rosette Maker</RouterLink></PageLink>
     <h3>Frieze Symmetry</h3>
+    <PageLink><RouterLink to="/frieze_symmetry">Frieze Gallery</RouterLink></PageLink>
     <!--
-    <PageLink><RouterLink to="/frieze_symmetry/frieze_viewer">Frieze Viewer</RouterLink></PageLink>
     <PageLink
       ><RouterLink to="/frieze_symmetry/frieze_blender">Frieze Blender</RouterLink></PageLink
     >
     -->
     <PageLink><RouterLink to="/frieze_symmetry/frieze_maker">Frieze Maker</RouterLink></PageLink>
     <h3>Wallpaper Symmetry</h3>
-    <PageLink><RouterLink to="/wallpaper_symmetry">Wallpaper Viewer</RouterLink></PageLink>
+    <PageLink><RouterLink to="/wallpaper_symmetry">Wallpaper Gallery</RouterLink></PageLink>
     <!--
     <PageLink
       ><RouterLink to="/wallpaper_symmetry/wallpaper_blender"

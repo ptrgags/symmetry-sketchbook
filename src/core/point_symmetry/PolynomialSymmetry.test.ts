@@ -1,7 +1,7 @@
 import { fail } from 'assert'
 import { describe, test, expect } from 'vitest'
 
-describe('PointSymmetry', () => {
+describe('PolynomialSymmetry', () => {
   describe('validation', () => {
     test('throws for empty rule list', () => {
       fail('not implemented')

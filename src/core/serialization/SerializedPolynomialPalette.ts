@@ -1,10 +1,10 @@
 import { Color } from '../Color'
 import { PALETTE_TYPES } from '../point_symmetry/PaletteType'
-import { type PointSymmetryPalette } from '../point_symmetry/PointSymmetryPalette'
+import { type PolynomialPalette } from '../point_symmetry/PolynomialPalette'
 import { is_hex_string, is_number } from '../validation'
 import type { Serializer } from './serialization'
 
-export interface SerializedPointSymmetryPalette {
+export interface SerializedPolynomialPalette {
   palette_type: string
   // The primary color used in every palette
   primary_color: string
@@ -18,10 +18,10 @@ export interface SerializedPointSymmetryPalette {
   far_power: number
 }
 
-export class PointSymmetryPaletteSerializer
-  implements Serializer<PointSymmetryPalette, SerializedPointSymmetryPalette>
+export class PolynomialPaletteSerializer
+  implements Serializer<PolynomialPalette, SerializedPolynomialPalette>
 {
-  serialize(value: PointSymmetryPalette): SerializedPointSymmetryPalette {
+  serialize(value: PolynomialPalette): SerializedPolynomialPalette {
     return {
       palette_type: value.palette_type.id,
       primary_color: value.primary_color.to_hex(),
@@ -31,7 +31,7 @@ export class PointSymmetryPaletteSerializer
     }
   }
 
-  validate(value: any): value is SerializedPointSymmetryPalette {
+  validate(value: any): value is SerializedPolynomialPalette {
     const palette_type = PALETTE_TYPES.find((x) => x.id === value.palette_type)
     if (!palette_type) {
       const valid_values = PALETTE_TYPES.map((x) => x.id)
@@ -55,7 +55,7 @@ export class PointSymmetryPaletteSerializer
     return true
   }
 
-  deserialize(serialized: SerializedPointSymmetryPalette): PointSymmetryPalette {
+  deserialize(serialized: SerializedPolynomialPalette): PolynomialPalette {
     return {
       palette_type: PALETTE_TYPES.find((x) => x.id === serialized.palette_type) ?? PALETTE_TYPES[0],
       primary_color: Color.from_hex(serialized.primary_color),

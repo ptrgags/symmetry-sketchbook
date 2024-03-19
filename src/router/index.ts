@@ -3,10 +3,10 @@ import IndexView from '@/views/IndexView.vue'
 import CurveViewerView from '@/views/CurveViewerView.vue'
 import CurveMakerView from '@/views/CurveMakerView.vue'
 import OrbitalMotionView from '@/views/OrbitalMotionView.vue'
-import PointSymmetryView from '@/views/PointSymmetryView.vue'
+import PolynomialGalleryView from '@/views/PolynomialGalleryView.vue'
 import PolynomialMakerView from '@/views/PolynomialMakerView.vue'
 import TieDyeAnalogyView from '@/views/TieDyeAnalogyView.vue'
-import WallpaperSymmetryView from '@/views/WallpaperSymmetryView.vue'
+import WallpaperGalleryView from '@/views/WallpaperSymmetryView.vue'
 import WallpaperMakerView from '@/views/WallpaperMakerView.vue'
 
 const router = createRouter({
@@ -30,7 +30,10 @@ const router = createRouter({
     },
     {
       path: '/point_symmetry',
-      component: PointSymmetryView
+      component: PolynomialGalleryView,
+      props: {
+        symmetryMode: 'rosette'
+      }
     },
     {
       path: '/point_symmetry/tie_dye_analogy',
@@ -44,6 +47,13 @@ const router = createRouter({
       }
     },
     {
+      path: '/frieze_symmetry',
+      component: PolynomialGalleryView,
+      props: {
+        symmetryMode: 'frieze'
+      }
+    },
+    {
       path: '/frieze_symmetry/frieze_maker',
       component: PolynomialMakerView,
       props: {
@@ -52,7 +62,7 @@ const router = createRouter({
     },
     {
       path: '/wallpaper_symmetry',
-      component: WallpaperSymmetryView
+      component: WallpaperGalleryView
     },
     {
       path: '/wallpaper_symmetry/wallpaper_maker',

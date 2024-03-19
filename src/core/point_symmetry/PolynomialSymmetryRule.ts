@@ -20,7 +20,7 @@ import type { PartnerType } from './PartnerType'
  * - u is how many times to apply "color turning" to the output
  * - question marks mean the transformations are conditionally applied.
  */
-export interface PointSymmetryRule {
+export interface PolynomialSymmetryRule {
   rotation_folds: number
   input_rotation: boolean
   input_reflection: boolean
@@ -29,7 +29,7 @@ export interface PointSymmetryRule {
   output_reflection: boolean
 }
 
-export const IDENTITY: PointSymmetryRule = {
+export const IDENTITY: PolynomialSymmetryRule = {
   rotation_folds: 1,
   input_rotation: false,
   input_reflection: false,
@@ -38,7 +38,7 @@ export const IDENTITY: PointSymmetryRule = {
   output_reflection: false
 }
 
-export function get_partner_type(rule: PointSymmetryRule): PartnerType {
+export function get_partner_type(rule: PolynomialSymmetryRule): PartnerType {
   // Using !== as XOR
   const swap = rule.input_reflection !== rule.output_reflection
   const invert = rule.input_inversion
@@ -58,7 +58,7 @@ export function get_partner_type(rule: PointSymmetryRule): PartnerType {
   return 'identity'
 }
 
-function input_flips(rule: PointSymmetryRule): number {
+function input_flips(rule: PolynomialSymmetryRule): number {
   return Number(rule.input_inversion) + Number(rule.input_reflection)
 }
 
@@ -81,7 +81,7 @@ function input_flips(rule: PointSymmetryRule): number {
  * @param frequency_diff The frequency difference (n - m)
  * @returns The number of rotations to apply
  */
-export function get_rotation_power(rule: PointSymmetryRule, frequency_diff: number): number {
+export function get_rotation_power(rule: PolynomialSymmetryRule, frequency_diff: number): number {
   // The sign of the first term depends on how many times we applied an
   // involution to the input
   const input_sign = Math.pow(-1, input_flips(rule))
@@ -102,7 +102,7 @@ export function get_rotation_power(rule: PointSymmetryRule, frequency_diff: numb
  * @param signed_col The signed column number for the term grid
  * @return for pure input rotations, this returns the frequency difference for this column of the term grid. For all other cases, it returns the column number as-is
  */
-export function get_freq_diff(rule: PointSymmetryRule, signed_col: number): number {
+export function get_freq_diff(rule: PolynomialSymmetryRule, signed_col: number): number {
   const has_input_rotation = rule.input_rotation
   const has_involutions = rule.input_reflection || rule.input_inversion || rule.output_reflection
 
@@ -161,7 +161,7 @@ export function get_freq_diff(rule: PointSymmetryRule, signed_col: number): numb
  */
 export function indices_to_diff_sum(
   signed_indices: GridIndices2D,
-  symmetry_rule: PointSymmetryRule
+  symmetry_rule: PolynomialSymmetryRule
 ): DiffSum {
   const { row, col } = signed_indices
 
@@ -178,7 +178,7 @@ export function indices_to_diff_sum(
 }
 
 export function enforce_self_partner_constraint(
-  rule: PointSymmetryRule,
+  rule: PolynomialSymmetryRule,
   frequency_diff: number,
   term: ComplexPolar
 ): ComplexPolar {
@@ -236,7 +236,7 @@ export function enforce_self_partner_constraint(
 }
 
 export function get_partner_term(
-  rule: PointSymmetryRule,
+  rule: PolynomialSymmetryRule,
   frequency_diff: number,
   term: ComplexPolar
 ): ComplexPolar {
