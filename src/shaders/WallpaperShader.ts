@@ -75,21 +75,37 @@ vec3 palette_polar(vec2 z_rect) {
 }
 
 vec3 palette(vec2 z_rect) {
-    vec2 stripe_direction = diagonal_density * vec2(500.0, 700.0);
-    float stripes = floor(dot(stripe_direction, uv));
-    float stripe_mask = mod(stripes, 2.0);
-
     vec3 color_x = palette_1d(fract(0.5 * z_rect.x));
     vec3 color_y = palette_1d(fract(0.5 * z_rect.y));
 
     const float HORIZONTAL_STRIPES = 0.0;
     const float VERTICAL_STRIPES = 1.0;
     const float PLAID = 2.0;
+
+    // For simple stripes, just return one of the above colors
     if (palette_type == HORIZONTAL_STRIPES) {
         return color_y;
     } else if (palette_type == VERTICAL_STRIPES) {
         return color_x;
     }
+
+    // To make plaid, we want to interleave the horizontal and vertical
+    // stripes. Looking at actual plaid fabric, you'll see this interleaving
+    // happen on diagonal stripes.
+
+    // A covector that measures a "stripe distance", i.e. how many stripes
+    // we are from the origin along a 45 angle in pixel space. To vary the
+    // thickness, we need to multiply by the density parameter.
+    vec2 stripe_covector_px = diagonal_density * vec2(1, 1);
+    // Convert the covector to UV space. covector components are covariant
+    // so we scale up by the canvas size.
+    vec2 stripes_covector_uv = vec2(500.0, 700.0) * stripe_covector_px;
+    //vec2 stripes_covector_uv = vec2(500.0diagonal_density * vec2(1.0, 1.0);
+
+    // Use the covector to measure the distance from the origin in stripes.
+    float stripe_distance = dot(stripes_covector_uv, uv);
+    // 0 and 1 alternating on each stripe
+    float stripe_mask = mod(floor(stripe_distance), 2.0);
 
     return mix(color_x, color_y, stripe_mask);
 }
