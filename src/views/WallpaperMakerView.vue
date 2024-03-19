@@ -7,7 +7,11 @@ import ReferenceGeometryEditor from '@/components/ReferenceGeometryEditor.vue'
 import { ComplexPolar, ComplexRect } from '@/core/Complex'
 import { FourierSeries2D, type FourierTerm2D } from '@/core/FourierSeries2D'
 import { TermGridSketch, type TermGridState } from '@/sketches/TermGridSketch'
-import { type WallpaperState, WallpaperSketch } from '@/sketches/WallpaperSketch'
+import {
+  type WallpaperState,
+  WallpaperSketch,
+  type WallpaperPattern
+} from '@/sketches/WallpaperSketch'
 import { WallpaperSymmetry } from '@/core/wallpaper_symmetry/WallpaperSymmetry'
 import { computed, ref, watch } from 'vue'
 import {
@@ -21,10 +25,10 @@ import {
 } from '@/core/wallpaper_symmetry/WallpaperSymmetryGroup'
 import WallpaperPalettePicker from '@/components/WallpaperPalettePicker.vue'
 import { to_compressed_json } from '@/core/serialization/serialization'
-import { FourierSeries2DSerializer } from '@/core/serialization/SerializedFourierSeries2D'
 import { type WallpaperPalette, DEFAULT_PALETTE } from '@/core/wallpaper_symmetry/WallpaperPalette'
 import { WallpaperPaletteSerializer } from '@/core/serialization/SerializedWallpaperPalette'
 import { default_ref_geom, type ReferenceGeometryCollection } from '@/core/ReferenceGeometry'
+import { WallpaperPatternSerializer } from '@/core/serialization/SerializedWallpaperPattern'
 
 // The frequencies will be [-MAX_FREQ, MAX_FREQ] in each direction
 const MAX_FREQ = 3
@@ -33,7 +37,7 @@ const TERM_COUNT = GRID_SIZE * GRID_SIZE
 const CENTER_1D = MAX_FREQ
 const DEFAULT_TERM = CENTER_1D * GRID_SIZE + CENTER_1D
 
-const PATTERN_SERIALIZER = new FourierSeries2DSerializer()
+const PATTERN_SERIALIZER = new WallpaperPatternSerializer()
 const PALETTE_SERIALIZER = new WallpaperPaletteSerializer()
 
 // Vue state -----------------------------
@@ -73,16 +77,16 @@ const palette_base64 = ref<string>()
 
 // P5.js sketches ----------------------------
 
-const viewer_state: WallpaperState = {
-  pattern: FourierSeries2D.from_tuples([
-    [1, 0, 1, 0],
-    [0, 1, 1, 0]
-  ]),
-  palette: palette.value,
-  group: symmetry_group.value
-}
-
-const viewer = new WallpaperSketch(viewer_state)
+const viewer = new WallpaperSketch({
+  pattern: {
+    series: FourierSeries2D.from_tuples([
+      [1, 0, 1, 0],
+      [0, 1, 1, 0]
+    ]),
+    group: symmetry_group.value
+  },
+  palette: palette.value
+})
 
 const term_grid_state: TermGridState = {
   cell_size: 40,
@@ -127,7 +131,10 @@ function update_viewer() {
     }
   }
 
-  const pattern = new FourierSeries2D(terms)
+  const pattern: WallpaperPattern = {
+    series: new FourierSeries2D(terms),
+    group: group.value
+  }
   viewer.pattern = pattern
 
   // Also update the link to the viewer
@@ -179,8 +186,6 @@ watch(group, (new_value) => {
   term_grid_state.selected_index = DEFAULT_TERM
   term_grid_state.frequency_map = (indices) => symmetry.value.frequency_map(indices)
   term_grid_state.editable_map = (indices) => symmetry.value.is_editable(indices)
-
-  viewer_state.group = selected_group
   update_viewer()
 })
 

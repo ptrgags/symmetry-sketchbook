@@ -1,6 +1,8 @@
 import type { PolynomialPattern } from '@/sketches/PolynomialSketch'
-import type { SerializedFourierSeries2D } from '../FourierSeries2D'
-import { FourierSeries2DSerializer } from './SerializedFourierSeries2D'
+import {
+  FourierSeries2DSerializer,
+  type SerializedFourierSeries2D
+} from './SerializedFourierSeries2D'
 import type { Serializer } from './serialization'
 import { is_number } from '../validation'
 

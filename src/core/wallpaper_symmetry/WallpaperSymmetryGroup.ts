@@ -97,7 +97,7 @@ export const WALLPAPER_GROUPS: { [key: string]: WallpaperSymmetryGroup } = {
     base_rule: 'hexagon',
     rules: [{ partner: 'negate' }, { partner: 'swap' }]
   }
-}
+} as const
 
 export const COLOR_REVERSING_GROUPS: { [key: string]: WallpaperSymmetryGroup } = {
   // General Lattice
@@ -255,4 +255,36 @@ export const COLOR_REVERSING_GROUPS: { [key: string]: WallpaperSymmetryGroup } =
     color_reversing: ColorReversingType.Horizontal
   }
   // TODO: start with pmg/pmg
+} as const
+
+export function find_group(group_id: string): WallpaperSymmetryGroup {
+  const group = WALLPAPER_GROUPS[group_id]
+  if (group) {
+    return group
+  }
+
+  const reversing_group = COLOR_REVERSING_GROUPS[group_id]
+  if (reversing_group) {
+    return reversing_group
+  }
+
+  throw new Error('group_id must be a valid wallpaper group ID')
+}
+
+// Reverse lookup of group IDs. This makes use of the fact that I only
+// ever use the above tables as constants.
+export function find_group_id(group: WallpaperSymmetryGroup): string {
+  for (const [key, value] of Object.entries(WALLPAPER_GROUPS)) {
+    if (value === group) {
+      return key
+    }
+  }
+
+  for (const [key, value] of Object.entries(COLOR_REVERSING_GROUPS)) {
+    if (value === group) {
+      return key
+    }
+  }
+
+  throw new Error('group must be one of the WallpaperSymmetryGroup constants')
 }

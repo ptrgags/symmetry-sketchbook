@@ -9,10 +9,14 @@ import type { WallpaperSymmetryGroup } from '@/core/wallpaper_symmetry/Wallpaper
 import { WallpaperShader, MAX_COLORS } from '@/shaders/WallpaperShader'
 import type p5 from 'p5'
 
-export interface WallpaperState {
-  pattern: FourierSeries2D
-  palette: WallpaperPalette
+export interface WallpaperPattern {
+  series: FourierSeries2D
   group: WallpaperSymmetryGroup
+}
+
+export interface WallpaperState {
+  pattern: WallpaperPattern
+  palette: WallpaperPalette
 }
 
 export class WallpaperSketch extends Sketch<WallpaperState> {
@@ -31,8 +35,10 @@ export class WallpaperSketch extends Sketch<WallpaperState> {
 
     this.shader.init(p)
 
+    // Initialize uniforms
+    this.pattern = this.state.pattern
     this.palette = this.state.palette
-    this.recompute()
+
     this.shader.disable()
   }
 
@@ -41,9 +47,15 @@ export class WallpaperSketch extends Sketch<WallpaperState> {
     this.shader.draw()
   }
 
-  set pattern(value: FourierSeries2D) {
+  set pattern(value: WallpaperPattern) {
     this.state.pattern = value
-    this.recompute()
+
+    this.shader.set_coefficients(value.series)
+    const lattice = get_lattice(value.group.lattice)
+    this.shader.set_lattice(...lattice)
+
+    const color_reversing = value.group.color_reversing ?? ColorReversingType.None
+    this.shader.set_uniform('color_reversing_type', color_reversing)
   }
 
   set show_palette(value: boolean) {
@@ -87,14 +99,5 @@ export class WallpaperSketch extends Sketch<WallpaperState> {
       this.set_color(prefix, geom.color)
       this.set_thickness(prefix, geom.thickness)
     }
-  }
-
-  recompute() {
-    this.shader.set_coefficients(this.state.pattern)
-    const lattice = get_lattice(this.state.group.lattice)
-    this.shader.set_lattice(...lattice)
-
-    const color_reversing = this.state.group.color_reversing ?? ColorReversingType.None
-    this.shader.set_uniform('color_reversing_type', color_reversing)
   }
 }
