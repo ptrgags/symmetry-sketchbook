@@ -61,14 +61,7 @@ uniform bool enable_standing_waves;
 `
 */
 
-common.uniforms_palette = `
-uniform bool show_palette;
-
-uniform vec3 primary_color;
-uniform vec3 secondary_color;
-uniform vec3 far_color;
-uniform float far_power;
-
+common.uniforms_ref_geom = `
 uniform vec4 grid_xyrt;
 uniform vec3 grid_color;
 uniform float grid_thickness;
@@ -84,9 +77,6 @@ uniform float input_axes_thickness;
 uniform vec4 output_axes_xyrt;
 uniform vec3 output_axes_color;
 uniform float output_axes_thickness;
-
-uniform bool invert_palette;
-uniform float secondary_color_mode;
 `
 
 common.funcs_view = `
@@ -205,76 +195,6 @@ void draw_axes(inout vec3 color, vec2 z_rect, vec3 axis_color, vec4 axis_xyrt, f
     color = mix(color, axis_color, axis_xyrt.y * y_axis);
     color = mix(color, axis_color, axis_xyrt.z * r_axis);
     color = mix(color, axis_color, axis_xyrt.w * theta_axis);
-}
-`
-
-common.funcs_palette = `
-
-vec3 palette(vec2 complex_rect) {
-    vec2 z = to_polar(complex_rect);
-
-    // get a normalized angle in [0, 1] starting from the +x axis
-    float angle_normalized = 0.5 + 0.5 * z.y / PI;
-    angle_normalized = fract(angle_normalized - 0.5);
-
-    float sector = floor(rotation_order * angle_normalized);
-    float sector_brightness = mix(0.25, 0.75, sector / (rotation_order - 1.0));
-
-    const float NONE = 0.0;
-    const float HALVES = 1.0;
-    const float ALTERNATING = 2.0;
-    const float INSIDE_CIRCLE = 3.0;
-
-    vec3 sector_color = primary_color;
-    if (secondary_color_mode == HALVES) {
-        sector_color = mix(primary_color, secondary_color, float(complex_rect.y < 0.0));
-    } else if (secondary_color_mode == ALTERNATING) {
-        sector_color = mix(primary_color, secondary_color, mod(sector, 2.0));
-    } else if (secondary_color_mode == INSIDE_CIRCLE) {
-        float inside_circle = 1.0 - step(1.0, z.x);
-        sector_color = mix(primary_color, secondary_color, inside_circle);
-    }
-
-    if (invert_palette) {
-        sector_color = mix(sector_color, 1.0 - sector_color, float(complex_rect.y > 0.0));
-    }
-
-    sector_color *= sector_brightness;
-
-    
-    
-
-    vec3 color = sector_color;
-
-    vec2 polar_repacked = vec2(z.x, angle_normalized);
-
-    draw_grid(
-        color,
-        complex_rect,
-        polar_repacked
-    );
-    
-    // Axes
-    draw_axes(
-        color,
-        complex_rect,
-        output_axes_color,
-        output_axes_xyrt,
-        output_axes_thickness
-    );
-
-    // Pulses
-    draw_pulses(
-        color,
-        complex_rect,
-        polar_repacked
-    );
-
-    // Gradient away from the unit circle
-    float dist = dist_from_pole(z.x);
-    color = mix(color, color * far_color, pow(1.0 - dist, far_power));
-
-    return vec3(color);
 }
 `
 

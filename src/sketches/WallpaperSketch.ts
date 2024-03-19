@@ -1,4 +1,6 @@
+import type { Color } from '@/core/Color'
 import { FourierSeries2D } from '@/core/FourierSeries2D'
+import type { ReferenceGeometryCollection } from '@/core/ReferenceGeometry'
 import { Sketch } from '@/core/Sketch'
 import { ColorReversingType } from '@/core/wallpaper_symmetry/ColorReversingType'
 import { get_lattice } from '@/core/wallpaper_symmetry/WallpaperLattice'
@@ -65,6 +67,26 @@ export class WallpaperSketch extends Sketch<WallpaperState> {
 
     this.shader.set_uniform('diagonal_density', 1.0 / value.diagonal_thickness)
     this.shader.set_uniform('palette_type', value.palette_type)
+  }
+
+  set_color(prefix: string, value: Color) {
+    this.shader.set_uniform(`${prefix}_color`, value.to_vec3())
+  }
+
+  set_xyrt_flags(prefix: string, value: boolean[]) {
+    this.shader.set_uniform(`${prefix}_xyrt`, value.map(Number))
+  }
+
+  set_thickness(prefix: string, value: number) {
+    this.shader.set_uniform(`${prefix}_thickness`, value)
+  }
+
+  set ref_geom(value: ReferenceGeometryCollection) {
+    for (const [prefix, geom] of Object.entries(value)) {
+      this.set_xyrt_flags(prefix, geom.xyrt_flags)
+      this.set_color(prefix, geom.color)
+      this.set_thickness(prefix, geom.thickness)
+    }
   }
 
   recompute() {

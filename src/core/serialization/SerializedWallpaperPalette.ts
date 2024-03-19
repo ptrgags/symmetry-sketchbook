@@ -1,5 +1,5 @@
 import { Color } from '../Color'
-import { is_hex_string, is_number, is_string } from '../validation'
+import { is_hex_string, is_number } from '../validation'
 import { WallpaperPaletteType, type WallpaperPalette } from '../wallpaper_symmetry/WallpaperPalette'
 import type { Serializer } from './serialization'
 

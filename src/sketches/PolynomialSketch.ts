@@ -2,7 +2,6 @@ import { Color } from '@/core/Color'
 import { FourierSeries2D } from '@/core/FourierSeries2D'
 import type { ReferenceGeometryCollection } from '@/core/ReferenceGeometry'
 import { Sketch } from '@/core/Sketch'
-import type { SecondaryColorType } from '@/core/point_symmetry/PaletteType'
 import { type PointSymmetryPalette } from '@/core/point_symmetry/PointSymmetryPalette'
 import { PolynomialShader } from '@/shaders/PolynomialShader'
 import p5 from 'p5'
@@ -75,12 +74,6 @@ export class PolynomialSketch extends Sketch<PolynomialState> {
   set_thickness(prefix: string, value: number) {
     this.shader.set_uniform(`${prefix}_thickness`, value)
   }
-
-  set invert_palette(value: boolean) {}
-
-  set secondary_color_mode(value: SecondaryColorType) {}
-
-  set far_power(value: number) {}
 
   set palette(value: PointSymmetryPalette) {
     this.state.palette = value
