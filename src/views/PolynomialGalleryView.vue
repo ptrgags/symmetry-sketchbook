@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import TwoColumns from '@/components/TwoColumns.vue'
 import P5Sketch from '@/components/P5Sketch.vue'
-import { PolynomialSketch } from '@/sketches/PolynomialSketch'
+import { PolynomialSketch, type PolynomialPattern } from '@/sketches/PolynomialSketch'
 import { FourierSeries2D } from '@/core/FourierSeries2D'
 import { useRoute } from 'vue-router'
 import { computed, onMounted, watch } from 'vue'
@@ -23,7 +23,7 @@ const title = computed<string>(() => {
 
 const route = useRoute()
 
-const DEFAULT_PATTERN = {
+const DEFAULT_PATTERN: PolynomialPattern = {
   series: FourierSeries2D.from_tuples([[1, 0, 1, 0]]),
   rotation_order: 8
 }

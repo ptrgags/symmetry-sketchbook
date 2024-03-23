@@ -70,10 +70,11 @@ export function from_json<Value, Serialized>(
     return undefined
   }
 
+  // Log the JSON so I can update the preset gallery
+  console.info(parsed)
+
   const deserialized = serializer.deserialize(parsed)
-  // Log the deserialized values at info level so I can copy the values whenever I
-  // want to make new presets
-  console.info(deserialized)
+
   return deserialized
 }
 
