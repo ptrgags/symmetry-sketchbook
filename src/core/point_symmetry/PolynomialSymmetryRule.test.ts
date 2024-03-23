@@ -3,10 +3,12 @@ import {
   IDENTITY,
   PolynomialSymmetryRule,
   get_freq_diff,
+  get_partner_term,
   get_partner_type,
   get_rotation_power
 } from './PolynomialSymmetryRule'
 import { fail } from 'assert'
+import { ComplexPolar } from '../Complex'
 
 function ignore_signed_zero(x: number): number {
   if (x === 0) {
@@ -343,8 +345,34 @@ describe('PolynomialRule', () => {
   })
 
   describe('get_partner_term', () => {
+    const TERM = new ComplexPolar(2, 0)
+
     test('throws for self-partner constraint', () => {
-      fail('not implemented')
+      // No reflections or inversions, so there's no reason to look at more
+      // than one coefficient.
+      const no_involutions = [
+        IDENTITY,
+        { ...IDENTITY, ...INPUT_ROTATION },
+        { ...IDENTITY, ...OUTPUT_ROTATION },
+        { ...IDENTITY, ...INPUT_ROTATION, ...OUTPUT_ROTATION }
+      ]
+
+      no_involutions.forEach((x) => {
+        expect(() => {
+          return get_partner_term(x, 0, TERM)
+        }).toThrowError()
+      })
+
+      // input + output reflections cancel out
+      const two_reflections = no_involutions.map((x) => {
+        return { ...x, ...INPUT_REFLECTION, ...OUTPUT_REFLECTION }
+      })
+
+      two_reflections.forEach((x) => {
+        expect(() => {
+          return get_partner_term(x, 0, TERM)
+        }).toThrowError()
+      })
     })
 
     test('mirrored partner term', () => {

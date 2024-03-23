@@ -1,10 +1,13 @@
 import { fail } from 'assert'
 import { describe, test, expect } from 'vitest'
+import { PolynomialSymmetry } from './PolynomialSymmetry'
 
 describe('PolynomialSymmetry', () => {
   describe('validation', () => {
     test('throws for empty rule list', () => {
-      fail('not implemented')
+      expect(() => {
+        return new PolynomialSymmetry(3, [])
+      }).toThrowError()
     })
 
     test('throws for multiple rules with the same partner type', () => {
