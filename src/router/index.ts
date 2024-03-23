@@ -1,6 +1,6 @@
 import { createRouter, createWebHistory } from 'vue-router'
 import IndexView from '@/views/IndexView.vue'
-import CurveViewerView from '@/views/CurveViewerView.vue'
+import CurveGalleryView from '@/views/CurveGalleryView.vue'
 import CurveMakerView from '@/views/CurveMakerView.vue'
 import OrbitalMotionView from '@/views/OrbitalMotionView.vue'
 import PolynomialGalleryView from '@/views/PolynomialGalleryView.vue'
@@ -18,7 +18,7 @@ const router = createRouter({
     },
     {
       path: '/curve_symmetry',
-      component: CurveViewerView
+      component: CurveGalleryView
     },
     {
       path: '/curve_symmetry/curve_maker',
