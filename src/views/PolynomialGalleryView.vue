@@ -117,8 +117,6 @@ watch(
 )
 
 watch(selected_pattern, (value) => {
-  console.log('selected', value)
-
   if (!value) {
     return
   }

@@ -230,7 +230,7 @@ watch(
             <RouterLink
               :to="{
                 path: viewer_path,
-                query: { pattern: pattern_base64, palette: palette_base64 }
+                query: { custom_pattern: pattern_base64, custom_palette: palette_base64 }
               }"
               target="_blank"
               >Viewer Link</RouterLink
