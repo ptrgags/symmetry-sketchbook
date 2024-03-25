@@ -81,14 +81,7 @@ export class TieDyeAnalogySketch extends Sketch<TieDyeAnalogyState> {
         [3, 1, 0.5, 0]
       ])
     )
-    this.shader.set_uniform('rotation_order', 8)
 
-    this.shader.set_uniform('primary_color', [0.5, 0.0, 1.0])
-    this.shader.set_uniform('secondary_color_mode', SecondaryColorType.Halves)
-    this.shader.set_uniform('secondary_color', [0.5, 1.0, 0.0])
-    this.shader.set_uniform('far_color', [1.0, 1.0, 1.0])
-
-    this.shader.set_animation([])
     this.shader.disable()
   }
 

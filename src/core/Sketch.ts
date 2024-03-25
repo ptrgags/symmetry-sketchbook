@@ -12,6 +12,7 @@ export abstract class Sketch<State> {
   }
 
   // p5 callbacks, but I find underscores easier to read 🐍
+  preload(p: p5) {}
   setup(p: p5) {}
   draw(p: p5) {}
   mouse_released(p: p5): boolean {
@@ -33,6 +34,7 @@ export abstract class Sketch<State> {
     return (p: p5) => {
       this.sketch = p
 
+      p.preload = () => this.preload(p)
       p.setup = () => this.setup(p)
       p.draw = () => this.draw(p)
       p.mouseReleased = () => this.mouse_released(p)
