@@ -6,7 +6,7 @@ import OrbitalMotionView from '@/views/OrbitalMotionView.vue'
 import PolynomialGalleryView from '@/views/PolynomialGalleryView.vue'
 import PolynomialMakerView from '@/views/PolynomialMakerView.vue'
 import TieDyeAnalogyView from '@/views/TieDyeAnalogyView.vue'
-import WallpaperGalleryView from '@/views/WallpaperSymmetryView.vue'
+import WallpaperGalleryView from '@/views/WallpaperGalleryView.vue'
 import WallpaperMakerView from '@/views/WallpaperMakerView.vue'
 
 const router = createRouter({
