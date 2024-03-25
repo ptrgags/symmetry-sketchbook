@@ -1,7 +1,6 @@
 import type p5 from 'p5'
 import { Sketch } from '@/core/Sketch.js'
 import { TieDyeShader } from '@/shaders/TieDyeShader.js'
-import { SecondaryColorType } from '@/core/point_symmetry/PaletteType.js'
 import { FourierSeries2D } from '@/core/FourierSeries2D'
 
 export enum TieDyeState {
@@ -95,12 +94,16 @@ export class TieDyeAnalogySketch extends Sketch<TieDyeAnalogyState> {
       if (elapsed_frames >= PAUSING_FRAMES) {
         state.animation_state = AnimationState.Animating
         state.reference_frame = frame
+        this.events.dispatchEvent(
+          new CustomEvent('tie_dye_step', { detail: (state.tie_dye_state + 1) % 4 })
+        )
       }
     } else if (state.animation_state === AnimationState.Animating) {
       // Create an interpolation factor based on the frame count.
-      state.transition_percent = elapsed_frames / (ANIMATING_FRAMES - 1)
+      state.transition_percent = elapsed_frames / ANIMATING_FRAMES
 
       if (elapsed_frames >= ANIMATING_FRAMES) {
+        state.transition_percent = 0.0
         state.tie_dye_state = (state.tie_dye_state + 1) % 4
         state.animation_state = AnimationState.Pausing
         state.reference_frame = frame
