@@ -184,6 +184,18 @@ export const ROSETTE_PALETTES: DropdownOption<PolynomialPalette>[] = [
       far_color: '#e36802',
       far_power: 19
     }
+  },
+  {
+    id: 'lemon_lime',
+    label: 'Lemon Lime',
+    value: {
+      version: 1,
+      palette_type: 'secondary-half',
+      primary_color: '#00ff6e',
+      secondary_color: '#ffbb00',
+      far_color: '#ffffff',
+      far_power: 4
+    }
   }
 ].map((x) => {
   return {

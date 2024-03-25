@@ -17,15 +17,11 @@ onMounted(() => {
 </script>
 
 <template>
-  <div class="container" ref="container"></div>
+  <div class="vertical" ref="container"></div>
 </template>
 
 <style>
-.container {
-  display: inline-block;
-}
-
-.container canvas {
+.vertical canvas {
   max-width: 80vw;
   object-fit: contain;
 }

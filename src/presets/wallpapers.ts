@@ -149,6 +149,40 @@ export const WALLPAPER_PATTERNS: DropdownOption<WallpaperPattern>[] = [
       },
       group: 'p31m'
     }
+  },
+  {
+    id: 'diamond_blobs',
+    label: 'Diamond Blobs',
+    value: {
+      version: 1,
+      series: {
+        terms: [
+          '0.000,1.000,0.478,2.690',
+          '-1.000,0.000,0.341,5.537',
+          '1.000,0.000,0.341,5.537',
+          '0.000,-1.000,0.478,2.690'
+        ]
+      },
+      group: 'p2'
+    }
+  },
+  {
+    id: 'sinusoidal',
+    label: 'Sinusoidal',
+    value: {
+      version: 1,
+      series: {
+        terms: [
+          '-1.000,1.000,0.740,6.173',
+          '1.000,1.000,-0.740,6.173',
+          '-1.000,0.000,-1.000,3.103',
+          '1.000,0.000,-1.000,3.103',
+          '-1.000,-1.000,-0.740,6.173',
+          '1.000,-1.000,0.740,6.173'
+        ]
+      },
+      group: 'pmg'
+    }
   }
 ].map((x) => {
   return {

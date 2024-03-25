@@ -282,6 +282,17 @@ export const ROSETTE_PATTERNS: DropdownOption<PolynomialPattern>[] = [
       },
       rotation_order: 3
     }
+  },
+  {
+    id: 'intersection',
+    label: 'Intersection',
+    value: {
+      version: 1,
+      series: {
+        terms: ['1.000,0.000,0.615,6.101', '-1.000,-1.000,1.106,2.373']
+      },
+      rotation_order: 4
+    }
   }
 ].map((x) => {
   return {

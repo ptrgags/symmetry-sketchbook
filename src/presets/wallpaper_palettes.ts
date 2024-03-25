@@ -74,6 +74,39 @@ export const WALLPAPER_PALETTES: DropdownOption<WallpaperPalette>[] = [
       diagonal_thickness: 2,
       colors: ['#412906', '#ffffff', '#fed2f2']
     }
+  },
+  {
+    id: 'progress',
+    label: 'Progress',
+    value: {
+      version: 1,
+      palette_type: 0,
+      diagonal_thickness: 4,
+      colors: [
+        '#ffff00',
+        '#ffffff',
+        '#f4c7eb',
+        '#a4e8fe',
+        '#623b04',
+        '#000000',
+        '#ff0000',
+        '#ff7300',
+        '#eeff00',
+        '#149022',
+        '#1329cd',
+        '#6214c2'
+      ]
+    }
+  },
+  {
+    id: 'none_of_the_above',
+    label: 'None of the Above',
+    value: {
+      version: 1,
+      palette_type: 1,
+      diagonal_thickness: 4,
+      colors: ['#ffdd00', '#ffffff', '#9900ff', '#000000']
+    }
   }
 ].map((x) => {
   return {
