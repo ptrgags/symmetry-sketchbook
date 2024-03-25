@@ -4,7 +4,7 @@ import { PolynomialPaletteSerializer } from '@/core/serialization/SerializedPoly
 
 const PALETTE_SERIALIZER = new PolynomialPaletteSerializer()
 
-export const PALETTE_PRESETS: DropdownOption<PolynomialPalette>[] = [
+export const ROSETTE_PALETTES: DropdownOption<PolynomialPalette>[] = [
   {
     id: 'royal_flower',
     label: 'Royal Flower',
@@ -182,6 +182,135 @@ export const PALETTE_PRESETS: DropdownOption<PolynomialPalette>[] = [
       primary_color: '#a3bfff',
       secondary_color: '#3876b7',
       far_color: '#e36802',
+      far_power: 19
+    }
+  }
+].map((x) => {
+  return {
+    id: x.id,
+    label: x.label,
+    value: PALETTE_SERIALIZER.deserialize(x.value)
+  }
+})
+
+export const FRIEZE_PALETTES: DropdownOption<PolynomialPalette>[] = [
+  {
+    id: 'purple_green',
+    label: 'Purple and Green',
+    value: {
+      version: 1,
+      palette_type: 'secondary-half',
+      primary_color: '#7f00ff',
+      secondary_color: '#7fff00',
+      far_color: '#ffffff',
+      far_power: 4
+    }
+  },
+  {
+    id: 'cool_colors',
+    label: 'Cool Colors',
+    value: {
+      version: 1,
+      palette_type: 'secondary-alternate',
+      primary_color: '#47e0ff',
+      secondary_color: '#b4b6fe',
+      far_color: '#9aedfe',
+      far_power: 4
+    }
+  },
+  {
+    id: 'ink_stains',
+    label: 'Ink Stains',
+    value: {
+      version: 1,
+      palette_type: 'secondary-half',
+      primary_color: '#16078d',
+      secondary_color: '#ffffff',
+      far_color: '#a7afec',
+      far_power: 13
+    }
+  },
+  {
+    id: 'mint_silhouette',
+    label: 'Mint Silhouette',
+    value: {
+      version: 1,
+      palette_type: 'secondary-half',
+      primary_color: '#000000',
+      secondary_color: '#5cffb3',
+      far_color: '#ffffff',
+      far_power: 13
+    }
+  },
+  {
+    id: 'magenta_orange',
+    label: 'Magenta and Orange',
+    value: {
+      version: 1,
+      palette_type: 'secondary-half',
+      primary_color: '#ff00f7',
+      secondary_color: '#f57600',
+      far_color: '#ffffff',
+      far_power: 19
+    }
+  },
+  {
+    id: 'blue_fade',
+    label: 'Blue Fade',
+    value: {
+      version: 1,
+      palette_type: 'primary',
+      primary_color: '#3e6efe',
+      secondary_color: '#ffffff',
+      far_color: '#e88787',
+      far_power: 19
+    }
+  },
+  {
+    id: 'focus',
+    label: 'Focus',
+    value: {
+      version: 1,
+      palette_type: 'invert-secondary-alternate',
+      primary_color: '#ff6600',
+      secondary_color: '#11ff00',
+      far_color: '#000000',
+      far_power: 19
+    }
+  },
+  {
+    id: 'flamingo',
+    label: 'Flamingo',
+    value: {
+      version: 1,
+      palette_type: 'secondary-half',
+      primary_color: '#f575a2',
+      secondary_color: '#f3aaca',
+      far_color: '#ffffff',
+      far_power: 19
+    }
+  },
+  {
+    id: 'yolk',
+    label: 'Yolk',
+    value: {
+      version: 1,
+      palette_type: 'secondary-circle',
+      primary_color: '#ffffff',
+      secondary_color: '#ffbb00',
+      far_color: '#ffffff',
+      far_power: 19
+    }
+  },
+  {
+    id: 'red_black',
+    label: 'Red and Black',
+    value: {
+      version: 1,
+      palette_type: 'secondary-circle',
+      primary_color: '#ff0000',
+      secondary_color: '#000000',
+      far_color: '#ffffff',
       far_power: 19
     }
   }

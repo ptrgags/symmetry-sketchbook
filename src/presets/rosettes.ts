@@ -4,7 +4,7 @@ import type { PolynomialPattern } from '@/sketches/PolynomialSketch'
 
 const PATTERN_SERIALIZER = new PolynomialPatternSerializer()
 
-export const ROSETTE_PRESETS: DropdownOption<PolynomialPattern>[] = [
+export const ROSETTE_PATTERNS: DropdownOption<PolynomialPattern>[] = [
   {
     id: 'hexaflower',
     label: 'Hexaflower',

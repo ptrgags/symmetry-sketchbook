@@ -12,9 +12,11 @@ import { default_palette, type PolynomialPalette } from '@/core/point_symmetry/P
 import { type ReferenceGeometryCollection, default_ref_geom } from '@/core/ReferenceGeometry'
 import ReferenceGeometryEditor from '@/components/ReferenceGeometryEditor.vue'
 import DropdownSelect from '@/components/DropdownSelect.vue'
-import { ROSETTE_PRESETS } from '@/presets/rosettes'
+import { ROSETTE_PATTERNS } from '@/presets/rosettes'
 import { get_string_param } from '@/core/query_util'
-import { PALETTE_PRESETS } from '@/presets/polynomial_palettes'
+import { FRIEZE_PALETTES, ROSETTE_PALETTES } from '@/presets/polynomial_palettes'
+import { type DropdownOption } from '@/core/DropdownOption'
+import { FRIEZE_PATTERNS } from '@/presets/friezes'
 
 const props = defineProps<{
   symmetryMode: 'rosette' | 'frieze'
@@ -22,6 +24,14 @@ const props = defineProps<{
 
 const title = computed<string>(() => {
   return props.symmetryMode === 'frieze' ? 'Frieze Symmetry Gallery' : 'Rosette Symmetry Gallery'
+})
+
+const pattern_options = computed<DropdownOption<PolynomialPattern>[]>(() => {
+  return props.symmetryMode === 'frieze' ? FRIEZE_PATTERNS : ROSETTE_PATTERNS
+})
+
+const palette_options = computed<DropdownOption<PolynomialPalette>[]>(() => {
+  return props.symmetryMode === 'frieze' ? FRIEZE_PALETTES : ROSETTE_PALETTES
 })
 
 const selected_pattern = defineModel<PolynomialPattern>('selected_pattern')
@@ -56,7 +66,7 @@ async function handle_pattern(preset_id: string | undefined, custom_pattern: str
   }
 
   if (preset_id) {
-    const preset = ROSETTE_PRESETS.find((x) => x.id === preset_id)
+    const preset = pattern_options.value.find((x) => x.id === preset_id)
     if (preset) {
       selected_pattern.value = preset.value
       sketch.pattern = preset.value
@@ -64,7 +74,7 @@ async function handle_pattern(preset_id: string | undefined, custom_pattern: str
     }
   }
 
-  selected_pattern.value = ROSETTE_PRESETS[0].value
+  selected_pattern.value = pattern_options.value[0].value
   sketch.pattern = selected_pattern.value
 }
 
@@ -79,14 +89,14 @@ async function handle_palette(preset_id: string | undefined, custom_palette: str
   }
 
   if (preset_id) {
-    const preset = PALETTE_PRESETS.find((x) => x.id == preset_id)
+    const preset = palette_options.value.find((x) => x.id == preset_id)
     if (preset) {
       selected_palette.value = preset.value
       sketch.palette = preset.value
     }
   }
 
-  selected_palette.value = PALETTE_PRESETS[0].value
+  selected_palette.value = palette_options.value[0].value
   sketch.palette = selected_palette.value
 }
 
@@ -141,12 +151,12 @@ watch(selected_palette, (value) => {
     <template #right>
       <h1>{{ title }}</h1>
       <div class="form-row">
-        <DropdownSelect :options="ROSETTE_PRESETS" v-model="selected_pattern"
+        <DropdownSelect :options="pattern_options" v-model="selected_pattern"
           >Pattern:
         </DropdownSelect>
       </div>
       <div class="form-row">
-        <DropdownSelect :options="PALETTE_PRESETS" v-model="selected_palette"
+        <DropdownSelect :options="palette_options" v-model="selected_palette"
           >Palette:
         </DropdownSelect>
       </div>
