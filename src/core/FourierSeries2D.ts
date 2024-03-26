@@ -68,53 +68,6 @@ export class FourierSeries2D {
       return [r, theta]
     })
   }
-  /*
-  get arrays() {
-    const powers = []
-    const coeffs = []
-    for (const [n, m, amp, phase] of this) {
-      powers.push(n, m)
-      coeffs.push(amp, phase)
-    }
-
-    return {
-      powers,
-      coeffs
-    }
-  }
-  */
-
-  /*
-  to_html() {
-    const parts = []
-    for (const [n, m, amp, phase] of this) {
-      const amp3 = amp.toPrecision(3)
-      const phase_deg3 = degrees(phase).toPrecision(3)
-      const tuple = `(${n}, ${m}, ${amp3}, ${phase_deg3}°)`
-      parts.push(tuple)
-    }
-    return parts.join('<br/>')
-  }
-  */
-
-  /*
-  static from_random() {
-    const terms = []
-
-    for (let i = 0; i < 5; i++) {
-      const n = rand_int(-10, 10)
-      const m = rand_int(-10, 10)
-      const amp = 1.0 / (n - m + 1)
-      const phase = 2.0 * Math.PI * Math.random()
-      terms.push({
-        frequencies: { n, m },
-        coefficient: new ComplexPolar(amp, phase)
-      })
-    }
-
-    return new FourierSeries2D(terms)
-  }
-  */
 
   static from_quasi_symmetry(k: 5 | 7): FourierSeries2D {
     const terms = []

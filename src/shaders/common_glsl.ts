@@ -11,8 +11,6 @@ common.defines = `
 // anyway, so I'm just going to list them in one big block.
 
 common.uniforms = `
-
-
 // current canvas aspect ratio (width / height);
 uniform float aspect;
 // Scale factor for zooming
@@ -45,21 +43,6 @@ uniform float num_terms;
 // the k in k-fold rotations. Needed for the palette
 uniform float rotation_order;
 `
-/*
-// 1.0 to enable, 0.0 to disable
-uniform float show_ref_geometry;
-
-// animation parameters. for each (n, m) term
-// we have a phase delta, which turns the coefficient into:
-// (r, theta + phase_delta * time))
-uniform float animation[MAX_TERMS];
-
-// If true, the polynomial will be run a second time with the
-// animation direction reversed. For waves, this produces
-// a standing wave effect.
-uniform bool enable_standing_waves;
-`
-*/
 
 common.uniforms_ref_geom = `
 uniform vec4 grid_xyrt;
@@ -209,60 +192,5 @@ vec2 to_rect(vec2 polar) {
     float x = polar.x * cos(polar.y);
     float y = polar.x * sin(polar.y);
     return vec2(x, y);
-}
-`
-
-common.funcs_animation = `
-// Triangle wave whose range is [0, num_terms]. This way we can animate
-// back and forth through the terms.
-float back_and_forth(float t) {
-    float n = num_terms - 1.0;
-    return abs(mod(t - n, 2.0 * n) - n);
-}
-
-// Create a set of blending coefficients for N terms with the following
-// animation:
-// ---------------------------------------------
-//     time    | what's shown
-// ------------+--------------------------------
-//      0      | term 0 only
-// 0.25 - 0.75 | blend between terms 0 and 1
-//      1      | term 1 only
-// 1.25 - 0.75 | blend between terms 1 and 2
-//      2      | term 2 only
-//     ...     | ...and so on
-//      N      | term N only
-// N.25 - N.75 | blend between terms N and N-1
-//   (N + 1)   | term N - 1 only 
-//     ...     | ...progressing backwards
-//     2N      | term 0 only
-//     ...     | ...keep blending back and forth
-float blend_pairwise(float term) {
-    if (!show_wave_components) {
-        return 1.0;
-    }
-
-    // The blending function moves back and forth across the N terms
-    float t = back_and_forth(time);
-
-    // clamp a v-shaped function and flip to create a trapezoid shape.
-    // This allows a pause before each transition
-    float valley = 2.0 * abs(term - t) - 0.5;
-    return 1.0 - clamp(valley, 0.0, 1.0);
-}
-`
-
-common.funcs_standing_waves = `
-vec2 standing_waves(vec2 complex) {
-    vec2 z = compute(complex, -1.0);
-
-    if (enable_standing_waves) {
-        // To compute standing waves, simply add a wave that's propagating
-        // in the opposite direction
-        z += compute(complex, 1.0);
-        z *= 0.5;
-    }
-
-    return z;
 }
 `

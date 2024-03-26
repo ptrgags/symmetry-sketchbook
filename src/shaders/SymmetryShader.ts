@@ -55,14 +55,4 @@ export class SymmetryShader extends Shader {
       shader.setUniform('coeffs', this.coefficients_buffer)
     }
   }
-
-  set_animation(animation_params: number[]) {
-    this.enable()
-    const animation_buffer = pad_zeros(animation_params, MAX_TERMS)
-
-    const shader = this.shader
-    if (shader) {
-      shader.setUniform('animation', animation_buffer)
-    }
-  }
 }

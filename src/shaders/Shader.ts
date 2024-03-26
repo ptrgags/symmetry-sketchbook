@@ -129,7 +129,6 @@ export class Shader {
     }
   }
 
-  // Temporary?
   draw() {
     const sketch = this.sketch
     if (!sketch) {

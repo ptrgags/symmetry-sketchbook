@@ -2,7 +2,19 @@ import p5 from 'p5'
 import { Sketch } from '@/core/Sketch'
 import { type Pixel } from '@/core/Pixel'
 import { FourierSeries } from '@/core/curve_symmetry/FourierSeries'
-import { draw_polyline } from '@/core/sketch_util'
+
+export function draw_polyline(p: p5, points: Pixel[], close: boolean) {
+  p.beginShape()
+  for (const { x, y } of points) {
+    p.vertex(x, y)
+  }
+
+  if (close) {
+    p.endShape(p.CLOSE)
+  } else {
+    p.endShape()
+  }
+}
 
 const MAX_X = 2.0
 const PERIOD = 800
