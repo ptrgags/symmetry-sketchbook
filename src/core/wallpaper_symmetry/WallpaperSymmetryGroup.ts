@@ -221,6 +221,7 @@ export const COLOR_REVERSING_GROUPS: { [key: string]: WallpaperSymmetryGroup } =
   pmm_cmm: {
     lattice: 'rhombus',
     rules: [{ partner: 'swap' }, { partner: 'negate' }],
+    parity: 'odd_nm',
     color_reversing: ColorReversingType.Vertical
   },
   // Rectangular cell with half-turns
@@ -229,6 +230,9 @@ export const COLOR_REVERSING_GROUPS: { [key: string]: WallpaperSymmetryGroup } =
     rules: [{ partner: 'negate_n', negate: 'negate' }, { partner: 'negate' }],
     color_reversing: ColorReversingType.Horizontal
   },
+  // Not sure why this pmg_p2 and pgg_p2 don't seem to work. I double checked that this
+  // matches the recipe in the table... I don't have time to worry about this
+  // now, at least the other 44 groups work 😅
   pmg_p2: {
     lattice: 'rectangle',
     rules: [{ partner: 'swap', negate: 'negate_m1' }, { partner: 'negate' }],
@@ -284,14 +288,17 @@ export const COLOR_REVERSING_GROUPS: { [key: string]: WallpaperSymmetryGroup } =
   // Square cell with negating 4-centers
   p4_p2: {
     lattice: 'square',
-    base_rule: 'square',
-    rules: [{ partner: 'negate_m_swap', negate: 'negate' }],
+    // Not sure why, but I need to explicitly list partner: negate for a few
+    // of these rather than using base_rule square. I think it has to do with
+    // negate_m_swap conflicting with the base rule, but I don't fully
+    // understand it.
+    rules: [{ partner: 'negate' }, { partner: 'negate_m_swap', negate: 'negate' }],
     color_reversing: ColorReversingType.Horizontal
   },
   p4m_pmm: {
     lattice: 'square',
-    base_rule: 'square',
     rules: [
+      { partner: 'negate' },
       { partner: 'negate_m_swap', negate: 'negate' },
       { partner: 'swap', negate: 'negate' }
     ],
@@ -299,8 +306,8 @@ export const COLOR_REVERSING_GROUPS: { [key: string]: WallpaperSymmetryGroup } =
   },
   p4g_pgg: {
     lattice: 'square',
-    base_rule: 'square',
     rules: [
+      { partner: 'negate' },
       { partner: 'negate_m_swap', negate: 'negate' },
       { partner: 'swap', negate: 'negate_nm1' }
     ],
@@ -308,14 +315,17 @@ export const COLOR_REVERSING_GROUPS: { [key: string]: WallpaperSymmetryGroup } =
   },
   p4m_cmm: {
     lattice: 'square',
-    base_rule: 'square',
-    rules: [{ partner: 'negate_m_swap', negate: 'negate' }, { partner: 'swap' }],
+    rules: [
+      { partner: 'negate' },
+      { partner: 'negate_m_swap', negate: 'negate' },
+      { partner: 'swap' }
+    ],
     color_reversing: ColorReversingType.Vertical
   },
   p4g_cmm: {
     lattice: 'square',
-    base_rule: 'square',
     rules: [
+      { partner: 'negate' },
       { partner: 'negate_m_swap', negate: 'negate' },
       { partner: 'swap', negate: 'negate_nm' }
     ],
