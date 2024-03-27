@@ -183,6 +183,22 @@ export const WALLPAPER_PATTERNS: DropdownOption<WallpaperPattern>[] = [
       },
       group: 'pmg'
     }
+  },
+  {
+    id: 'masquerade',
+    label: 'Masquerade',
+    value: {
+      version: 1,
+      series: {
+        terms: [
+          '1.000,2.000,0.822,0.372',
+          '-2.000,1.000,-0.822,0.372',
+          '2.000,1.000,-0.822,0.372',
+          '1.000,-2.000,0.822,0.372'
+        ]
+      },
+      group: 'p4m_pmm'
+    }
   }
 ].map((x) => {
   return {

@@ -107,6 +107,16 @@ export const WALLPAPER_PALETTES: DropdownOption<WallpaperPalette>[] = [
       diagonal_thickness: 4,
       colors: ['#ffdd00', '#ffffff', '#9900ff', '#000000']
     }
+  },
+  {
+    id: 'purple_grey',
+    label: 'Purple and Grey',
+    value: {
+      version: 1,
+      palette_type: 0,
+      diagonal_thickness: 4,
+      colors: ['#7300ff', '#ababab']
+    }
   }
 ].map((x) => {
   return {

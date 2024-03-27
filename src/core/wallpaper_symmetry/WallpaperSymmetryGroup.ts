@@ -148,7 +148,10 @@ export const COLOR_REVERSING_GROUPS: { [key: string]: WallpaperSymmetryGroup } =
   },
   pmg_pg: {
     lattice: 'rectangle',
-    rules: [{ partner: 'negate', negate: 'negate' }],
+    rules: [
+      { partner: 'negate_n', negate: 'negate_m' },
+      { partner: 'negate', negate: 'negate' }
+    ],
     color_reversing: ColorReversingType.Horizontal
   },
   pgg_pg: {
@@ -253,8 +256,143 @@ export const COLOR_REVERSING_GROUPS: { [key: string]: WallpaperSymmetryGroup } =
     rules: [{ partner: 'negate_n', negate: 'negate_m' }, { partner: 'negate' }],
     parity: 'odd_m',
     color_reversing: ColorReversingType.Horizontal
+  },
+  pmg_pmg: {
+    lattice: 'rectangle',
+    rules: [{ partner: 'negate_n', negate: 'negate_m' }, { partner: 'negate' }],
+    parity: 'odd_n',
+    color_reversing: ColorReversingType.Horizontal
+  },
+  cmm_pmg: {
+    lattice: 'rectangle',
+    rules: [{ partner: 'negate_n', negate: 'negate_m' }, { partner: 'negate' }],
+    parity: 'odd_nm',
+    color_reversing: ColorReversingType.Vertical
+  },
+  pmg_pgg: {
+    lattice: 'rectangle',
+    rules: [{ partner: 'negate_n', negate: 'negate_nm' }, { partner: 'negate' }],
+    parity: 'odd_n',
+    color_reversing: ColorReversingType.Vertical
+  },
+  cmm_pgg: {
+    lattice: 'rectangle',
+    rules: [{ partner: 'negate_n', negate: 'negate_nm' }, { partner: 'negate' }],
+    parity: 'odd_nm',
+    color_reversing: ColorReversingType.Horizontal
+  },
+  // Square cell with negating 4-centers
+  p4_p2: {
+    lattice: 'square',
+    base_rule: 'square',
+    rules: [{ partner: 'negate_m_swap', negate: 'negate' }],
+    color_reversing: ColorReversingType.Horizontal
+  },
+  p4m_pmm: {
+    lattice: 'square',
+    base_rule: 'square',
+    rules: [
+      { partner: 'negate_m_swap', negate: 'negate' },
+      { partner: 'swap', negate: 'negate' }
+    ],
+    color_reversing: ColorReversingType.Horizontal
+  },
+  p4g_pgg: {
+    lattice: 'square',
+    base_rule: 'square',
+    rules: [
+      { partner: 'negate_m_swap', negate: 'negate' },
+      { partner: 'swap', negate: 'negate_nm1' }
+    ],
+    color_reversing: ColorReversingType.Vertical
+  },
+  p4m_cmm: {
+    lattice: 'square',
+    base_rule: 'square',
+    rules: [{ partner: 'negate_m_swap', negate: 'negate' }, { partner: 'swap' }],
+    color_reversing: ColorReversingType.Vertical
+  },
+  p4g_cmm: {
+    lattice: 'square',
+    base_rule: 'square',
+    rules: [
+      { partner: 'negate_m_swap', negate: 'negate' },
+      { partner: 'swap', negate: 'negate_nm' }
+    ],
+    color_reversing: ColorReversingType.Vertical
+  },
+  // Square cell with positive 4-centers
+  p4_p4: {
+    lattice: 'square',
+    base_rule: 'square',
+    rules: [{ partner: 'negate_m_swap' }],
+    parity: 'odd_nm',
+    color_reversing: ColorReversingType.Vertical
+  },
+  p4m_p4: {
+    lattice: 'square',
+    base_rule: 'square',
+    rules: [{ partner: 'negate_m_swap' }, { partner: 'swap', negate: 'negate' }],
+    color_reversing: ColorReversingType.Vertical
+  },
+  p4g_p4: {
+    lattice: 'square',
+    base_rule: 'square',
+    rules: [{ partner: 'negate_m_swap' }, { partner: 'swap', negate: 'negate_nm1' }],
+    color_reversing: ColorReversingType.Horizontal
+  },
+  p4m_p4m: {
+    lattice: 'square',
+    base_rule: 'square',
+    rules: [{ partner: 'negate_m_swap' }, { partner: 'swap' }],
+    parity: 'odd_nm',
+    color_reversing: ColorReversingType.Vertical
+  },
+  p4m_p4g: {
+    lattice: 'square',
+    base_rule: 'square',
+    rules: [{ partner: 'negate_m_swap' }, { partner: 'swap', negate: 'negate_nm' }],
+    parity: 'odd_nm',
+    color_reversing: ColorReversingType.Vertical
+  },
+  // Hexagonal cell, p3 symmetry
+  p31m_p3: {
+    lattice: 'hexagon',
+    base_rule: 'hexagon',
+    rules: [{ partner: 'swap', negate: 'negate' }],
+    color_reversing: ColorReversingType.Horizontal
+  },
+  p3m1_p3: {
+    lattice: 'hexagon',
+    base_rule: 'hexagon',
+    rules: [{ partner: 'negate_swap', negate: 'negate' }],
+    color_reversing: ColorReversingType.Horizontal
+  },
+  p6_p3: {
+    lattice: 'hexagon',
+    base_rule: 'hexagon',
+    rules: [{ partner: 'negate', negate: 'negate' }],
+    color_reversing: ColorReversingType.Horizontal
+  },
+  // Hexagonal cell, p6m symmetry
+  p6m_p31m: {
+    lattice: 'hexagon',
+    base_rule: 'hexagon',
+    rules: [{ partner: 'swap' }, { partner: 'negate', negate: 'negate' }],
+    color_reversing: ColorReversingType.Vertical
+  },
+  p6m_p3m1: {
+    lattice: 'hexagon',
+    base_rule: 'hexagon',
+    rules: [{ partner: 'negate_swap' }, { partner: 'negate', negate: 'negate' }],
+    color_reversing: ColorReversingType.Vertical
+  },
+  p6m_p6: {
+    lattice: 'hexagon',
+    base_rule: 'hexagon',
+    rules: [{ partner: 'negate' }, { partner: 'swap', negate: 'negate' }],
+    color_reversing: ColorReversingType.Vertical
   }
-  // TODO: start with pmg/pmg
 } as const
 
 export function find_group(group_id: string): WallpaperSymmetryGroup {

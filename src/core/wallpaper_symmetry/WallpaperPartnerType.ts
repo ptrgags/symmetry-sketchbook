@@ -1,6 +1,12 @@
 import type { Frequency2D } from '../Frequency2D'
 
-export type WallpaperPartnerType = 'negate' | 'negate_n' | 'negate_m' | 'swap' | 'negate_swap'
+export type WallpaperPartnerType =
+  | 'negate'
+  | 'negate_n'
+  | 'negate_m'
+  | 'swap'
+  | 'negate_swap'
+  | 'negate_m_swap'
 export type PartnerFunc = (frequencies: Frequency2D) => Frequency2D
 
 const PARTNER_FUNCTIONS: { [key in WallpaperPartnerType]: PartnerFunc } = {
@@ -18,6 +24,9 @@ const PARTNER_FUNCTIONS: { [key in WallpaperPartnerType]: PartnerFunc } = {
   },
   negate_swap: ({ n, m }) => {
     return { n: -m, m: -n }
+  },
+  negate_m_swap: ({ n, m }) => {
+    return { n: -m, m: n }
   }
 }
 
