@@ -49,7 +49,9 @@ function step_class(state: TieDyeState): string[] {
         </li>
         <li>
           <span :class="step_class(TieDyeState.Dyeing)">Dyeing</span> &mdash; Color the points based
-          on where they land. This is like dyeing the t-shirt.
+          on where they land. This is like dyeing the t-shirt. Notice that wherever the pattern
+          overlaps itself, multiple points will have the same color. Careful choice of overlap is
+          how symmetry is produced.
         </li>
         <li>
           <span :class="step_class(TieDyeState.Untying)">Untying</span> &mdash; Finally, return the
@@ -64,5 +66,9 @@ function step_class(state: TieDyeState): string[] {
 <style scoped>
 .highlight-step {
   color: var(--color-accent-dark);
+}
+
+li {
+  padding: 5px;
 }
 </style>
