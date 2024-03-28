@@ -74,6 +74,10 @@ details {
   box-sizing: border-box;
 }
 
+.center {
+  margin: 0 auto;
+}
+
 @media screen and (max-width: 1000px) {
   .horizontal {
     flex-direction: column;

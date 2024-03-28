@@ -1,6 +1,8 @@
 <script setup lang="ts">
 import TwoColumns from '@/components/TwoColumns.vue'
 import P5Sketch from '@/components/P5Sketch.vue'
+import TabLayout from '@/components/TabLayout.vue'
+import TabContent from '@/components/TabContent.vue'
 
 import { ref, computed, type ComputedRef } from 'vue'
 import { CurveSymmetryType, SYMMETRY_TYPES } from '@/core/curve_symmetry/CurveSymmetryType'
@@ -130,27 +132,111 @@ function get_label(symmetry: CurveSymmetryType) {
 </script>
 
 <template>
+  <h2>Curve Maker</h2>
   <TwoColumns>
     <template #left><P5Sketch :sketch="viewer"></P5Sketch></template>
     <template #right>
-      <div class="vertical">
-        <h1>Curve Maker</h1>
-        <label for="symmetry-type">Symmetry Type: </label>
-        <select id="symmetry-type" v-model="symmetry_type" @change="change_symmetry">
-          <option v-for="(symmetry, index) in SYMMETRY_TYPES" :key="index" :value="symmetry">
-            {{ get_label(symmetry) }}
-          </option>
-        </select>
-        <P5Sketch :sketch="term_grid"></P5Sketch>
-        <P5Sketch :sketch="picker"></P5Sketch>
-        <div v-if="pattern_base64" class="form-row">
-          <RouterLink
-            :to="{ path: '/curve_symmetry', query: { pattern: pattern_base64 } }"
-            target="_blank"
-            >Viewer Link</RouterLink
-          >
-        </div>
-      </div>
+      <TabLayout>
+        <TabContent title="Symmetry">
+          <div class="form-row">
+            <label
+              >Symmetry Type:
+              <select id="symmetry-type" v-model="symmetry_type" @change="change_symmetry">
+                <option v-for="(symmetry, index) in SYMMETRY_TYPES" :key="index" :value="symmetry">
+                  {{ get_label(symmetry) }}
+                </option>
+              </select>
+            </label>
+          </div>
+          <p>
+            Select a symmetry type from the dropdown above. Then switch to the Pattern tab to edit
+            the curve.
+          </p>
+          <p>
+            <strong>Note:</strong> changing the symmetry type will reset the pattern! This is
+            because the mathematical constraints are often different from one symmetry type to the
+            next.
+          </p>
+          <details>
+            <summary>Math Details</summary>
+            <p>
+              Symmetry types are of the form: "
+              <math><mi>k</mi></math>
+              -fold symmetry of type
+              <math><mi>d</mi></math>
+              ".
+              <math><mi>k</mi></math> determines how many "petals" the pattern will have. Meanwhile,
+              <math><mi>d</mi></math> determines how far around the circle you move for each petal.
+            </p>
+            <p>
+              For example, 5-fold symmetry of type 1 draws the petals one by one counterclockwise
+              (like a pentagon). Meanwhile 5-fold symmetry of type 2 would visit every second petal
+              (like a star).
+            </p>
+          </details>
+        </TabContent>
+        <TabContent title="Pattern">
+          <p>
+            Select a term from the grid. Then click and drag in the complex plane below to edit the
+            term. Curves need at least 2 terms (else the result will be a circle).
+          </p>
+          <div class="form-row">
+            <P5Sketch :sketch="term_grid"></P5Sketch>
+          </div>
+          <div class="form-row">
+            <P5Sketch :sketch="picker"></P5Sketch>
+          </div>
+          <details>
+            <summary>Math Details</summary>
+            <p>
+              Based on your choice in the Symmetry tab, this page will automatically update the list
+              of terms to produce the symmetry.
+            </p>
+            <p>
+              The number next to each spinner represents an integer frequency. To create (at least)
+              k-fold symmetry, the terms you choose must satisfy:
+            </p>
+            <!-- Generated with https://temml.org/ -->
+            <math
+              xmlns="http://www.w3.org/1998/Math/MathML"
+              display="block"
+              class="tml-display"
+              style="display: block math"
+            >
+              <mrow>
+                <mi>n</mi>
+                <mo>≡</mo>
+                <mi>d</mi>
+                <mo></mo>
+                <mspace width="1em"></mspace>
+                <mo form="prefix" stretchy="false">(</mo>
+                <mrow>
+                  <mtext></mtext>
+                  <mi>mod</mi>
+                </mrow>
+                <mspace width="0.3333em"></mspace>
+                <mi>k</mi>
+                <mo form="postfix" stretchy="false">)</mo>
+              </mrow>
+            </math>
+            <p>
+              Note that it is possible to produce curves with <em>more</em> symmetry than the
+              selected option, by picking terms that are evenly spaced apart.
+            </p>
+          </details>
+        </TabContent>
+        <TabContent title="Export">
+          <div v-if="pattern_base64" class="form-row">
+            <RouterLink
+              :to="{ path: '/curve_symmetry', query: { pattern: pattern_base64 } }"
+              target="_blank"
+              class="center"
+              >Link to curve</RouterLink
+            >
+          </div>
+          <div v-else>Create a pattern using the other tabs, then a link will appear here</div>
+        </TabContent>
+      </TabLayout>
     </template>
   </TwoColumns>
 </template>

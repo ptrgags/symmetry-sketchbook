@@ -196,12 +196,12 @@ watch(
 </script>
 
 <template>
+  <h2>{{ title }}</h2>
   <TwoColumns>
     <template #left>
       <P5Sketch :sketch="viewer"></P5Sketch>
     </template>
     <template #right>
-      <h1>{{ title }}</h1>
       <TabLayout>
         <TabContent title="Symmetry">
           <PolynomialSymmetryEditor
