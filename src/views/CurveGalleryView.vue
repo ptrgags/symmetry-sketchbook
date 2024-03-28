@@ -80,7 +80,7 @@ watch(show_arm, (value) => {
   <h2>Curve Symmetry Gallery</h2>
   <TwoColumns>
     <template #left>
-      <P5Sketch :sketch="sketch"></P5Sketch>
+      <P5Sketch :sketch="sketch" :is_card="true"></P5Sketch>
     </template>
     <template #right>
       <div class="form-row">

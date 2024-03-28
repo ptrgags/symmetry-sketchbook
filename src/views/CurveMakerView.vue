@@ -134,7 +134,7 @@ function get_label(symmetry: CurveSymmetryType) {
 <template>
   <h2>Curve Maker</h2>
   <TwoColumns>
-    <template #left><P5Sketch :sketch="viewer"></P5Sketch></template>
+    <template #left><P5Sketch :sketch="viewer" :is_card="true"></P5Sketch></template>
     <template #right>
       <TabLayout>
         <TabContent title="Symmetry">
@@ -181,10 +181,10 @@ function get_label(symmetry: CurveSymmetryType) {
             term. Curves need at least 2 terms (else the result will be a circle).
           </p>
           <div class="form-row">
-            <P5Sketch :sketch="term_grid"></P5Sketch>
+            <P5Sketch :sketch="term_grid" :is_card="false"></P5Sketch>
           </div>
           <div class="form-row">
-            <P5Sketch :sketch="picker"></P5Sketch>
+            <P5Sketch :sketch="picker" :is_card="false"></P5Sketch>
           </div>
           <details>
             <summary>Math Details</summary>

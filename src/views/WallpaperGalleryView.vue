@@ -131,7 +131,7 @@ watch(selected_palette, (value) => {
 <template>
   <TwoColumns>
     <template #left>
-      <P5Sketch :sketch="sketch"></P5Sketch>
+      <P5Sketch :sketch="sketch" :is_card="true"></P5Sketch>
     </template>
     <template #right>
       <h1>Wallpaper Gallery</h1>

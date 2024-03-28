@@ -31,7 +31,7 @@ function step_class(state: TieDyeState): string[] {
   <h2>Tie-Dye Analogy</h2>
   <TwoColumns>
     <template #left>
-      <P5Sketch :sketch="sketch"></P5Sketch>
+      <P5Sketch :sketch="sketch" :is_card="true"></P5Sketch>
     </template>
     <template #right>
       <p>
