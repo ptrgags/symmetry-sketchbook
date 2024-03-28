@@ -119,7 +119,7 @@ export class TieDyeAnalogySketch extends Sketch<TieDyeAnalogyState> {
     this.shader.set_uniform('tie', get_tie_amount(tie_dye_state, transition_percent))
     this.shader.set_uniform('dye', get_dye_amount(tie_dye_state, transition_percent))
 
-    p.background(0, 40, 45)
+    p.background(0)
     this.shader.draw()
   }
 }

@@ -3,7 +3,7 @@ import P5Sketch from '@/components/P5Sketch.vue'
 import TwoColumns from '@/components/TwoColumns.vue'
 import { ROSETTES } from '@/presets/parametric_curves'
 import { ParametricCurveSketch } from '@/sketches/ParametricCurveSketch'
-import { onMounted, watch } from 'vue'
+import { onMounted, ref, watch } from 'vue'
 import { useRoute } from 'vue-router'
 import { is_string } from '@/core/validation'
 import { from_compressed_json } from '@/core/serialization/serialization'
@@ -11,8 +11,8 @@ import { FourierSeriesSerializer } from '@/core/serialization/SerializedFourierS
 
 const route = useRoute()
 
-const selected_preset = defineModel<string>('selected_preset')
-const show_arm = defineModel<boolean>('show_arm', { default: true })
+const selected_preset = ref<string>()
+const show_arm = ref<boolean>(true)
 
 const sketch = new ParametricCurveSketch({
   pattern: undefined,
@@ -71,11 +71,12 @@ watch(show_arm, (value) => {
     </template>
     <template #right>
       <h1>Curve Symmetry Gallery</h1>
-      <label for="preset-select">Select Preset:</label>
-      &nbsp;
-      <select id="preset-select" v-model="selected_preset">
-        <option v-for="key in Object.keys(ROSETTES)" :key="key" :value="key">{{ key }}</option>
-      </select>
+      <div class="form-row">
+        <label for="preset-select">Select Preset:</label>
+        <select id="preset-select" v-model="selected_preset">
+          <option v-for="key in Object.keys(ROSETTES)" :key="key" :value="key">{{ key }}</option>
+        </select>
+      </div>
       <div class="form-row">
         <label><input type="checkbox" v-model="show_arm" /> Show drawing arm</label>
       </div>

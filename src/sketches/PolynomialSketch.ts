@@ -41,7 +41,7 @@ export class PolynomialSketch extends Sketch<PolynomialState> {
   }
 
   draw(p: p5) {
-    p.background(0, 40, 45)
+    p.background(0)
     this.shader.draw()
     this.shader.disable()
   }

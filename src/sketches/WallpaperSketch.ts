@@ -43,7 +43,7 @@ export class WallpaperSketch extends Sketch<WallpaperState> {
   }
 
   draw(p: p5) {
-    p.background(0, 40, 45)
+    p.background(0)
     this.shader.draw()
   }
 

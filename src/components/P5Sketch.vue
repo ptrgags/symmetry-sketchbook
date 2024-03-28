@@ -1,6 +1,5 @@
 <script setup lang="ts" generic="T">
 import type { Sketch } from '@/core/Sketch'
-import p5 from 'p5'
 import { ref, onMounted, type Ref } from 'vue'
 
 const props = defineProps<{
@@ -24,5 +23,6 @@ onMounted(() => {
 .vertical canvas {
   max-width: 80vw;
   object-fit: contain;
+  background-color: black;
 }
 </style>

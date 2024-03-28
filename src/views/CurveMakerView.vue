@@ -13,7 +13,6 @@ import {
 } from '@/sketches/CoefficientPickerSketch'
 import { ComplexPolar, ComplexRect } from '@/core/Complex'
 import type { GridIndices2D } from '@/core/GridIndices2D'
-import { compress_base64 } from '@/core/serialization/gzip_base64'
 import { to_compressed_json } from '@/core/serialization/serialization'
 import { FourierSeriesSerializer } from '@/core/serialization/SerializedFourierSeries'
 
