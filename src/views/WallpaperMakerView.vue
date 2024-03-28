@@ -200,9 +200,14 @@ watch(
       <P5Sketch :sketch="viewer"></P5Sketch>
     </template>
     <template #right>
-      <h1>Wallpaper Maker</h1>
+      <h2>Wallpaper Maker</h2>
       <TabLayout>
         <TabContent title="Symmetry">
+          <p>
+            Using the dropdowns below, select a
+            <a href="https://en.wikipedia.org/wiki/Wallpaper_group">wallpaper group</a> or one of
+            the color-reversing variations listed in <cite>Creating Symmetry</cite>
+          </p>
           <div class="form-row">
             <label for="wallpaper-category">Select Category: </label>
             <select id="wallpaper-category" v-model="category">
@@ -223,12 +228,91 @@ watch(
               </option>
             </select>
           </div>
+          <details>
+            <summary>Math Details</summary>
+            <p>
+              Wallpaper waves are the sum of plane waves traveling in different directions. Given
+              how I implemented them in the shader, I phrase it slightly differently than the book
+              does. The formula looks like this:
+            </p>
+            <math display="block" class="tml-display" style="display: block math">
+              <mrow>
+                <mi>f</mi>
+                <mo form="prefix" stretchy="false">(</mo>
+                <mi>z</mi>
+                <mo form="postfix" stretchy="false">)</mo>
+                <mo>=</mo>
+                <mrow>
+                  <munder>
+                    <mo movablelimits="false">∑</mo>
+                    <mrow>
+                      <mi>n</mi>
+                      <mo separator="true">,</mo>
+                      <mi>m</mi>
+                    </mrow>
+                  </munder>
+                </mrow>
+                <msub>
+                  <mi>a</mi>
+                  <mrow>
+                    <mi>n</mi>
+                    <mo separator="true">,</mo>
+                    <mi>m</mi>
+                  </mrow>
+                </msub>
+                <msup>
+                  <mi>e</mi>
+                  <mrow>
+                    <mn>2</mn>
+                    <mi>π</mi>
+                    <mi>i</mi>
+                    <mo form="prefix" stretchy="false">(</mo>
+                    <mi>k</mi>
+                    <mo>⋅</mo>
+                    <msup>
+                      <mi>A</mi>
+                      <mrow>
+                        <mo form="prefix" stretchy="false" lspace="0em" rspace="0em">−</mo>
+                        <mn>1</mn>
+                      </mrow>
+                    </msup>
+                    <mi>z</mi>
+                    <mo form="postfix" stretchy="false" lspace="0em" rspace="0em">)</mo>
+                  </mrow>
+                </msup>
+              </mrow>
+            </math>
+            <p>
+              Where <math><mi>A</mi></math> is a matrix that changes to the basis of the lattice,
+              <math><mi>k</mi></math> is the wave vector (integer frequencies) and the dot
+              represents a dot product (which makes the wave point in the direction of
+              <math><mi>k</mi></math> )
+            </p>
+            <p>
+              Similarly to the rosettes/friezes, the form takes the selected symmetry type and
+              applies constraints to the coefficients to produce the desired symmetry.
+            </p>
+          </details>
         </TabContent>
         <TabContent title="Pattern">
-          <P5Sketch :sketch="term_grid"></P5Sketch>
-          <P5Sketch :sketch="coefficient_picker"></P5Sketch>
+          <p>
+            Select a term from the grid. Then click and drag in the complex plane below to edit the
+            term.
+          </p>
+          <div class="form-row">
+            <P5Sketch :sketch="term_grid"></P5Sketch>
+          </div>
+          <div class="form-row">
+            <P5Sketch :sketch="coefficient_picker"></P5Sketch>
+          </div>
         </TabContent>
         <TabContent title="Palette">
+          <p>
+            Select a palette type and edit the colors to customize your design. The "Show color
+            palette" button shows what the color palette looks like for reference. See the
+            <RouterLink to="/point_symmetry/tie_dye_analogy">Tie-Dye Analogy page</RouterLink> for
+            an explanation of how the palette is applied.
+          </p>
           <div class="form-row">
             <label>
               <input id="toggle-palette" type="checkbox" v-model="show_palette" />

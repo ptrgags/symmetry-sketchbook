@@ -189,12 +189,44 @@ function get_label(symmetry: CurveSymmetryType) {
           <details>
             <summary>Math Details</summary>
             <p>
-              Based on your choice in the Symmetry tab, this page will automatically update the list
-              of terms to produce the symmetry.
+              As described in the book, these curves are a Fourier series (i.e. sum of circular
+              motion) of the form:
+            </p>
+            <math display="block" class="tml-display" style="display: block math">
+              <mrow>
+                <mi>f</mi>
+                <mo form="prefix" stretchy="false">(</mo>
+                <mi>t</mi>
+                <mo form="postfix" stretchy="false">)</mo>
+                <mo>=</mo>
+                <mrow>
+                  <munder>
+                    <mo movablelimits="false">∑</mo>
+                    <mi>n</mi>
+                  </munder>
+                </mrow>
+                <msub>
+                  <mi>a</mi>
+                  <mi>n</mi>
+                </msub>
+                <msup>
+                  <mi>e</mi>
+                  <mrow>
+                    <mi>i</mi>
+                    <mi>n</mi>
+                    <mi>t</mi>
+                  </mrow>
+                </msup>
+              </mrow>
+            </math>
+            <p>
+              Based on your choice in the Symmetry tab, this page will select the integer
+              frequencies
+              <math><mi>n</mi></math> to produce the selected symmetry.
             </p>
             <p>
-              The number next to each spinner represents an integer frequency. To create (at least)
-              k-fold symmetry, the terms you choose must satisfy:
+              The number next to each spinner represents the frequency. To create (at least) k-fold
+              symmetry, the terms you choose must satisfy:
             </p>
             <!-- Generated with https://temml.org/ -->
             <math
@@ -222,6 +254,10 @@ function get_label(symmetry: CurveSymmetryType) {
             <p>
               Note that it is possible to produce curves with <em>more</em> symmetry than the
               selected option, by picking terms that are evenly spaced apart.
+            </p>
+            <p>
+              Note: the spinner animation is just to show the relative speed of each spinner. The
+              spinners are slowed down so they're easier to follow with your eyes.
             </p>
           </details>
         </TabContent>

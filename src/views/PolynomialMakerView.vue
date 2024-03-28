@@ -208,13 +208,183 @@ watch(
             :symmetry-mode="props.symmetryMode"
             @update:model-value="change_symmetry"
           />
+          <details class="form-row">
+            <summary>Math Details</summary>
+            <p>
+              As described in the first half of <cite>Creating Symmetry</cite> by Frank Farris,
+              rosettes and friezes can be made using complex polynomials of the form:
+            </p>
+            <math display="block" class="tml-display" style="display: block math">
+              <mtable displaystyle="true" columnalign="right left">
+                <mtr>
+                  <mtd class="tml-right" style="padding: 0.7ex 0em 0.7ex 0em">
+                    <mrow>
+                      <msub>
+                        <mi>f</mi>
+                        <mrow>
+                          <mi>r</mi>
+                          <mi>o</mi>
+                          <mi>s</mi>
+                          <mi>e</mi>
+                          <mi>t</mi>
+                          <mi>t</mi>
+                          <mi>e</mi>
+                        </mrow>
+                      </msub>
+                      <mo form="prefix" stretchy="false">(</mo>
+                      <mi>z</mi>
+                      <mo form="postfix" stretchy="false">)</mo>
+                    </mrow>
+                  </mtd>
+                  <mtd class="tml-left" style="padding: 0.7ex 0em 0.7ex 0em">
+                    <mrow>
+                      <mo>=</mo>
+                      <mrow>
+                        <munder>
+                          <mo movablelimits="false">∑</mo>
+                          <mrow>
+                            <mi>n</mi>
+                            <mo separator="true">,</mo>
+                            <mi>m</mi>
+                          </mrow>
+                        </munder>
+                      </mrow>
+                      <msub>
+                        <mi>a</mi>
+                        <mrow>
+                          <mi>n</mi>
+                          <mo separator="true">,</mo>
+                          <mi>m</mi>
+                        </mrow>
+                      </msub>
+                      <msup>
+                        <mi>z</mi>
+                        <mi>n</mi>
+                      </msup>
+                      <msup>
+                        <mover>
+                          <mi>z</mi>
+                          <mo
+                            stretchy="false"
+                            class="tml-xshift"
+                            style="math-style: normal; math-depth: 0"
+                            >‾</mo
+                          >
+                        </mover>
+                        <mi>m</mi>
+                      </msup>
+                    </mrow>
+                  </mtd>
+                </mtr>
+                <mtr>
+                  <mtd class="tml-right" style="padding: 0.7ex 0em 0.7ex 0em">
+                    <mrow>
+                      <msub>
+                        <mi>f</mi>
+                        <mrow>
+                          <mi>f</mi>
+                          <mi>r</mi>
+                          <mi>i</mi>
+                          <mi>e</mi>
+                          <mi>z</mi>
+                          <mi>e</mi>
+                        </mrow>
+                      </msub>
+                      <mo form="prefix" stretchy="false">(</mo>
+                      <mi>z</mi>
+                      <mo form="postfix" stretchy="false">)</mo>
+                    </mrow>
+                  </mtd>
+                  <mtd class="tml-left" style="padding: 0.7ex 0em 0.7ex 0em">
+                    <mrow>
+                      <mo>=</mo>
+                      <msub>
+                        <mi>f</mi>
+                        <mrow>
+                          <mi>r</mi>
+                          <mi>o</mi>
+                          <mi>s</mi>
+                          <mi>e</mi>
+                          <mi>t</mi>
+                          <mi>t</mi>
+                          <mi>e</mi>
+                        </mrow>
+                      </msub>
+                      <mo form="prefix" stretchy="false">(</mo>
+                      <msup>
+                        <mi>e</mi>
+                        <mrow>
+                          <mi>i</mi>
+                          <mi>z</mi>
+                        </mrow>
+                      </msup>
+                      <mo form="postfix" stretchy="false">)</mo>
+                    </mrow>
+                  </mtd>
+                </mtr>
+              </mtable>
+            </math>
+            <p>
+              By careful choice of the coefficients, symmetries of these equations turn into
+              symmetries of the complex function.
+            </p>
+            <p>
+              This form does quite a bit of math behind the scenes to take the symmetry description,
+              and produce constraints for the grid of terms to help enforce the symmetry. The basics
+              are described in chapters 7-8 of the book, but I had to derive the generalization of
+              the patterns myself.
+            </p>
+          </details>
+          <details class="form-row">
+            <summary>Known Issues</summary>
+            <p>
+              This page is the most experimental one of the entire website. It mostly works, but
+              checking the rest is rather tedious. I may return to it someday, but I don't want to
+              hold up showing off the rest of this project that is working.
+            </p>
+            <ul>
+              <li>
+                Roto-inversions/glide reflections seem to be buggy, I haven't gotten around to
+                debugging it.
+              </li>
+              <li>
+                The symmetry options aren't restrictive enough and allow some invalid symmetry
+                rules. For example, for roto-inversions the number of rotations must be even, else
+                the pattern won't line up with itself after a full circle.
+              </li>
+              <li>
+                For the color turning/reversing symmetry options, I realized too late that the
+                recipes are a lot more restrictive than I thought. Since mirrors/inversions are
+                involutions (repeating it twice cancels it out), the only valid color turn for those
+                cases is a half turn.
+              </li>
+            </ul>
+            <p>
+              If I ever update this in the future, the main thing would be to redo this form. If I
+              figure out an exhaustive list of cases, then a dropdown like in the wallpaper maker
+              page would make this a lot simpler for everyone.
+            </p>
+          </details>
         </TabContent>
         <TabContent title="Pattern">
-          <P5Sketch :sketch="term_grid"></P5Sketch>
-          <P5Sketch :sketch="coefficient_picker"></P5Sketch>
+          <p>
+            Select a term from the grid. Then click and drag in the complex plane below to edit the
+            term.
+          </p>
+          <div class="form-row">
+            <P5Sketch :sketch="term_grid"></P5Sketch>
+          </div>
+          <div class="form-row">
+            <P5Sketch :sketch="coefficient_picker"></P5Sketch>
+          </div>
         </TabContent>
         <TabContent title="Palette">
-          <h3>Color Palette</h3>
+          <p>
+            Select a palette type and edit the colors to customize your design. The "Show color
+            palette" button shows what the color palette looks like for reference. See the
+            <RouterLink to="/point_symmetry/tie_dye_analogy">Tie-Dye Analogy page</RouterLink> for
+            an explanation of how the palette is applied.
+          </p>
           <div class="form-row">
             <input id="toggle-palette" type="checkbox" @change="toggle_palette" />
             <label for="toggle-palette"> Show color palette</label>

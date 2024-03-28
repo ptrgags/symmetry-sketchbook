@@ -30,6 +30,7 @@ watch(
     These options help visualize key points in the complex plane. This is aimed at the
     mathematically curious, but I find it also adds some artistic flair to the image!
   </p>
+  <p>Note: reference geometry is not included when exporting patterns.</p>
   <h3>Axes</h3>
 
   <div class="form-row">

@@ -61,8 +61,12 @@ function add_color() {
     </div>
   </div>
   <div v-for="(color, index) in palette.colors" :key="index">
-    <ColorPicker v-model="palette.colors[index]">Color {{ index + 1 }}</ColorPicker>
-    <button @click="remove_color(index)">Remove Color</button>
+    <div class="form-row">
+      <ColorPicker v-model="palette.colors[index]">Color {{ index + 1 }}: </ColorPicker>
+      <button @click="remove_color(index)">Remove Color</button>
+    </div>
   </div>
-  <button @click="add_color">Add color</button>
+  <div class="form-row">
+    <button @click="add_color">Add color</button>
+  </div>
 </template>
