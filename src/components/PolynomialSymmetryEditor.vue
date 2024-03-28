@@ -194,16 +194,4 @@ watch(
   </div>
 </template>
 
-<style>
-.constraint {
-  width: 100%;
-  background-color: var(--color-background-light);
-  margin: 4px 0;
-  padding: 8px;
-}
-.form-row {
-  width: 100%;
-  margin: 4px 0;
-}
-</style>
-@/core/point_symmetry/PolynomialSymmetryRule
+<style></style>

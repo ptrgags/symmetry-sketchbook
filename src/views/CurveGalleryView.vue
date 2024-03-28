@@ -70,9 +70,9 @@ watch(show_arm, (value) => {
       <P5Sketch :sketch="sketch"></P5Sketch>
     </template>
     <template #right>
-      <h1>Curve Symmetry Gallery</h1>
+      <h2>Curve Symmetry Gallery</h2>
       <div class="form-row">
-        <label for="preset-select">Select Preset:</label>
+        <label for="preset-select">Select Preset: </label>
         <select id="preset-select" v-model="selected_preset">
           <option v-for="key in Object.keys(ROSETTES)" :key="key" :value="key">{{ key }}</option>
         </select>

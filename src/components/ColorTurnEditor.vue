@@ -71,4 +71,11 @@ watch([rotations, has_reflection], (new_value, old_value) => {
   </div>
 </template>
 
-<style></style>
+<style scoped>
+.constraint {
+  width: 100%;
+  background-color: var(--color-background-light);
+  margin: 4px 0;
+  padding: 8px;
+}
+</style>
