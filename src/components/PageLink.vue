@@ -30,5 +30,10 @@
     /** Match the size of the image */
     width: 250px;
   }
+
+  .description {
+    max-width: initial;
+    width: 100%;
+  }
 }
 </style>

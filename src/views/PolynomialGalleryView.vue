@@ -163,7 +163,7 @@ watch(selected_palette, (value) => {
       <p>
         Select a pattern and color palette preset from the lists above to view one of my designs.
         The two lists are the same length, and corresponding options (e.g. the third element of each
-        list) are my original designs. However, you can mix and match to get new designs
+        list) are my original designs. However, you can mix and match to get new designs!
       </p>
       <details class="form-row">
         <summary>Reference Geometry</summary>
