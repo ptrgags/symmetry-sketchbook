@@ -7,7 +7,6 @@ import {
   get_partner_type,
   get_rotation_power
 } from './PolynomialSymmetryRule'
-import { fail } from 'assert'
 import { ComplexPolar } from '../Complex'
 
 function ignore_signed_zero(x: number): number {
@@ -304,46 +303,6 @@ describe('PolynomialRule', () => {
     })
   })
 
-  describe('indices_to_diff_sum', () => {
-    test('no rotation', () => {
-      fail('not implemented')
-    })
-
-    test('rotation', () => {
-      fail('not implemented')
-    })
-
-    test('handles odd diagonals correctly', () => {
-      fail('not implemented')
-    })
-  })
-
-  describe('enforce_self_partner_constraint', () => {
-    test('throws for partner constraint', () => {
-      fail('not implemented')
-    })
-
-    test('returns zero if term is invalid', () => {
-      fail('not implemented')
-    })
-
-    test('no output transformation', () => {
-      fail('not implemented')
-    })
-
-    test('output mirrors', () => {
-      fail('not implemented')
-    })
-
-    test('output rotations', () => {
-      fail('not implemented')
-    })
-
-    test('both mirrors and rotations', () => {
-      fail('not implemented')
-    })
-  })
-
   describe('get_partner_term', () => {
     const TERM = new ComplexPolar(2, 0)
 
@@ -373,18 +332,6 @@ describe('PolynomialRule', () => {
           return get_partner_term(x, 0, TERM)
         }).toThrowError()
       })
-    })
-
-    test('mirrored partner term', () => {
-      fail('not implemented')
-    })
-
-    test('rotated partner term', () => {
-      fail('not implemented')
-    })
-
-    test('rotated and mirrored partner term', () => {
-      fail('not implemented')
     })
   })
 })
