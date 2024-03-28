@@ -64,18 +64,6 @@ vec3 palette_1d(float t) {
     return color;
 }
 
-vec3 palette_polar(vec2 z_rect) {
-    vec2 z_polar = to_polar(z_rect);
-
-    // get a normalized angle in [0, 1] starting from the +x axis
-    float angle_normalized = 0.5 + 0.5 * z_polar.y / PI;
-    angle_normalized = fract(angle_normalized - 0.5);
-
-    float t = angle_normalized;
-
-    return palette_1d(fract(2.0 * t));
-}
-
 vec3 palette(vec2 z_rect) {
     // Compute stripes in the x and y direction. The 0.5 factor is
     // so a single repeat of the palette goes from 0 to 2 in the respective
