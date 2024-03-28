@@ -2,7 +2,7 @@
 import { OrbitalMotionSketch, type OrbitalMotionState } from '@/sketches/OrbitalMotionSketch'
 import P5Sketch from '@/components/P5Sketch.vue'
 import TwoColumns from '@/components/TwoColumns.vue'
-import { watch } from 'vue'
+import { ref, watch } from 'vue'
 
 const sketch_state: OrbitalMotionState = {
   planets: [
@@ -42,9 +42,7 @@ const sketch_state: OrbitalMotionState = {
 
 const sketch = new OrbitalMotionSketch(sketch_state)
 
-const perspective = defineModel<number>('perspective', {
-  default: 0
-})
+const perspective = ref<number>(0)
 
 watch(perspective, (value) => {
   sketch_state.reference_planet = value ?? 0
@@ -58,12 +56,16 @@ watch(perspective, (value) => {
     </template>
     <template #right>
       <h1>Orbital Motion</h1>
-      <label for="preset-select">Select Perspective:</label>
-      <select id="preset-select" v-model="perspective">
-        <option v-for="i in sketch_state.planets.length" :key="i" :value="i - 1">
-          {{ i === 1 ? 'Sun' : `Planet ${i - 1}` }}
-        </option>
-      </select>
+      <div class="form-row">
+        <label
+          >Select Perspective:
+          <select id="preset-select" v-model="perspective">
+            <option v-for="i in sketch_state.planets.length" :key="i" :value="i - 1">
+              {{ i === 1 ? 'Sun' : `Planet ${i - 1}` }}
+            </option>
+          </select>
+        </label>
+      </div>
       <p>
         The motion of a solar system looks very different depending on your perspective. Relative to
         the star at the center, the orbits are concentric circles. However, if you center the
@@ -72,7 +74,7 @@ watch(perspective, (value) => {
         <a href="https://en.wikipedia.org/wiki/Epicycloid">epicycloids</a>.
       </p>
       <p>To see this change of perspective, select one of the planets from the dropdown above.</p>
-      <details>
+      <details class="form-row">
         <summary>Fun Fact: Spirograph Art</summary>
         A <a href="https://en.wikipedia.org/wiki/Spirograph">Spirograph</a> can draw epicycloids.
         This happens when the drawing gear rolls along the outside of the ring. What if you put the

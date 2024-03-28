@@ -49,6 +49,10 @@ a:active {
   color: var(--color-accent);
 }
 
+details {
+  padding: 10px;
+}
+
 .horizontal {
   display: flex;
   flex-wrap: wrap;
