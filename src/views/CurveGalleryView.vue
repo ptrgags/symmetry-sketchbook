@@ -1,17 +1,21 @@
 <script setup lang="ts">
 import P5Sketch from '@/components/P5Sketch.vue'
 import TwoColumns from '@/components/TwoColumns.vue'
-import { ROSETTES } from '@/presets/parametric_curves'
+import DropdownSelect from '@/components/DropdownSelect.vue'
+import { PARAMETRIC_CURVES } from '@/presets/parametric_curves'
 import { ParametricCurveSketch } from '@/sketches/ParametricCurveSketch'
 import { onMounted, ref, watch } from 'vue'
 import { useRoute } from 'vue-router'
-import { is_string } from '@/core/validation'
 import { from_compressed_json } from '@/core/serialization/serialization'
 import { FourierSeriesSerializer } from '@/core/serialization/SerializedFourierSeries'
+import type { FourierSeries } from '@/core/curve_symmetry/FourierSeries'
+import { get_string_param } from '@/core/query_util'
+
+const PATTERN_SERIALIZER = new FourierSeriesSerializer()
 
 const route = useRoute()
 
-const selected_preset = ref<string>()
+const selected_preset = ref<FourierSeries>()
 const show_arm = ref<boolean>(true)
 
 const sketch = new ParametricCurveSketch({
@@ -19,19 +23,9 @@ const sketch = new ParametricCurveSketch({
   show_arm: true
 })
 
-async function handle_query() {
-  const query = route.query
-  if (query.preset && is_string(query.preset, 'string')) {
-    const preset_str = query.preset
-    const preset = ROSETTES[preset_str]
-    if (preset) {
-      selected_preset.value = preset_str
-      return
-    }
-  }
-
-  if (query.pattern && is_string(query.pattern, 'pattern')) {
-    const series = await from_compressed_json(query.pattern, new FourierSeriesSerializer())
+async function handle_pattern(preset_id: string | undefined, custom_pattern: string | undefined) {
+  if (custom_pattern) {
+    const series = await from_compressed_json(custom_pattern, PATTERN_SERIALIZER)
     if (series) {
       selected_preset.value = undefined
       sketch.pattern = series
@@ -40,8 +34,28 @@ async function handle_query() {
     }
   }
 
-  // No query params, just select the first one from the dropdown
-  selected_preset.value = Object.keys(ROSETTES)[0]
+  if (preset_id) {
+    const preset = PARAMETRIC_CURVES.find((x) => x.id === preset_id)
+    if (preset) {
+      selected_preset.value = preset.value
+      sketch.pattern = preset.value
+      sketch.restart_animation()
+      return
+    }
+  }
+
+  selected_preset.value = PARAMETRIC_CURVES[0].value
+  sketch.pattern = selected_preset.value
+  sketch.restart_animation()
+}
+
+async function handle_query() {
+  const query = route.query
+
+  handle_pattern(
+    get_string_param(query.pattern, 'pattern'),
+    get_string_param(query.custom_pattern, 'custom_pattern')
+  )
 }
 
 onMounted(() => {
@@ -50,12 +64,10 @@ onMounted(() => {
 
 watch(selected_preset, (value) => {
   if (!value) {
-    // If we don't have a value, it was because the pattern was set via
-    // ?pattern=<base64 string>, this is handled elsewhere
     return
   }
 
-  sketch.pattern = ROSETTES[value]
+  sketch.pattern = value
   sketch.restart_animation()
 })
 
@@ -72,10 +84,9 @@ watch(show_arm, (value) => {
     <template #right>
       <h2>Curve Symmetry Gallery</h2>
       <div class="form-row">
-        <label for="preset-select">Select Preset: </label>
-        <select id="preset-select" v-model="selected_preset">
-          <option v-for="key in Object.keys(ROSETTES)" :key="key" :value="key">{{ key }}</option>
-        </select>
+        <DropdownSelect :options="PARAMETRIC_CURVES" v-model="selected_preset"
+          >Select Preset:
+        </DropdownSelect>
       </div>
       <div class="form-row">
         <label><input type="checkbox" v-model="show_arm" /> Show drawing arm</label>
