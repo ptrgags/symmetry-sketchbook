@@ -32,7 +32,8 @@ const toggle_theta = toggle(theta)
 </script>
 
 <template>
-  <div class="form-row">
+  <div>
+    Enabled:
     <label><input type="checkbox" :checked="x" @change="toggle_x" />x</label>
     <label><input type="checkbox" :checked="y" @change="toggle_y" />y</label>
     <label><input type="checkbox" :checked="r" @change="toggle_r" />r</label>

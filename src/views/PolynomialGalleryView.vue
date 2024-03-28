@@ -144,12 +144,12 @@ watch(selected_palette, (value) => {
 </script>
 
 <template>
+  <h2>{{ title }}</h2>
   <TwoColumns>
     <template #left>
       <P5Sketch :sketch="sketch"></P5Sketch>
     </template>
     <template #right>
-      <h1>{{ title }}</h1>
       <div class="form-row">
         <DropdownSelect :options="pattern_options" v-model="selected_pattern"
           >Pattern:
@@ -160,6 +160,11 @@ watch(selected_palette, (value) => {
           >Palette:
         </DropdownSelect>
       </div>
+      <p>
+        Select a pattern and color palette preset from the lists above to view one of my designs.
+        The two lists are the same length, and corresponding options (e.g. the third element of each
+        list) are my original designs. However, you can mix and match to get new designs
+      </p>
       <details class="form-row">
         <summary>Reference Geometry</summary>
         <ReferenceGeometryEditor v-model="ref_geom"></ReferenceGeometryEditor>

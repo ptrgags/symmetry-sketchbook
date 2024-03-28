@@ -18,18 +18,22 @@ function on_change(e: Event) {
 </script>
 
 <template>
-  <div class="form-row">
-    <label>
-      <slot></slot>
-      <input
-        id="slider"
-        type="range"
-        :min="$props.min"
-        :max="$props.max"
-        :step="$props.step"
-        :value="$props.modelValue"
-        @input="on_change"
-      />
-    </label>
-  </div>
+  <label>
+    <slot></slot>
+    <input
+      id="slider"
+      type="range"
+      :min="$props.min"
+      :max="$props.max"
+      :step="$props.step"
+      :value="$props.modelValue"
+      @input="on_change"
+    />
+  </label>
 </template>
+
+<style scoped>
+input {
+  height: 10px;
+}
+</style>

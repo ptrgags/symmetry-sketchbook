@@ -22,7 +22,7 @@ watch(color_hex, (value) => {
 
 <template>
   <label>
+    <slot class="center-vertically"></slot>
     <input type="color" v-model="color_hex" />
-    <slot></slot>
   </label>
 </template>
