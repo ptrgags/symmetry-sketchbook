@@ -193,5 +193,3 @@ watch(
     ></ColorTurnEditor>
   </div>
 </template>
-
-<style></style>

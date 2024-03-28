@@ -20,9 +20,6 @@ const MAX_X = 2.0
 const PERIOD = 800
 const THICKNESS = 3.0
 
-// TODO: How much of this state should be exposed?
-// the pattern and showing the arm are the main things,
-// start_frame and curve are internal details...
 export interface ParametricCurveState {
   pattern?: FourierSeries
   show_arm: boolean
