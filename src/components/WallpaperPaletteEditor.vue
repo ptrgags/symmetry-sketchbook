@@ -48,18 +48,14 @@ function add_color() {
         <option :value="WallpaperPaletteType.Plaid">Plaid</option>
       </select>
     </label>
-    <div class="form-row" v-show="palette.palette_type === WallpaperPaletteType.Plaid">
-      <label>
-        Plaid diagonal thickness
-        <RangeSlider
-          :min="1"
-          :max="20"
-          :step="1"
-          v-model="palette.diagonal_thickness"
-        ></RangeSlider>
-      </label>
-    </div>
   </div>
+  <div class="form-row" v-show="palette.palette_type === WallpaperPaletteType.Plaid">
+    <label>
+      Plaid diagonal thickness
+      <RangeSlider :min="1" :max="20" :step="1" v-model="palette.diagonal_thickness"></RangeSlider>
+    </label>
+  </div>
+
   <div v-for="(color, index) in palette.colors" :key="index">
     <div class="form-row">
       <ColorPicker v-model="palette.colors[index]">Color {{ index + 1 }}: </ColorPicker>

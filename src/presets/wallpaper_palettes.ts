@@ -117,6 +117,95 @@ export const WALLPAPER_PALETTES: DropdownOption<WallpaperPalette>[] = [
       diagonal_thickness: 4,
       colors: ['#7300ff', '#ababab']
     }
+  },
+  {
+    id: 'black_blue',
+    label: 'Black and Blue',
+    value: {
+      version: 1,
+      palette_type: 0,
+      diagonal_thickness: 4,
+      colors: ['#2c5d90', '#000000']
+    }
+  },
+  {
+    id: 'darkness',
+    label: 'Darkness',
+    value: {
+      version: 1,
+      palette_type: 2,
+      diagonal_thickness: 20,
+      colors: ['#471c73', '#17195e']
+    }
+  },
+  {
+    id: 'avocado',
+    label: 'Avocado',
+    value: {
+      version: 1,
+      palette_type: 0,
+      diagonal_thickness: 20,
+      colors: ['#000000', '#368514', '#614b0f', '#ffffff']
+    }
+  },
+  {
+    id: 'toothpaste',
+    label: 'Toothpaste',
+    value: {
+      version: 1,
+      palette_type: 1,
+      diagonal_thickness: 20,
+      colors: ['#14cbf0', '#ffffff', '#ffffff', '#ff0000', '#ffffff', '#ffffff']
+    }
+  },
+  {
+    id: 'earth',
+    label: 'Earth',
+    value: {
+      version: 1,
+      palette_type: 1,
+      diagonal_thickness: 4,
+      colors: ['#168d2a', '#0b20c1']
+    }
+  },
+  {
+    id: 'bright_plaid',
+    label: 'Bright Plaid',
+    value: {
+      version: 1,
+      palette_type: 2,
+      diagonal_thickness: 1,
+      colors: ['#8f8f8f', '#e44949', '#a522e2', '#ff7b00', '#fe7e06', '#0f701b']
+    }
+  },
+  {
+    id: 'dark_orange_with_context',
+    label: 'Dark Orange with Context',
+    value: {
+      version: 1,
+      palette_type: 2,
+      diagonal_thickness: 1,
+      colors: ['#61410a', '#000000', '#896606']
+    }
+  },
+  {
+    id: 'magenta',
+    label: 'Magenta',
+    value: {
+      version: 1,
+      palette_type: 0,
+      diagonal_thickness: 1,
+      colors: [
+        '#fb00ff',
+        '#ff00bb',
+        '#680075',
+        '#43014b',
+        '#000000',
+        '#d800f5',
+        '#a80092',
+        '#000000'
+      ]
+    }
   }
 ].map((x) => {
   return {
