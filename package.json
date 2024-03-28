@@ -7,6 +7,7 @@
     "dev": "vite",
     "test": "vitest",
     "build": "run-p type-check \"build-only {@}\" --",
+    "deploy": "git subtree push --prefix=dist origin gh-pages",
     "preview": "vite preview",
     "build-only": "vite build",
     "type-check": "vue-tsc --build --force",

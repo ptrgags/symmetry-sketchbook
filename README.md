@@ -1,25 +1,19 @@
-# symmetry-vue
+# Symmetry Sketchbook (2019-2020, 2024)
 
-This template should help get you started developing with Vue 3 in Vite.
+| Parametric Curves | Rosettes | Wallpapers |
+| --- | --- | --- |
+| ![Curve Example](src/assets/thumbnails/curve-gallery.png) | ![Rosette Example](src/assets/thumbnails/rosette-gallery.png) | ![Wallpaper Example](src/assets/thumbnails/wallpaper-gallery.png) |
 
-## Recommended IDE Setup
+Mathematical symmetry experiments based on the book [Creating Symmetry](https://www.google.com/books/edition/Creating_Symmetry/mmqYDwAAQBAJ?hl=en) by Frank A. Farris.
 
-[VSCode](https://code.visualstudio.com/) + [Volar](https://marketplace.visualstudio.com/items?itemName=Vue.volar) (and disable Vetur) + [TypeScript Vue Plugin (Volar)](https://marketplace.visualstudio.com/items?itemName=Vue.vscode-typescript-vue-plugin).
+Implemented in p5.js using WebGL for rendering.
 
-## Type Support for `.vue` Imports in TS
+This is the second iteration of this website. I redid the site in Vue and TypeScript since the old UI was confusing to use.
 
-TypeScript cannot handle type information for `.vue` imports by default, so we replace the `tsc` CLI with `vue-tsc` for type checking. In editors, we need [TypeScript Vue Plugin (Volar)](https://marketplace.visualstudio.com/items?itemName=Vue.vscode-typescript-vue-plugin) to make the TypeScript language service aware of `.vue` types.
+## Usage
 
-If the standalone TypeScript plugin doesn't feel fast enough to you, Volar has also implemented a [Take Over Mode](https://github.com/johnsoncodehk/volar/discussions/471#discussioncomment-1361669) that is more performant. You can enable it by the following steps:
+Visit https://ptrgags.dev/symmetry-sketchbook/ to explore the website. Instructions are included on each page.
 
-1. Disable the built-in TypeScript Extension
-    1) Run `Extensions: Show Built-in Extensions` from VSCode's command palette
-    2) Find `TypeScript and JavaScript Language Features`, right click and select `Disable (Workspace)`
-2. Reload the VSCode window by running `Developer: Reload Window` from the command palette.
-
-## Customize configuration
-
-See [Vite Configuration Reference](https://vitejs.dev/config/).
 
 ## Project Setup
 
@@ -27,20 +21,36 @@ See [Vite Configuration Reference](https://vitejs.dev/config/).
 npm install
 ```
 
-### Compile and Hot-Reload for Development
+### Run Dev Server
 
 ```sh
 npm run dev
-```
-
-### Type-Check, Compile and Minify for Production
-
-```sh
-npm run build
 ```
 
 ### Lint with [ESLint](https://eslint.org/)
 
 ```sh
 npm run lint
+```
+
+### Compile for Production
+
+```sh
+npm run build
+```
+
+### Release
+
+When ready to release an update to the site, do the following:
+
+```sh
+# Build the static site into the dist/ folder
+npm run build
+
+# Check in changes
+git add dist/
+git commit
+
+# This pushes the dist/ folder to origin/gh-pages as a git subtree.
+npm run deploy
 ```
