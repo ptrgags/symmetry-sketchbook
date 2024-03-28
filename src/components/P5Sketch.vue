@@ -20,9 +20,19 @@ onMounted(() => {
 </template>
 
 <style>
-.vertical canvas {
-  max-width: 80vw;
-  object-fit: contain;
-  background-color: black;
+/** If we can't fit the full image, make it half as big to preserve the aspect ratio */
+@media screen and (max-width: 500px) {
+  .vertical canvas {
+    max-width: 250px;
+    max-height: 350px;
+  }
+}
+
+/** I'd be surprised if there's a phone this narrow, but better safe than sorry */
+@media screen and (max-width: 250px) {
+  .vertical canvas {
+    max-width: 125px;
+    max-height: 175px;
+  }
 }
 </style>

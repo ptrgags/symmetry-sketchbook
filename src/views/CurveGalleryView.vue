@@ -77,12 +77,12 @@ watch(show_arm, (value) => {
 </script>
 
 <template>
+  <h2>Curve Symmetry Gallery</h2>
   <TwoColumns>
     <template #left>
       <P5Sketch :sketch="sketch"></P5Sketch>
     </template>
     <template #right>
-      <h2>Curve Symmetry Gallery</h2>
       <div class="form-row">
         <DropdownSelect :options="PARAMETRIC_CURVES" v-model="selected_preset"
           >Select Preset:
