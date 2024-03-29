@@ -1,4 +1,4 @@
-var y=Object.defineProperty;var w=(e,s,t)=>s in e?y(e,s,{enumerable:!0,configurable:!0,writable:!0,value:t}):e[s]=t;var _=(e,s,t)=>(w(e,typeof s!="symbol"?s+"":s,t),t);import{S as u,T as x,_ as k}from"./Sketch-D1HhKuvk.js";import{S as b,c as o,F as T}from"./common_glsl-CLkdFb3a.js";import{R as I}from"./PolynomialShader-rZ4bNzel.js";import{d as C,r as E,c as $,a as p,b as m,F as A,f as F,g as c,e as n,s as l,h as d,x as R,y as D,_ as N}from"./index-xFizMusB.js";const S=`
+var y=Object.defineProperty;var w=(e,s,t)=>s in e?y(e,s,{enumerable:!0,configurable:!0,writable:!0,value:t}):e[s]=t;var _=(e,s,t)=>(w(e,typeof s!="symbol"?s+"":s,t),t);import{S as u,T as x,_ as k}from"./Sketch-BAjGWOdi.js";import{S as b,c as o,F as T}from"./common_glsl-BTx0Zr80.js";import{R as I}from"./PolynomialShader-BtCNT9O0.js";import{d as C,r as E,c as $,a as p,b as m,F as A,f as F,g as c,e as n,s as l,h as d,x as R,y as D,_ as N}from"./index-ztu_RY0m.js";const S=`
 ${o.defines}
 attribute vec3 aPosition;
 attribute vec2 aTexCoord;
