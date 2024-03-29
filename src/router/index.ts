@@ -1,4 +1,4 @@
-import { createRouter, createWebHistory } from 'vue-router'
+import { createRouter, createWebHashHistory } from 'vue-router'
 import IndexView from '@/views/IndexView.vue'
 import CurveGalleryView from '@/views/CurveGalleryView.vue'
 import CurveMakerView from '@/views/CurveMakerView.vue'
@@ -10,7 +10,7 @@ import WallpaperGalleryView from '@/views/WallpaperGalleryView.vue'
 import WallpaperMakerView from '@/views/WallpaperMakerView.vue'
 
 const router = createRouter({
-  history: createWebHistory(import.meta.env.BASE_URL),
+  history: createWebHashHistory(import.meta.env.BASE_URL),
   routes: [
     {
       path: '/',
