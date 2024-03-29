@@ -14,7 +14,7 @@ import {
 } from '@/sketches/CoefficientPickerSketch'
 import { PolynomialSketch, type PolynomialPattern } from '@/sketches/PolynomialSketch'
 import { TermGridSketch, type TermGridState } from '@/sketches/TermGridSketch'
-import { ref, computed, watch } from 'vue'
+import { ref, computed, watch, onMounted } from 'vue'
 import PolynomialSymmetryEditor from '@/components/PolynomialSymmetryEditor.vue'
 import PolynomialPaletteEditor from '@/components/PolynomialPaletteEditor.vue'
 import { default_palette, type PolynomialPalette } from '@/core/point_symmetry/PolynomialPalette'
@@ -52,9 +52,11 @@ const viewer_path = computed<string>(() => {
 
 const symmetry = ref(new PolynomialSymmetry(GRID_SIZE, [IDENTITY]))
 
-const palette = defineModel<PolynomialPalette>('palette', {
-  default: default_palette
-})
+const palette = ref<PolynomialPalette>(default_palette())
+const initial_pattern: PolynomialPattern = {
+  series: FourierSeries2D.from_tuples([[1, 0, 1, 0]]),
+  rotation_order: 4
+}
 
 const ref_geom = defineModel<ReferenceGeometryCollection>('ref_geom', {
   default: default_ref_geom
@@ -67,10 +69,7 @@ const palette_base64 = ref<string>()
 
 const viewer = new PolynomialSketch({
   symmetry_mode: props.symmetryMode,
-  pattern: {
-    series: FourierSeries2D.from_tuples([[1, 0, 1, 0]]),
-    rotation_order: 4
-  },
+  pattern: initial_pattern,
   palette: palette.value,
   ref_geom: ref_geom.value
 })
@@ -98,6 +97,15 @@ term_grid.events.addEventListener('term-selected', (e) => {
   const z = (e as CustomEvent).detail as ComplexPolar
   coefficient_picker_state.coefficient = z.to_rect()
 })
+
+function update_pattern_link(pattern: PolynomialPattern) {
+  // Also update the link to the viewer
+  to_compressed_json(pattern, PATTERN_SERIALIZER)
+    .then((x) => {
+      pattern_base64.value = x
+    })
+    .catch(console.error)
+}
 
 function update_viewer() {
   const coefficients = term_grid_state.coefficients
@@ -130,12 +138,7 @@ function update_viewer() {
   }
   viewer.pattern = pattern
 
-  // Also update the link to the viewer
-  to_compressed_json(pattern, PATTERN_SERIALIZER)
-    .then((x) => {
-      pattern_base64.value = x
-    })
-    .catch(console.error)
+  update_pattern_link(pattern)
 }
 
 function update_coefficient(e: Event) {
@@ -172,16 +175,19 @@ function change_symmetry(rules: PolynomialSymmetryRule[]) {
   update_viewer()
 }
 
+function update_palette_link(value: PolynomialPalette) {
+  to_compressed_json(value, PALETTE_SERIALIZER)
+    .then((x) => {
+      palette_base64.value = x
+    })
+    .catch(console.error)
+}
+
 watch(
   palette,
   (value) => {
     viewer.palette = value
-
-    to_compressed_json(value, PALETTE_SERIALIZER)
-      .then((x) => {
-        palette_base64.value = x
-      })
-      .catch(console.error)
+    update_palette_link(value)
   },
   { deep: true }
 )
@@ -193,6 +199,11 @@ watch(
   },
   { deep: true }
 )
+
+onMounted(() => {
+  update_pattern_link(initial_pattern)
+  update_palette_link(palette.value)
+})
 </script>
 
 <template>

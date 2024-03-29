@@ -9,7 +9,7 @@ import { FourierSeries2D, type FourierTerm2D } from '@/core/FourierSeries2D'
 import { TermGridSketch, type TermGridState } from '@/sketches/TermGridSketch'
 import { WallpaperSketch, type WallpaperPattern } from '@/sketches/WallpaperSketch'
 import { WallpaperSymmetry } from '@/core/wallpaper_symmetry/WallpaperSymmetry'
-import { computed, ref, watch } from 'vue'
+import { computed, onMounted, ref, watch } from 'vue'
 import {
   CoefficientPickerSketch,
   type CoefficientPickerState
@@ -62,7 +62,7 @@ const show_palette = defineModel<boolean>('enable_palette', { default: false })
 
 const symmetry = ref(new WallpaperSymmetry(GRID_SIZE, group.value))
 
-const palette = defineModel<WallpaperPalette>('palette', { default: DEFAULT_PALETTE })
+const palette = ref<WallpaperPalette>(DEFAULT_PALETTE)
 
 const ref_geom = defineModel<ReferenceGeometryCollection>('ref_geom', {
   default: default_ref_geom
@@ -73,14 +73,16 @@ const palette_base64 = ref<string>()
 
 // P5.js sketches ----------------------------
 
+const initial_pattern: WallpaperPattern = {
+  series: FourierSeries2D.from_tuples([
+    [1, 0, 1, 0],
+    [0, 1, 1, 0]
+  ]),
+  group: symmetry_group.value
+}
+
 const viewer = new WallpaperSketch({
-  pattern: {
-    series: FourierSeries2D.from_tuples([
-      [1, 0, 1, 0],
-      [0, 1, 1, 0]
-    ]),
-    group: symmetry_group.value
-  },
+  pattern: initial_pattern,
   palette: palette.value
 })
 
@@ -107,6 +109,15 @@ term_grid.events.addEventListener('term-selected', (e) => {
   coefficient_picker_state.coefficient = z.to_rect()
 })
 
+function update_pattern_link(pattern: WallpaperPattern) {
+  // Also update the link to the viewer
+  to_compressed_json(pattern, PATTERN_SERIALIZER)
+    .then((x) => {
+      pattern_base64.value = x
+    })
+    .catch(console.error)
+}
+
 function update_viewer() {
   const coefficients = term_grid_state.coefficients
   const terms: FourierTerm2D[] = []
@@ -132,13 +143,7 @@ function update_viewer() {
     group: group.value
   }
   viewer.pattern = pattern
-
-  // Also update the link to the viewer
-  to_compressed_json(pattern, PATTERN_SERIALIZER)
-    .then((x) => {
-      pattern_base64.value = x
-    })
-    .catch(console.error)
+  update_pattern_link(pattern)
 }
 
 function update_coefficient(e: Event) {
@@ -159,16 +164,19 @@ watch(show_palette, (show) => {
   viewer.show_palette = show
 })
 
+function update_palette_link(value: WallpaperPalette) {
+  to_compressed_json(value, PALETTE_SERIALIZER)
+    .then((x) => {
+      palette_base64.value = x
+    })
+    .catch(console.error)
+}
+
 watch(
   palette,
   (value) => {
     viewer.palette = value
-
-    to_compressed_json(value, PALETTE_SERIALIZER)
-      .then((x) => {
-        palette_base64.value = x
-      })
-      .catch(console.error)
+    update_palette_link
   },
   { deep: true }
 )
@@ -192,6 +200,11 @@ watch(
   },
   { deep: true }
 )
+
+onMounted(() => {
+  update_pattern_link(initial_pattern)
+  update_palette_link(palette.value)
+})
 </script>
 
 <template>

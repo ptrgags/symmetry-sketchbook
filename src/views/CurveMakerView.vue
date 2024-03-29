@@ -4,7 +4,7 @@ import P5Sketch from '@/components/P5Sketch.vue'
 import TabLayout from '@/components/TabLayout.vue'
 import TabContent from '@/components/TabContent.vue'
 
-import { ref, computed, type ComputedRef } from 'vue'
+import { ref, computed, type ComputedRef, onMounted } from 'vue'
 import { CurveSymmetryType, SYMMETRY_TYPES } from '@/core/curve_symmetry/CurveSymmetryType'
 import { ParametricCurveSketch, type ParametricCurveState } from '@/sketches/ParametricCurveSketch'
 import { FourierSeries, type FourierTerm } from '@/core/curve_symmetry/FourierSeries'
@@ -36,9 +36,11 @@ const frequency_map: ComputedRef<(indices: GridIndices2D) => number> = computed(
 
 const pattern_base64 = ref<string>()
 
+const initial_pattern: FourierSeries = FourierSeries.from_tuples([[1, 1, 0]])
+
 // p5.js sketches --------------------------------
 const viewer_state: ParametricCurveState = {
-  pattern: FourierSeries.from_tuples([[1, 1, 0]]),
+  pattern: initial_pattern,
   show_arm: false
 }
 const viewer = new ParametricCurveSketch(viewer_state)
@@ -67,6 +69,14 @@ term_grid.events.addEventListener('term-selected', (e) => {
   picker_state.coefficient = z.to_rect()
 })
 
+function update_pattern_link(pattern: FourierSeries) {
+  to_compressed_json(pattern, new FourierSeriesSerializer())
+    .then((x) => {
+      pattern_base64.value = x
+    })
+    .catch(console.error)
+}
+
 function update_viewer() {
   const coefficients = term_grid_state.coefficients
 
@@ -91,11 +101,7 @@ function update_viewer() {
   viewer.recompute_curve()
 
   // Also update the link to the viewer
-  to_compressed_json(pattern, new FourierSeriesSerializer())
-    .then((x) => {
-      pattern_base64.value = x
-    })
-    .catch(console.error)
+  update_pattern_link(pattern)
 }
 
 function coefficient_changed(e: Event) {
@@ -129,6 +135,10 @@ function get_label(symmetry: CurveSymmetryType) {
 
   return `${symmetry.folds}-fold symmetry of type ${symmetry.order}`
 }
+
+onMounted(() => {
+  update_pattern_link(initial_pattern)
+})
 </script>
 
 <template>
@@ -264,7 +274,7 @@ function get_label(symmetry: CurveSymmetryType) {
         <TabContent title="Export">
           <div v-if="pattern_base64" class="form-row">
             <RouterLink
-              :to="{ path: '/curve_symmetry', query: { pattern: pattern_base64 } }"
+              :to="{ path: '/curve_symmetry', query: { custom_pattern: pattern_base64 } }"
               target="_blank"
               class="center"
               >Link to curve</RouterLink
