@@ -1,0 +1,1 @@
+.other-sketch canvas{max-width:80vw;object-fit:contain}@media screen and (max-width: 500px){.card canvas{max-width:250px;max-height:350px}}@media screen and (max-width: 250px){.card canvas{max-width:125px;max-height:175px}}.column{width:40%;margin:0 auto}@media screen and (max-width: 1000px){.column{width:100%}}
