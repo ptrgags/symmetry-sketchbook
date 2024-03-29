@@ -1,13 +1,5 @@
 import { createRouter, createWebHashHistory } from 'vue-router'
 import IndexView from '@/views/IndexView.vue'
-import CurveGalleryView from '@/views/CurveGalleryView.vue'
-import CurveMakerView from '@/views/CurveMakerView.vue'
-import OrbitalMotionView from '@/views/OrbitalMotionView.vue'
-import PolynomialGalleryView from '@/views/PolynomialGalleryView.vue'
-import PolynomialMakerView from '@/views/PolynomialMakerView.vue'
-import TieDyeAnalogyView from '@/views/TieDyeAnalogyView.vue'
-import WallpaperGalleryView from '@/views/WallpaperGalleryView.vue'
-import WallpaperMakerView from '@/views/WallpaperMakerView.vue'
 
 const router = createRouter({
   history: createWebHashHistory(import.meta.env.BASE_URL),
@@ -18,55 +10,55 @@ const router = createRouter({
     },
     {
       path: '/curve_symmetry',
-      component: CurveGalleryView
+      component: () => import('@/views/CurveGalleryView.vue')
     },
     {
       path: '/curve_symmetry/curve_maker',
-      component: CurveMakerView
+      component: () => import('@/views/CurveMakerView.vue')
     },
     {
       path: '/curve_symmetry/orbital_motion',
-      component: OrbitalMotionView
+      component: () => import('@/views/OrbitalMotionView.vue')
     },
     {
       path: '/point_symmetry',
-      component: PolynomialGalleryView,
+      component: () => import('@/views/PolynomialGalleryView.vue'),
       props: {
         symmetryMode: 'rosette'
       }
     },
     {
       path: '/point_symmetry/tie_dye_analogy',
-      component: TieDyeAnalogyView
+      component: () => import('@/views/TieDyeAnalogyView.vue')
     },
     {
       path: '/point_symmetry/rosette_maker',
-      component: PolynomialMakerView,
+      component: () => import('@/views/PolynomialMakerView.vue'),
       props: {
         symmetryMode: 'rosette'
       }
     },
     {
       path: '/frieze_symmetry',
-      component: PolynomialGalleryView,
+      component: () => import('@/views/PolynomialGalleryView.vue'),
       props: {
         symmetryMode: 'frieze'
       }
     },
     {
       path: '/frieze_symmetry/frieze_maker',
-      component: PolynomialMakerView,
+      component: () => import('@/views/PolynomialMakerView.vue'),
       props: {
         symmetryMode: 'frieze'
       }
     },
     {
       path: '/wallpaper_symmetry',
-      component: WallpaperGalleryView
+      component: () => import('@/views/WallpaperGalleryView.vue')
     },
     {
       path: '/wallpaper_symmetry/wallpaper_maker',
-      component: WallpaperMakerView
+      component: () => import('@/views/WallpaperMakerView.vue')
     }
   ]
 })

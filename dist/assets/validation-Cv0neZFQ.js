@@ -1,0 +1,1 @@
+function t(r,e){return typeof r=="number"?!0:(console.error(`${e??"value"} must be a number`),!1)}function n(r,e){return typeof r=="string"?!0:(console.error(`${e??"value"} must be a string`),!1)}function s(r,e){return typeof r=="string"&&/#[0-9A-Fa-f]{6}/.test(r)?!0:(console.error(`${e??"value"} must be a hex string #RRGGBB`),!1)}export{s as a,n as b,t as i};
