@@ -219,6 +219,11 @@ onMounted(() => {
             :symmetry-mode="props.symmetryMode"
             @update:model-value="change_symmetry"
           />
+          <p>
+            <strong>Note:</strong> changing the symmetry type will reset the pattern! This is
+            because the mathematical constraints are often different from one symmetry type to the
+            next. A new pattern can be created in the Pattern tab.
+          </p>
           <details class="form-row">
             <summary>Math Details</summary>
             <p>
