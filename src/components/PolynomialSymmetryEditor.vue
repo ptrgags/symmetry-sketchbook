@@ -144,52 +144,50 @@ watch(
 </script>
 
 <template>
-  <div>
-    <div class="form-row">
-      <label for="rotation-folds">Rotation folds (1 = no rotation) </label>
-      <input
-        id="rotation-folds"
-        type="number"
-        min="1"
-        max="12"
-        step="1"
-        v-model.number="rotation_folds"
-      />
-    </div>
-    <div class="form-row">
-      <label for="symmetry-group">Symmetry Type: </label>
-      <select v-if="rotation_folds === 1" id="symmetry-group" v-model="no_rotation_group">
-        <option v-for="option in NO_ROTATION_OPTIONS" :key="option.id" :value="option">
-          {{ option.label[$props.symmetryMode] }}
-        </option>
-      </select>
-      <select v-else id="symmetry-group" v-model="rotation_group">
-        <option v-for="option in ROTATION_OPTIONS" :key="option.id" :value="option">
-          {{ option.label[$props.symmetryMode] }}
-        </option>
-      </select>
-    </div>
-    <div v-if="symmetry_group" class="form-row">
-      <label for="color-turning-enabled">Color Turning Symmetry? </label>
-      <input id="color-turning-enabled" type="checkbox" @change="toggle_color_turning" />
-    </div>
-    <ColorTurnEditor
-      v-if="color_turning_enabled && symmetry_group"
-      :constraint="symmetry_group.first_constraint"
-      :rotation-folds="rotation_folds"
-      v-model="first_color_turn"
-    ></ColorTurnEditor>
-    <ColorTurnEditor
-      v-if="color_turning_enabled && symmetry_group?.second_constraint"
-      :constraint="symmetry_group.second_constraint"
-      :rotation-folds="rotation_folds"
-      v-model="second_color_turn"
-    ></ColorTurnEditor>
-    <ColorTurnEditor
-      v-if="color_turning_enabled && symmetry_group?.third_constraint"
-      :constraint="symmetry_group.third_constraint"
-      :rotation-folds="rotation_folds"
-      v-model="third_color_turn"
-    ></ColorTurnEditor>
+  <div class="form-row">
+    <label for="rotation-folds">Rotation folds (1 = no rotation) </label>
+    <input
+      id="rotation-folds"
+      type="number"
+      min="1"
+      max="12"
+      step="1"
+      v-model.number="rotation_folds"
+    />
   </div>
+  <div class="form-row">
+    <label for="symmetry-group">Symmetry Type: </label>
+    <select v-if="rotation_folds === 1" id="symmetry-group" v-model="no_rotation_group">
+      <option v-for="option in NO_ROTATION_OPTIONS" :key="option.id" :value="option">
+        {{ option.label[$props.symmetryMode] }}
+      </option>
+    </select>
+    <select v-else id="symmetry-group" v-model="rotation_group">
+      <option v-for="option in ROTATION_OPTIONS" :key="option.id" :value="option">
+        {{ option.label[$props.symmetryMode] }}
+      </option>
+    </select>
+  </div>
+  <div v-if="symmetry_group" class="form-row">
+    <label for="color-turning-enabled">Color Turning Symmetry? </label>
+    <input id="color-turning-enabled" type="checkbox" @change="toggle_color_turning" />
+  </div>
+  <ColorTurnEditor
+    v-if="color_turning_enabled && symmetry_group"
+    :constraint="symmetry_group.first_constraint"
+    :rotation-folds="rotation_folds"
+    v-model="first_color_turn"
+  ></ColorTurnEditor>
+  <ColorTurnEditor
+    v-if="color_turning_enabled && symmetry_group?.second_constraint"
+    :constraint="symmetry_group.second_constraint"
+    :rotation-folds="rotation_folds"
+    v-model="second_color_turn"
+  ></ColorTurnEditor>
+  <ColorTurnEditor
+    v-if="color_turning_enabled && symmetry_group?.third_constraint"
+    :constraint="symmetry_group.third_constraint"
+    :rotation-folds="rotation_folds"
+    v-model="third_color_turn"
+  ></ColorTurnEditor>
 </template>

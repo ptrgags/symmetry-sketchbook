@@ -85,7 +85,7 @@ export class TieDyeShader extends SymmetryShader {
   grid_model?: p5.Geometry
 
   preload(sketch: p5) {
-    this.grid_model = sketch.loadModel('../grid.obj')
+    this.grid_model = sketch.loadModel('/symmetry-sketchbook/grid.obj')
   }
 
   init(sketch: p5) {

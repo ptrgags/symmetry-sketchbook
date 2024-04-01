@@ -176,7 +176,7 @@ watch(
   palette,
   (value) => {
     viewer.palette = value
-    update_palette_link
+    update_palette_link(value)
   },
   { deep: true }
 )
@@ -241,6 +241,11 @@ onMounted(() => {
               </option>
             </select>
           </div>
+          <p>
+            <strong>Note:</strong> changing the symmetry type will reset the pattern! This is
+            because the mathematical constraints are often different from one symmetry type to the
+            next. A new pattern can be created in the Pattern tab.
+          </p>
           <details>
             <summary>Math Details</summary>
             <p>

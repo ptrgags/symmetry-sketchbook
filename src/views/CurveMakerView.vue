@@ -165,7 +165,7 @@ onMounted(() => {
           <p>
             <strong>Note:</strong> changing the symmetry type will reset the pattern! This is
             because the mathematical constraints are often different from one symmetry type to the
-            next.
+            next. A new pattern can be created in the Pattern tab.
           </p>
           <details>
             <summary>Math Details</summary>
