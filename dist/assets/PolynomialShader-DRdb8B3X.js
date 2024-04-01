@@ -1,4 +1,4 @@
-var s=Object.defineProperty;var n=(e,r,o)=>r in e?s(e,r,{enumerable:!0,configurable:!0,writable:!0,value:o}):e[r]=o;var l=(e,r,o)=>(n(e,typeof r!="symbol"?r+"":r,o),o);import"./Sketch-BAjGWOdi.js";import{S as _,c as t}from"./common_glsl-BTx0Zr80.js";const m=`
+var s=Object.defineProperty;var n=(e,r,o)=>r in e?s(e,r,{enumerable:!0,configurable:!0,writable:!0,value:o}):e[r]=o;var l=(e,r,o)=>(n(e,typeof r!="symbol"?r+"":r,o),o);import"./Sketch-v-RCqe1c.js";import{S as _,c as t}from"./common_glsl-CF-Ah18z.js";const m=`
 attribute vec3 aPosition;
 attribute vec2 aTexCoord;
 
